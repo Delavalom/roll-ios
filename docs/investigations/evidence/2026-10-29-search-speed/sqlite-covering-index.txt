@@ -1,0 +1,19 @@
+# sqlite3 CLI on the Mac, on a copy of the proof database (29,685 asset rows, ~3 KB feature print per row,
+# 4 KB pages, ~120 MB). Query: the rankingRows() column list, summed so every column is read; no identifiers.
+# Order: DROP (no-op), 3 table scans (the first one cold), CREATE INDEX (0.055 s), plan, 3 scans with the index, DROP.
+# Script: CREATE INDEX bench_ranking ON asset(deleted, id, mediaType, subtypes, estBytes, blur, aesthetic,
+#         isUtility, sensitive, previewSide, embedded)
+Run Time: real 0.002 user 0.000120 sys 0.001346
+without covering index (table scan), 3 runs
+Run Time: real 0.280 user 0.016817 sys 0.038664
+Run Time: real 0.031 user 0.014701 sys 0.016827
+Run Time: real 0.032 user 0.014853 sys 0.016905
+Run Time: real 0.055 user 0.030747 sys 0.018877
+with covering index, 3 runs
+QUERY PLAN
+`--SEARCH asset USING COVERING INDEX bench_ranking (deleted=?)
+Run Time: real 0.000 user 0.000030 sys 0.000000
+Run Time: real 0.007 user 0.006876 sys 0.000022
+Run Time: real 0.007 user 0.006841 sys 0.000012
+Run Time: real 0.007 user 0.006821 sys 0.000025
+Run Time: real 0.000 user 0.000173 sys 0.000035

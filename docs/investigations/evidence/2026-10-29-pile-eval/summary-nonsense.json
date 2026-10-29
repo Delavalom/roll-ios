@@ -1,0 +1,102 @@
+[
+  {
+    "empty" : 0,
+    "fold" : [
+      {
+        "meanStrong" : 29681,
+        "ratio" : 0.4
+      },
+      {
+        "meanStrong" : 29681,
+        "ratio" : 0.5
+      },
+      {
+        "meanStrong" : 29681,
+        "ratio" : 0.6
+      }
+    ],
+    "gate" : "cos>=0.2",
+    "medianPassing" : 29681,
+    "queries" : 12
+  },
+  {
+    "empty" : 0,
+    "fold" : [
+      {
+        "meanStrong" : 1251.5,
+        "ratio" : 0.4
+      },
+      {
+        "meanStrong" : 521.1667,
+        "ratio" : 0.5
+      },
+      {
+        "meanStrong" : 187.0833,
+        "ratio" : 0.6
+      }
+    ],
+    "gate" : "z>=1.5",
+    "medianPassing" : 2062,
+    "queries" : 12
+  },
+  {
+    "empty" : 0,
+    "fold" : [
+      {
+        "meanStrong" : 737.3333,
+        "ratio" : 0.4
+      },
+      {
+        "meanStrong" : 477.0833,
+        "ratio" : 0.5
+      },
+      {
+        "meanStrong" : 187.0833,
+        "ratio" : 0.6
+      }
+    ],
+    "gate" : "z>=2.0",
+    "medianPassing" : 738,
+    "queries" : 12
+  },
+  {
+    "empty" : 0,
+    "fold" : [
+      {
+        "meanStrong" : 234.3333,
+        "ratio" : 0.4
+      },
+      {
+        "meanStrong" : 225.75,
+        "ratio" : 0.5
+      },
+      {
+        "meanStrong" : 145.5,
+        "ratio" : 0.6
+      }
+    ],
+    "gate" : "z>=2.5",
+    "medianPassing" : 203.5,
+    "queries" : 12
+  },
+  {
+    "empty" : 0,
+    "fold" : [
+      {
+        "meanStrong" : 60.5,
+        "ratio" : 0.4
+      },
+      {
+        "meanStrong" : 60.5,
+        "ratio" : 0.5
+      },
+      {
+        "meanStrong" : 58.3333,
+        "ratio" : 0.6
+      }
+    ],
+    "gate" : "z>=3.0",
+    "medianPassing" : 47.5,
+    "queries" : 12
+  }
+]

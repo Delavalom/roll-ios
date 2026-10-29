@@ -1,0 +1,136 @@
+{
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 31,
+    "document" : 61,
+    "livePhoto" : 300,
+    "panorama" : 0,
+    "portrait" : 0,
+    "screenRecording" : 1,
+    "screenshot" : 80,
+    "sensitive" : 0,
+    "textHeavy" : 133,
+    "video" : 275
+  },
+  "cosMean" : 0.625,
+  "cosSD" : 0.032,
+  "cosTop" : 0.7781,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "threshold" : 0.2
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 1664,
+          "ratio" : 0.4,
+          "strong" : 2099
+        },
+        {
+          "folded" : 2760,
+          "ratio" : 0.5,
+          "strong" : 1003
+        },
+        {
+          "folded" : 3399,
+          "ratio" : 0.6,
+          "strong" : 364
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 3763,
+      "threshold" : 1.5
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 1800
+        },
+        {
+          "folded" : 797,
+          "ratio" : 0.5,
+          "strong" : 1003
+        },
+        {
+          "folded" : 1436,
+          "ratio" : 0.6,
+          "strong" : 364
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 1800,
+      "threshold" : 2
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 784
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 784
+        },
+        {
+          "folded" : 420,
+          "ratio" : 0.6,
+          "strong" : 364
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 784,
+      "threshold" : 2.5
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 246
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 246
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.6,
+          "strong" : 246
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 246,
+      "threshold" : 3
+    }
+  ],
+  "name" : "pile.private",
+  "positives" : 0,
+  "prompts" : 3,
+  "rule" : "sensitive",
+  "zTop" : 4.7491
+}

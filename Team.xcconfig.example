@@ -1,0 +1,5 @@
+// Copy to Team.xcconfig (gitignored) and fill in.
+DEVELOPMENT_TEAM = XXXXXXXXXX
+RC_PUBLIC_KEY =
+// RevenueCat Test Store public key (DEBUG builds launched with -RCTestStore only; Release forces it empty).
+RC_TEST_STORE_KEY =

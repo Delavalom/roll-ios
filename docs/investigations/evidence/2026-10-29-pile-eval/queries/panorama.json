@@ -1,0 +1,214 @@
+{
+  "cappedRecallAt200" : 0,
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 23,
+    "document" : 34,
+    "livePhoto" : 40,
+    "panorama" : 0,
+    "portrait" : 0,
+    "screenRecording" : 0,
+    "screenshot" : 23,
+    "sensitive" : 0,
+    "textHeavy" : 54,
+    "video" : 271
+  },
+  "cosMean" : 0.6081,
+  "cosSD" : 0.03,
+  "cosTop" : 0.77,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681,
+          "strongPrecision" : 0.0005,
+          "strongTrue" : 16
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681,
+          "strongPrecision" : 0.0005,
+          "strongTrue" : 16
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681,
+          "strongPrecision" : 0.0005,
+          "strongTrue" : 16
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "precision" : 0.0005,
+      "recall" : 1,
+      "threshold" : 0.2,
+      "truePassing" : 16
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 1277,
+          "foldedPrecision" : 0.0023,
+          "foldedTrue" : 3,
+          "foldedTrueShare" : 1,
+          "ratio" : 0.4,
+          "strong" : 735,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        },
+        {
+          "folded" : 1684,
+          "foldedPrecision" : 0.0018,
+          "foldedTrue" : 3,
+          "foldedTrueShare" : 1,
+          "ratio" : 0.5,
+          "strong" : 328,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        },
+        {
+          "folded" : 1865,
+          "foldedPrecision" : 0.0016,
+          "foldedTrue" : 3,
+          "foldedTrueShare" : 1,
+          "ratio" : 0.6,
+          "strong" : 147,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 2012,
+      "precision" : 0.0015,
+      "recall" : 0.1875,
+      "threshold" : 1.5,
+      "truePassing" : 3
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 191,
+          "foldedPrecision" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.4,
+          "strong" : 735,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        },
+        {
+          "folded" : 598,
+          "foldedPrecision" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.5,
+          "strong" : 328,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        },
+        {
+          "folded" : 779,
+          "foldedPrecision" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.6,
+          "strong" : 147,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 926,
+      "precision" : 0,
+      "recall" : 0,
+      "threshold" : 2,
+      "truePassing" : 0
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.4,
+          "strong" : 443,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        },
+        {
+          "folded" : 115,
+          "foldedPrecision" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.5,
+          "strong" : 328,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        },
+        {
+          "folded" : 296,
+          "foldedPrecision" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.6,
+          "strong" : 147,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 443,
+      "precision" : 0,
+      "recall" : 0,
+      "threshold" : 2.5,
+      "truePassing" : 0
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.4,
+          "strong" : 203,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.5,
+          "strong" : 203,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        },
+        {
+          "folded" : 56,
+          "foldedPrecision" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.6,
+          "strong" : 147,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 203,
+      "precision" : 0,
+      "recall" : 0,
+      "threshold" : 3,
+      "truePassing" : 0
+    }
+  ],
+  "name" : "panorama",
+  "positives" : 16,
+  "precisionAt20" : 0,
+  "prompts" : 1,
+  "recallAt200" : 0,
+  "rule" : "panorama",
+  "zTop" : 5.3907
+}

@@ -1,0 +1,86 @@
+{"cores": 6, "event": "session", "lowPowerMode": false, "machine": "iPhone14,3", "mode": "read-only", "model": "iPhone", "osVersion": "27.0.1", "photosAccess": "3", "physicalMemory": 5913821184, "system": "iOS", "t": 1793279427.648216, "up": 0.2}
+{"event": "model", "state": "loading", "t": 1793279427.6787128, "up": 0.3}
+{"all": 29685, "audio": 0, "cinematic": 0, "event": "library_totals", "favorites": 380, "hdrPhotos": 69, "hidden": 0, "images": 24495, "livePhotos": 2169, "panoramas": 16, "portrait": 19, "screenRecordings": 30, "screenshots": 2532, "slomo": 9, "t": 1793279439.537856, "timelapse": 1, "up": 12.1, "userAlbums": 24, "videos": 5190}
+{"event": "model", "state": "preparing 0/9", "t": 1793279442.660654, "up": 15.3}
+{"event": "model", "state": "preparing 1/9", "t": 1793279500.631011, "up": 73.2}
+{"event": "index_run", "state": "started", "t": 1793279526.040549, "total": 0, "up": 98.6}
+{"event": "index_run", "processed": 0, "state": "thermalPause", "t": 1793279526.201607, "up": 98.8}
+{"event": "model", "state": "preparing 2/9", "t": 1793279560.365998, "up": 133}
+{"event": "model", "state": "preparing 3/9", "t": 1793279616.354732, "up": 189}
+{"event": "model", "state": "preparing 4/9", "t": 1793279674.3663568, "up": 247}
+{"event": "model", "state": "preparing 5/9", "t": 1793279803.029763, "up": 375.6}
+{"event": "model", "state": "preparing 6/9", "t": 1793279931.778877, "up": 504.4}
+{"event": "index_run", "failed": 0, "full": 385, "inCloud": 0, "itemsPerSecond": 0.8677765667693451, "previews": 115, "processed": 500, "seconds": 576.185183084, "state": "finished", "t": 1793280102.2371778, "thumbs": 500, "total": 500, "up": 674.8}
+{"event": "model", "state": "preparing 7/9", "t": 1793280215.263033, "up": 787.8}
+{"event": "model", "state": "preparing 8/9", "t": 1793280345.20499, "up": 917.8}
+{"event": "index_run", "state": "started", "t": 1793280470.191877, "total": 0, "up": 1042.8}
+{"event": "index_run", "processed": 0, "state": "thermalPause", "t": 1793280470.910331, "up": 1043.5}
+{"event": "model", "state": "ready", "t": 1793280471.898967, "up": 1044.5}
+{"event": "index_run", "processed": 639, "state": "thermalPause", "t": 1793280698.611254, "up": 1271.2}
+{"event": "index_run", "processed": 1251, "state": "thermalPause", "t": 1793280798.6439981, "up": 1371.2}
+{"event": "index_run", "processed": 2041, "state": "thermalPause", "t": 1793280923.641933, "up": 1496.2}
+{"event": "index_run", "processed": 2741, "state": "thermalPause", "t": 1793281038.650883, "up": 1611.2}
+{"event": "index_run", "processed": 3523, "state": "thermalPause", "t": 1793281148.64475, "up": 1721.2}
+{"event": "index_run", "processed": 4226, "state": "thermalPause", "t": 1793281248.621893, "up": 1821.2}
+{"event": "index_run", "processed": 4914, "state": "thermalPause", "t": 1793281338.686554, "up": 1911.2}
+{"event": "index_run", "processed": 5583, "state": "thermalPause", "t": 1793281428.633867, "up": 2001.2}
+{"event": "index_run", "processed": 6194, "state": "thermalPause", "t": 1793281508.634344, "up": 2081.2}
+{"event": "index_run", "processed": 6787, "state": "thermalPause", "t": 1793281588.666551, "up": 2161.2}
+{"event": "index_run", "processed": 7374, "state": "thermalPause", "t": 1793281668.683677, "up": 2241.2}
+{"event": "index_run", "processed": 8037, "state": "thermalPause", "t": 1793281763.667375, "up": 2336.2}
+{"event": "index_run", "processed": 8703, "state": "thermalPause", "t": 1793281853.652072, "up": 2426.2}
+{"event": "index_run", "processed": 9316, "state": "thermalPause", "t": 1793281938.685672, "up": 2511.2}
+{"event": "index_run", "processed": 9920, "state": "thermalPause", "t": 1793282023.6759539, "up": 2596.2}
+{"event": "index_run", "processed": 10523, "state": "thermalPause", "t": 1793282108.718709, "up": 2681.2}
+{"event": "index_run", "processed": 11050, "state": "thermalPause", "t": 1793282188.723618, "up": 2761.2}
+{"event": "index_run", "processed": 11664, "state": "thermalPause", "t": 1793282278.736115, "up": 2851.2}
+{"event": "index_run", "processed": 12349, "state": "thermalPause", "t": 1793282378.7500172, "up": 2951.2}
+{"event": "index_run", "processed": 12871, "state": "thermalPause", "t": 1793282483.720223, "up": 3056.2}
+{"event": "index_run", "processed": 13567, "state": "thermalPause", "t": 1793282608.7344232, "up": 3181.2}
+{"event": "index_run", "processed": 14339, "state": "thermalPause", "t": 1793282708.727063, "up": 3281.2}
+{"event": "index_run", "processed": 15024, "state": "thermalPause", "t": 1793282798.73946, "up": 3371.2}
+{"event": "index_run", "processed": 15693, "state": "thermalPause", "t": 1793282883.7124062, "up": 3456.2}
+{"event": "index_run", "processed": 16365, "state": "thermalPause", "t": 1793282968.7260919, "up": 3541.2}
+{"event": "index_run", "processed": 17050, "state": "thermalPause", "t": 1793283058.716416, "up": 3631.2}
+{"event": "index_run", "processed": 17734, "state": "thermalPause", "t": 1793283143.738606, "up": 3716.2}
+{"event": "index_run", "processed": 18407, "state": "thermalPause", "t": 1793283228.769631, "up": 3801.2}
+{"event": "index_run", "processed": 18928, "state": "thermalPause", "t": 1793283313.760782, "up": 3886.2}
+{"event": "index_run", "processed": 19556, "state": "thermalPause", "t": 1793283408.748407, "up": 3981.2}
+{"event": "index_run", "processed": 20171, "state": "thermalPause", "t": 1793283508.759581, "up": 4081.2}
+{"event": "index_run", "processed": 20796, "state": "thermalPause", "t": 1793283598.771822, "up": 4171.2}
+{"event": "index_run", "processed": 21499, "state": "thermalPause", "t": 1793283703.760104, "up": 4276.2}
+{"event": "index_run", "processed": 22182, "state": "thermalPause", "t": 1793283803.762278, "up": 4376.2}
+{"event": "index_run", "processed": 22868, "state": "thermalPause", "t": 1793283923.7787871, "up": 4496.2}
+{"event": "index_run", "processed": 23481, "state": "thermalPause", "t": 1793284018.809391, "up": 4591.2}
+{"event": "index_run", "processed": 24113, "state": "thermalPause", "t": 1793284108.836889, "up": 4681.2}
+{"event": "index_run", "processed": 24830, "state": "thermalPause", "t": 1793284208.803123, "up": 4781.2}
+{"event": "index_run", "processed": 25522, "state": "thermalPause", "t": 1793284323.8467832, "up": 4896.2}
+{"event": "index_run", "processed": 26136, "state": "thermalPause", "t": 1793284428.81369, "up": 5001.2}
+{"event": "index_run", "processed": 26829, "state": "thermalPause", "t": 1793284528.78894, "up": 5101.2}
+{"event": "index_run", "processed": 27525, "state": "thermalPause", "t": 1793284633.855547, "up": 5206.2}
+{"event": "index_run", "processed": 28224, "state": "thermalPause", "t": 1793284738.818917, "up": 5311.2}
+{"event": "index_run", "processed": 28924, "state": "thermalPause", "t": 1793284848.821578, "up": 5421.2}
+{"event": "index_run", "processed": 29611, "state": "thermalPause", "t": 1793284948.827005, "up": 5521.2}
+{"event": "index_run", "failed": 0, "full": 24498, "inCloud": 4, "itemsPerSecond": 0, "previews": 5183, "processed": 0, "seconds": 4549.870116083, "state": "finished", "t": 1793285020.29458, "thumbs": 29685, "total": 29685, "up": 5592.6}
+{"event": "index_run", "state": "started", "t": 1793285063.1768842, "total": 0, "up": 5635.5}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.053132333, "state": "finished", "t": 1793285063.230021, "thumbs": 0, "total": 0, "up": 5635.6}
+{"event": "index_run", "state": "started", "t": 1793285065.756549, "total": 0, "up": 5638.1}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.050372042, "state": "finished", "t": 1793285065.806925, "thumbs": 0, "total": 0, "up": 5638.2}
+{"event": "index_run", "state": "started", "t": 1793285068.0264878, "total": 0, "up": 5640.4}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.050402625, "state": "finished", "t": 1793285068.076896, "thumbs": 0, "total": 0, "up": 5640.4}
+{"event": "index_run", "state": "started", "t": 1793285070.716183, "total": 0, "up": 5643.1}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.066469542, "state": "finished", "t": 1793285070.7826571, "thumbs": 0, "total": 0, "up": 5643.1}
+{"event": "index_run", "state": "started", "t": 1793285073.978863, "total": 0, "up": 5646.3}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.057415208, "state": "finished", "t": 1793285074.036283, "thumbs": 0, "total": 0, "up": 5646.4}
+{"event": "index_run", "state": "started", "t": 1793285076.32966, "total": 0, "up": 5648.7}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.05057125, "state": "finished", "t": 1793285076.380237, "thumbs": 0, "total": 0, "up": 5648.7}
+{"event": "index_run", "state": "started", "t": 1793285078.8731952, "total": 0, "up": 5651.2}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.0589595, "state": "finished", "t": 1793285078.93216, "thumbs": 0, "total": 0, "up": 5651.3}
+{"event": "index_run", "state": "started", "t": 1793285081.331132, "total": 0, "up": 5653.7}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.050596166, "state": "finished", "t": 1793285081.381733, "thumbs": 0, "total": 0, "up": 5653.7}
+{"event": "index_run", "state": "started", "t": 1793285083.477695, "total": 0, "up": 5655.8}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.050223792, "state": "finished", "t": 1793285083.527923, "thumbs": 0, "total": 0, "up": 5655.9}
+{"event": "index_run", "state": "started", "t": 1793285085.94204, "total": 0, "up": 5658.3}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.0643105, "state": "finished", "t": 1793285086.0063539, "thumbs": 0, "total": 0, "up": 5658.4}
+{"event": "index_run", "state": "started", "t": 1793285086.499476, "total": 0, "up": 5658.8}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.052831917, "state": "finished", "t": 1793285086.5523129, "thumbs": 0, "total": 0, "up": 5658.9}

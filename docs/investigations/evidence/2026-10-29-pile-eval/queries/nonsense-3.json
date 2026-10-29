@@ -1,0 +1,135 @@
+{
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 6,
+    "document" : 513,
+    "livePhoto" : 30,
+    "panorama" : 2,
+    "portrait" : 0,
+    "screenRecording" : 2,
+    "screenshot" : 191,
+    "sensitive" : 0,
+    "textHeavy" : 579,
+    "video" : 148
+  },
+  "cosMean" : 0.5953,
+  "cosSD" : 0.0216,
+  "cosTop" : 0.7013,
+  "expect" : "nothing",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "threshold" : 0.2
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 1158,
+          "ratio" : 0.4,
+          "strong" : 1026
+        },
+        {
+          "folded" : 1770,
+          "ratio" : 0.5,
+          "strong" : 414
+        },
+        {
+          "folded" : 2023,
+          "ratio" : 0.6,
+          "strong" : 161
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 2184,
+      "threshold" : 1.5
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 979
+        },
+        {
+          "folded" : 565,
+          "ratio" : 0.5,
+          "strong" : 414
+        },
+        {
+          "folded" : 818,
+          "ratio" : 0.6,
+          "strong" : 161
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 979,
+      "threshold" : 2
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 380
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 380
+        },
+        {
+          "folded" : 219,
+          "ratio" : 0.6,
+          "strong" : 161
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 380,
+      "threshold" : 2.5
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 146
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 146
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.6,
+          "strong" : 146
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 146,
+      "threshold" : 3
+    }
+  ],
+  "name" : "nonsense 3",
+  "positives" : 0,
+  "prompts" : 1,
+  "zTop" : 4.9126
+}

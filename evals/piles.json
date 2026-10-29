@@ -1,0 +1,53 @@
+{
+  "about": "Pile and typed-query eval with proxy labels from Roll's own metadata (no ids, no hand-labelling). Each rule is a SQL condition over the asset table, live rows only. A query with a preset uses that pile's prompts (Preset.prompts), best prompt per vector. Run with scripts/eval (pile-eval); results and limits in docs/investigations/2026-10-29-pile-eval.md.",
+  "rules": {
+    "screenshot": {"sql": "(subtypes & 4) != 0", "about": "PhotoKit screenshot subtype", "visible": true},
+    "screenRecording": {"sql": "mediaType = 2 AND (subtypes & 524288) != 0", "about": "PhotoKit screen recording subtype (the vector is one frame)", "visible": true},
+    "document": {"sql": "isUtility = 1", "about": "Vision's isUtility (documents, receipts, screens of text, whiteboards)", "visible": true},
+    "textHeavy": {"sql": "(subtypes & 4) != 0 OR isUtility = 1", "about": "screenshots or utility images", "visible": true},
+    "blurryPhoto": {"sql": "mediaType = 1 AND blur < 25", "about": "Roll's blur score under AssetRecord.blurryBelow, photos only (the founder's Blurry)", "visible": true},
+    "panorama": {"sql": "(subtypes & 1) != 0", "about": "PhotoKit panorama subtype", "visible": true},
+    "portrait": {"sql": "(subtypes & 16) != 0", "about": "PhotoKit depth-effect (Portrait) subtype", "visible": true},
+    "animated": {"sql": "(subtypes & 64) != 0", "about": "PhotoKit animation subtype (GIF, animated PNG)", "visible": true},
+    "sensitive": {"sql": "sensitive = 1", "about": "Vision sensitive content (needs Sensitive Content Warning on)", "visible": true},
+    "video": {"sql": "mediaType = 2", "about": "videos; the vector is one frame, so this is a control", "visible": false},
+    "livePhoto": {"sql": "mediaType = 1 AND (subtypes & 8) != 0", "about": "Live Photos; a still looks like any photo, so this is a control", "visible": false}
+  },
+  "queries": [
+    {"name": "pile.screenshots", "preset": "screenshots", "rule": "screenshot", "expect": "matches"},
+    {"name": "pile.receipts", "preset": "receipts", "rule": "document", "expect": "matches"},
+    {"name": "pile.blurry", "preset": "blurry", "rule": "blurryPhoto", "expect": "matches"},
+    {"name": "pile.private", "preset": "privateStuff", "rule": "sensitive", "expect": "matches"},
+    {"name": "pile.memes", "preset": "memes", "expect": "unlabelled"},
+
+    {"name": "chat screenshot", "text": "a screenshot of a chat conversation", "rule": "screenshot", "expect": "matches"},
+    {"name": "social post screenshot", "text": "a screenshot of a social media post", "rule": "screenshot", "expect": "matches"},
+    {"name": "app screenshot", "text": "a screenshot of an app", "rule": "screenshot", "expect": "matches"},
+    {"name": "phone screen", "text": "a phone screen with text and icons", "rule": "screenshot", "expect": "matches"},
+    {"name": "screen recording", "text": "a screen recording of a phone screen", "rule": "screenRecording", "expect": "matches"},
+    {"name": "printed page", "text": "a page of printed text", "rule": "document", "expect": "matches"},
+    {"name": "handwritten note", "text": "a handwritten note", "rule": "document", "expect": "matches"},
+    {"name": "invoice", "text": "an invoice or a form", "rule": "document", "expect": "matches"},
+    {"name": "lots of text", "text": "an image with a lot of text", "rule": "textHeavy", "expect": "matches"},
+    {"name": "very blurry", "text": "a very blurry photo", "rule": "blurryPhoto", "expect": "matches"},
+    {"name": "motion blur", "text": "a photo with motion blur", "rule": "blurryPhoto", "expect": "matches"},
+    {"name": "panorama", "text": "a wide panoramic landscape photo", "rule": "panorama", "expect": "matches"},
+    {"name": "portrait mode", "text": "a portrait photo with a blurred background", "rule": "portrait", "expect": "matches"},
+    {"name": "gif", "text": "an animated gif", "rule": "animated", "expect": "matches"},
+    {"name": "control: video frame", "text": "a frame from a video", "rule": "video", "expect": "matches"},
+    {"name": "control: live photo", "text": "a live photo", "rule": "livePhoto", "expect": "matches"},
+
+    {"name": "nonsense 1", "text": "qwzx vbnm plorth", "expect": "nothing"},
+    {"name": "nonsense 2", "text": "asdfghjkl", "expect": "nothing"},
+    {"name": "nonsense 3", "text": "zxqv fnord kpt 7781", "expect": "nothing"},
+    {"name": "nonsense 4", "text": "vrrp glorbix snee", "expect": "nothing"},
+    {"name": "nonsense 5", "text": "blick frum taspo", "expect": "nothing"},
+    {"name": "nonsense 6", "text": "mxyzptlk", "expect": "nothing"},
+    {"name": "nonsense 7", "text": "jjjjj kkkkk", "expect": "nothing"},
+    {"name": "nonsense 8", "text": "flonq trrrn vosk", "expect": "nothing"},
+    {"name": "nonsense 9", "text": "plim plam plooz", "expect": "nothing"},
+    {"name": "nonsense 10", "text": "uuxo pevrit 0042 zank", "expect": "nothing"},
+    {"name": "nonsense 11", "text": "kwerty zib zab", "expect": "nothing"},
+    {"name": "nonsense 12", "text": "ghrelp", "expect": "nothing"}
+  ]
+}

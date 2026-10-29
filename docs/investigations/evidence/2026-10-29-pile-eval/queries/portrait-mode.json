@@ -1,0 +1,215 @@
+{
+  "cappedRecallAt200" : 0,
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 16,
+    "document" : 0,
+    "livePhoto" : 247,
+    "panorama" : 0,
+    "portrait" : 2,
+    "screenRecording" : 0,
+    "screenshot" : 33,
+    "sensitive" : 0,
+    "textHeavy" : 33,
+    "video" : 110
+  },
+  "cosMean" : 0.6366,
+  "cosSD" : 0.0371,
+  "cosTop" : 0.7793,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681,
+          "strongPrecision" : 0.0006,
+          "strongTrue" : 19
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681,
+          "strongPrecision" : 0.0006,
+          "strongTrue" : 19
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681,
+          "strongPrecision" : 0.0006,
+          "strongTrue" : 19
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "precision" : 0.0006,
+      "recall" : 1,
+      "threshold" : 0.2,
+      "truePassing" : 19
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 96,
+          "foldedPrecision" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 2529,
+          "strongPrecision" : 0.002,
+          "strongTrue" : 5
+        },
+        {
+          "folded" : 1120,
+          "foldedPrecision" : 0.0027,
+          "foldedTrue" : 3,
+          "foldedTrueShare" : 0.6,
+          "ratio" : 0.5,
+          "strong" : 1505,
+          "strongPrecision" : 0.0013,
+          "strongTrue" : 2
+        },
+        {
+          "folded" : 1972,
+          "foldedPrecision" : 0.002,
+          "foldedTrue" : 4,
+          "foldedTrueShare" : 0.8,
+          "ratio" : 0.6,
+          "strong" : 653,
+          "strongPrecision" : 0.0015,
+          "strongTrue" : 1
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 2625,
+      "precision" : 0.0019,
+      "recall" : 0.2632,
+      "threshold" : 1.5,
+      "truePassing" : 5
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 1284,
+          "strongPrecision" : 0.0016,
+          "strongTrue" : 2
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 1284,
+          "strongPrecision" : 0.0016,
+          "strongTrue" : 2
+        },
+        {
+          "folded" : 631,
+          "foldedPrecision" : 0.0016,
+          "foldedTrue" : 1,
+          "foldedTrueShare" : 0.5,
+          "ratio" : 0.6,
+          "strong" : 653,
+          "strongPrecision" : 0.0015,
+          "strongTrue" : 1
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 1284,
+      "precision" : 0.0016,
+      "recall" : 0.1053,
+      "threshold" : 2,
+      "truePassing" : 2
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 359,
+          "strongPrecision" : 0.0028,
+          "strongTrue" : 1
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 359,
+          "strongPrecision" : 0.0028,
+          "strongTrue" : 1
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 359,
+          "strongPrecision" : 0.0028,
+          "strongTrue" : 1
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 359,
+      "precision" : 0.0028,
+      "recall" : 0.0526,
+      "threshold" : 2.5,
+      "truePassing" : 1
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.4,
+          "strong" : 34,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.5,
+          "strong" : 34,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "ratio" : 0.6,
+          "strong" : 34,
+          "strongPrecision" : 0,
+          "strongTrue" : 0
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 34,
+      "precision" : 0,
+      "recall" : 0,
+      "threshold" : 3,
+      "truePassing" : 0
+    }
+  ],
+  "name" : "portrait mode",
+  "positives" : 19,
+  "precisionAt20" : 0,
+  "prompts" : 1,
+  "recallAt200" : 0,
+  "rule" : "portrait",
+  "zTop" : 3.8409
+}

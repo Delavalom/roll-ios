@@ -1,0 +1,223 @@
+{
+  "cappedRecallAt200" : 0.72,
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 47,
+    "document" : 666,
+    "livePhoto" : 40,
+    "panorama" : 2,
+    "portrait" : 0,
+    "screenRecording" : 0,
+    "screenshot" : 320,
+    "sensitive" : 0,
+    "textHeavy" : 791,
+    "video" : 111
+  },
+  "cosMean" : 0.6243,
+  "cosSD" : 0.0277,
+  "cosTop" : 0.7796,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681,
+          "strongPrecision" : 0.1366,
+          "strongTrue" : 4055
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681,
+          "strongPrecision" : 0.1366,
+          "strongTrue" : 4055
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681,
+          "strongPrecision" : 0.1366,
+          "strongTrue" : 4055
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "precision" : 0.1366,
+      "recall" : 1,
+      "threshold" : 0.2,
+      "truePassing" : 4055
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 1264,
+          "foldedPrecision" : 0.4114,
+          "foldedTrue" : 520,
+          "foldedTrueShare" : 0.5039,
+          "ratio" : 0.4,
+          "strong" : 843,
+          "strongPrecision" : 0.6074,
+          "strongTrue" : 512
+        },
+        {
+          "folded" : 1662,
+          "foldedPrecision" : 0.4446,
+          "foldedTrue" : 739,
+          "foldedTrueShare" : 0.7161,
+          "ratio" : 0.5,
+          "strong" : 445,
+          "strongPrecision" : 0.6584,
+          "strongTrue" : 293
+        },
+        {
+          "folded" : 1893,
+          "foldedPrecision" : 0.4654,
+          "foldedTrue" : 881,
+          "foldedTrueShare" : 0.8537,
+          "ratio" : 0.6,
+          "strong" : 214,
+          "strongPrecision" : 0.7056,
+          "strongTrue" : 151
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 2107,
+      "precision" : 0.4898,
+      "recall" : 0.2545,
+      "threshold" : 1.5,
+      "truePassing" : 1032
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 302,
+          "foldedPrecision" : 0.5099,
+          "foldedTrue" : 154,
+          "foldedTrueShare" : 0.2312,
+          "ratio" : 0.4,
+          "strong" : 843,
+          "strongPrecision" : 0.6074,
+          "strongTrue" : 512
+        },
+        {
+          "folded" : 700,
+          "foldedPrecision" : 0.5329,
+          "foldedTrue" : 373,
+          "foldedTrueShare" : 0.5601,
+          "ratio" : 0.5,
+          "strong" : 445,
+          "strongPrecision" : 0.6584,
+          "strongTrue" : 293
+        },
+        {
+          "folded" : 931,
+          "foldedPrecision" : 0.5532,
+          "foldedTrue" : 515,
+          "foldedTrueShare" : 0.7733,
+          "ratio" : 0.6,
+          "strong" : 214,
+          "strongPrecision" : 0.7056,
+          "strongTrue" : 151
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 1145,
+      "precision" : 0.5817,
+      "recall" : 0.1642,
+      "threshold" : 2,
+      "truePassing" : 666
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 640,
+          "strongPrecision" : 0.625,
+          "strongTrue" : 400
+        },
+        {
+          "folded" : 195,
+          "foldedPrecision" : 0.5487,
+          "foldedTrue" : 107,
+          "foldedTrueShare" : 0.2675,
+          "ratio" : 0.5,
+          "strong" : 445,
+          "strongPrecision" : 0.6584,
+          "strongTrue" : 293
+        },
+        {
+          "folded" : 426,
+          "foldedPrecision" : 0.5845,
+          "foldedTrue" : 249,
+          "foldedTrueShare" : 0.6225,
+          "ratio" : 0.6,
+          "strong" : 214,
+          "strongPrecision" : 0.7056,
+          "strongTrue" : 151
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 640,
+      "precision" : 0.625,
+      "recall" : 0.0986,
+      "threshold" : 2.5,
+      "truePassing" : 400
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 348,
+          "strongPrecision" : 0.6753,
+          "strongTrue" : 235
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 348,
+          "strongPrecision" : 0.6753,
+          "strongTrue" : 235
+        },
+        {
+          "folded" : 134,
+          "foldedPrecision" : 0.6269,
+          "foldedTrue" : 84,
+          "foldedTrueShare" : 0.3574,
+          "ratio" : 0.6,
+          "strong" : 214,
+          "strongPrecision" : 0.7056,
+          "strongTrue" : 151
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 348,
+      "precision" : 0.6753,
+      "recall" : 0.058,
+      "threshold" : 3,
+      "truePassing" : 235
+    }
+  ],
+  "name" : "printed page",
+  "positives" : 4055,
+  "precisionAt20" : 0.75,
+  "prompts" : 1,
+  "recallAt200" : 0.0355,
+  "rule" : "document",
+  "zTop" : 5.614
+}

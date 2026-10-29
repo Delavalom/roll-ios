@@ -1,0 +1,29 @@
+{
+  "constants": "anchor t=0.35 span=120s cap=24",
+  "duplicates": {
+    "extras": 722,
+    "extrasGB": 3.91,
+    "groups": 593,
+    "groupsOf10OrMore": 0,
+    "largest": 9,
+    "members": 1315,
+    "p50Size": 2,
+    "p95Size": 3,
+    "pctOfLibrary": 4.43
+  },
+  "equalsAnchorWithShippedConstants": false,
+  "equalsOldUnionFind": true,
+  "macDebugSeconds": 8.301,
+  "note": "Written by the same tool run against the code at e48da12 (union-find, 0.35, 120 s, 24 neighbours); extracted from that run.",
+  "similar": {
+    "extras": 10225,
+    "extrasGB": 44.99,
+    "groups": 2835,
+    "groupsOf10OrMore": 223,
+    "largest": 175,
+    "members": 13060,
+    "p50Size": 3,
+    "p95Size": 12,
+    "pctOfLibrary": 43.995
+  }
+}

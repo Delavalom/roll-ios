@@ -1,0 +1,218 @@
+{
+  "cappedRecallAt200" : 0.1333,
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 14,
+    "document" : 484,
+    "livePhoto" : 13,
+    "panorama" : 0,
+    "portrait" : 0,
+    "screenRecording" : 9,
+    "screenshot" : 484,
+    "sensitive" : 0,
+    "textHeavy" : 670,
+    "video" : 157
+  },
+  "cosMean" : 0.645,
+  "cosSD" : 0.0358,
+  "cosTop" : 0.7837,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681,
+          "strongPrecision" : 0.001,
+          "strongTrue" : 30
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681,
+          "strongPrecision" : 0.001,
+          "strongTrue" : 30
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681,
+          "strongPrecision" : 0.001,
+          "strongTrue" : 30
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "precision" : 0.001,
+      "recall" : 1,
+      "threshold" : 0.2,
+      "truePassing" : 30
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 201,
+          "foldedPrecision" : 0.005,
+          "foldedTrue" : 1,
+          "foldedTrueShare" : 0.0667,
+          "ratio" : 0.4,
+          "strong" : 2218,
+          "strongPrecision" : 0.0063,
+          "strongTrue" : 14
+        },
+        {
+          "folded" : 1331,
+          "foldedPrecision" : 0.0045,
+          "foldedTrue" : 6,
+          "foldedTrueShare" : 0.4,
+          "ratio" : 0.5,
+          "strong" : 1088,
+          "strongPrecision" : 0.0083,
+          "strongTrue" : 9
+        },
+        {
+          "folded" : 1952,
+          "foldedPrecision" : 0.0051,
+          "foldedTrue" : 10,
+          "foldedTrueShare" : 0.6667,
+          "ratio" : 0.6,
+          "strong" : 467,
+          "strongPrecision" : 0.0107,
+          "strongTrue" : 5
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 2419,
+      "precision" : 0.0062,
+      "recall" : 0.5,
+      "threshold" : 1.5,
+      "truePassing" : 15
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 956,
+          "strongPrecision" : 0.0094,
+          "strongTrue" : 9
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 956,
+          "strongPrecision" : 0.0094,
+          "strongTrue" : 9
+        },
+        {
+          "folded" : 489,
+          "foldedPrecision" : 0.0082,
+          "foldedTrue" : 4,
+          "foldedTrueShare" : 0.4444,
+          "ratio" : 0.6,
+          "strong" : 467,
+          "strongPrecision" : 0.0107,
+          "strongTrue" : 5
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 956,
+      "precision" : 0.0094,
+      "recall" : 0.3,
+      "threshold" : 2,
+      "truePassing" : 9
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 305,
+          "strongPrecision" : 0.0131,
+          "strongTrue" : 4
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 305,
+          "strongPrecision" : 0.0131,
+          "strongTrue" : 4
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 305,
+          "strongPrecision" : 0.0131,
+          "strongTrue" : 4
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 305,
+      "precision" : 0.0131,
+      "recall" : 0.1333,
+      "threshold" : 2.5,
+      "truePassing" : 4
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 70,
+          "strongPrecision" : 0.0286,
+          "strongTrue" : 2
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 70,
+          "strongPrecision" : 0.0286,
+          "strongTrue" : 2
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 70,
+          "strongPrecision" : 0.0286,
+          "strongTrue" : 2
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 70,
+      "precision" : 0.0286,
+      "recall" : 0.0667,
+      "threshold" : 3,
+      "truePassing" : 2
+    }
+  ],
+  "name" : "screen recording",
+  "positives" : 30,
+  "precisionAt20" : 0.1,
+  "prompts" : 1,
+  "recallAt200" : 0.1333,
+  "rule" : "screenRecording",
+  "zTop" : 3.873
+}

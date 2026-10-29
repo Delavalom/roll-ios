@@ -1,0 +1,135 @@
+{
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 1,
+    "document" : 381,
+    "livePhoto" : 26,
+    "panorama" : 2,
+    "portrait" : 0,
+    "screenRecording" : 2,
+    "screenshot" : 184,
+    "sensitive" : 0,
+    "textHeavy" : 456,
+    "video" : 110
+  },
+  "cosMean" : 0.609,
+  "cosSD" : 0.0199,
+  "cosTop" : 0.6943,
+  "expect" : "nothing",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "threshold" : 0.2
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 608,
+          "ratio" : 0.4,
+          "strong" : 1450
+        },
+        {
+          "folded" : 1386,
+          "ratio" : 0.5,
+          "strong" : 672
+        },
+        {
+          "folded" : 1776,
+          "ratio" : 0.6,
+          "strong" : 282
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 2058,
+      "threshold" : 1.5
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 854
+        },
+        {
+          "folded" : 182,
+          "ratio" : 0.5,
+          "strong" : 672
+        },
+        {
+          "folded" : 572,
+          "ratio" : 0.6,
+          "strong" : 282
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 854,
+      "threshold" : 2
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 337
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 337
+        },
+        {
+          "folded" : 55,
+          "ratio" : 0.6,
+          "strong" : 282
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 337,
+      "threshold" : 2.5
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 98
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 98
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.6,
+          "strong" : 98
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 98,
+      "threshold" : 3
+    }
+  ],
+  "name" : "nonsense 10",
+  "positives" : 0,
+  "prompts" : 1,
+  "zTop" : 4.2776
+}

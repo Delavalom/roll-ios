@@ -1,0 +1,222 @@
+{
+  "cappedRecallAt200" : 0.5821,
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 59,
+    "document" : 19,
+    "livePhoto" : 90,
+    "panorama" : 0,
+    "portrait" : 0,
+    "screenRecording" : 1,
+    "screenshot" : 31,
+    "sensitive" : 0,
+    "textHeavy" : 48,
+    "video" : 228
+  },
+  "cosMean" : 0.6293,
+  "cosSD" : 0.0278,
+  "cosTop" : 0.7689,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681,
+          "strongPrecision" : 0.0023,
+          "strongTrue" : 67
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681,
+          "strongPrecision" : 0.0023,
+          "strongTrue" : 67
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681,
+          "strongPrecision" : 0.0023,
+          "strongTrue" : 67
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "precision" : 0.0023,
+      "recall" : 1,
+      "threshold" : 0.2,
+      "truePassing" : 67
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 1328,
+          "foldedPrecision" : 0.003,
+          "foldedTrue" : 4,
+          "foldedTrueShare" : 0.0635,
+          "ratio" : 0.4,
+          "strong" : 776,
+          "strongPrecision" : 0.076,
+          "strongTrue" : 59
+        },
+        {
+          "folded" : 1817,
+          "foldedPrecision" : 0.011,
+          "foldedTrue" : 20,
+          "foldedTrueShare" : 0.3175,
+          "ratio" : 0.5,
+          "strong" : 287,
+          "strongPrecision" : 0.1498,
+          "strongTrue" : 43
+        },
+        {
+          "folded" : 1993,
+          "foldedPrecision" : 0.0181,
+          "foldedTrue" : 36,
+          "foldedTrueShare" : 0.5714,
+          "ratio" : 0.6,
+          "strong" : 111,
+          "strongPrecision" : 0.2432,
+          "strongTrue" : 27
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 2104,
+      "precision" : 0.0299,
+      "recall" : 0.9403,
+      "threshold" : 1.5,
+      "truePassing" : 63
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 7,
+          "foldedPrecision" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 776,
+          "strongPrecision" : 0.076,
+          "strongTrue" : 59
+        },
+        {
+          "folded" : 496,
+          "foldedPrecision" : 0.0323,
+          "foldedTrue" : 16,
+          "foldedTrueShare" : 0.2712,
+          "ratio" : 0.5,
+          "strong" : 287,
+          "strongPrecision" : 0.1498,
+          "strongTrue" : 43
+        },
+        {
+          "folded" : 672,
+          "foldedPrecision" : 0.0476,
+          "foldedTrue" : 32,
+          "foldedTrueShare" : 0.5424,
+          "ratio" : 0.6,
+          "strong" : 111,
+          "strongPrecision" : 0.2432,
+          "strongTrue" : 27
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 783,
+      "precision" : 0.0754,
+      "recall" : 0.8806,
+      "threshold" : 2,
+      "truePassing" : 59
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 287,
+          "strongPrecision" : 0.1498,
+          "strongTrue" : 43
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 287,
+          "strongPrecision" : 0.1498,
+          "strongTrue" : 43
+        },
+        {
+          "folded" : 176,
+          "foldedPrecision" : 0.0909,
+          "foldedTrue" : 16,
+          "foldedTrueShare" : 0.3721,
+          "ratio" : 0.6,
+          "strong" : 111,
+          "strongPrecision" : 0.2432,
+          "strongTrue" : 27
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 287,
+      "precision" : 0.1498,
+      "recall" : 0.6418,
+      "threshold" : 2.5,
+      "truePassing" : 43
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 115,
+          "strongPrecision" : 0.2348,
+          "strongTrue" : 27
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 115,
+          "strongPrecision" : 0.2348,
+          "strongTrue" : 27
+        },
+        {
+          "folded" : 4,
+          "foldedPrecision" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 111,
+          "strongPrecision" : 0.2432,
+          "strongTrue" : 27
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 115,
+      "precision" : 0.2348,
+      "recall" : 0.403,
+      "threshold" : 3,
+      "truePassing" : 27
+    }
+  ],
+  "name" : "very blurry",
+  "positives" : 67,
+  "precisionAt20" : 0.25,
+  "prompts" : 1,
+  "recallAt200" : 0.5821,
+  "rule" : "blurryPhoto",
+  "zTop" : 5.0179
+}

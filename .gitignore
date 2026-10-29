@@ -1,0 +1,15 @@
+# Generated
+*.xcodeproj
+*.xcworkspace
+.build/
+.swiftpm/
+DerivedData/
+build/
+artifacts/
+STATUS.md
+
+# Local-only config (team id, RevenueCat public SDK key)
+Team.xcconfig
+
+.DS_Store
+xcuserdata/

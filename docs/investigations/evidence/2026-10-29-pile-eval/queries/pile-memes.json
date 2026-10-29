@@ -1,0 +1,135 @@
+{
+  "composition" : {
+    "animated" : 1,
+    "blurryPhoto" : 27,
+    "document" : 163,
+    "livePhoto" : 124,
+    "panorama" : 1,
+    "portrait" : 0,
+    "screenRecording" : 6,
+    "screenshot" : 250,
+    "sensitive" : 0,
+    "textHeavy" : 344,
+    "video" : 461
+  },
+  "cosMean" : 0.6378,
+  "cosSD" : 0.0273,
+  "cosTop" : 0.7587,
+  "expect" : "unlabelled",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "threshold" : 0.2
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 2934,
+          "ratio" : 0.4,
+          "strong" : 1311
+        },
+        {
+          "folded" : 3787,
+          "ratio" : 0.5,
+          "strong" : 458
+        },
+        {
+          "folded" : 4083,
+          "ratio" : 0.6,
+          "strong" : 162
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 4245,
+      "threshold" : 1.5
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 661,
+          "ratio" : 0.4,
+          "strong" : 1311
+        },
+        {
+          "folded" : 1514,
+          "ratio" : 0.5,
+          "strong" : 458
+        },
+        {
+          "folded" : 1810,
+          "ratio" : 0.6,
+          "strong" : 162
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 1972,
+      "threshold" : 2
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 772
+        },
+        {
+          "folded" : 314,
+          "ratio" : 0.5,
+          "strong" : 458
+        },
+        {
+          "folded" : 610,
+          "ratio" : 0.6,
+          "strong" : 162
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 772,
+      "threshold" : 2.5
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "ratio" : 0.4,
+          "strong" : 290
+        },
+        {
+          "folded" : 0,
+          "ratio" : 0.5,
+          "strong" : 290
+        },
+        {
+          "folded" : 128,
+          "ratio" : 0.6,
+          "strong" : 162
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 290,
+      "threshold" : 3
+    }
+  ],
+  "name" : "pile.memes",
+  "positives" : 0,
+  "prompts" : 3,
+  "zTop" : 5.5887
+}

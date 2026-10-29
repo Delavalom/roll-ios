@@ -1,0 +1,30 @@
+{"cores": 6, "event": "session", "lowPowerMode": false, "machine": "iPhone14,3", "mode": "read-only", "model": "iPhone", "osVersion": "27.0.1", "photosAccess": "3", "physicalMemory": 5913821184, "system": "iOS", "t": 1793287154.005883, "up": 0.3}
+{"event": "model", "state": "loading", "t": 1793287154.354311, "up": 0.6}
+{"event": "model", "state": "ready", "t": 1793287159.153862, "up": 5.4}
+{"event": "search_bench", "state": "started", "t": 1793287195.3214889, "up": 41.6}
+{"attempt": 1, "event": "search", "ms": 52525.54575, "preset": "receipts", "results": 20, "t": 1793287247.848268, "up": 94.1}
+{"attempt": 2, "event": "search", "ms": 719.619167, "preset": "receipts", "results": 20, "t": 1793287248.568235, "up": 94.8}
+{"attempt": 3, "event": "search", "ms": 317.902541, "preset": "receipts", "results": 20, "t": 1793287248.88622, "up": 95.2}
+{"attempt": 4, "event": "search", "ms": 312.019042, "preset": "receipts", "results": 20, "t": 1793287249.198329, "up": 95.5}
+{"attempt": 5, "event": "search", "ms": 318.799834, "preset": "receipts", "results": 20, "t": 1793287249.5172172, "up": 95.8}
+{"attempt": 1, "event": "search", "ms": 323.971583, "preset": "privateStuff", "results": 20, "t": 1793287249.84127, "up": 96.1}
+{"attempt": 2, "event": "search", "ms": 314.977709, "preset": "privateStuff", "results": 20, "t": 1793287250.156394, "up": 96.4}
+{"attempt": 3, "event": "search", "ms": 309.119125, "preset": "privateStuff", "results": 20, "t": 1793287250.465596, "up": 96.7}
+{"attempt": 4, "event": "search", "ms": 309.916083, "preset": "privateStuff", "results": 20, "t": 1793287250.775595, "up": 97}
+{"attempt": 5, "event": "search", "ms": 313.564458, "preset": "privateStuff", "results": 20, "t": 1793287251.08924, "up": 97.4}
+{"attempt": 1, "event": "search", "ms": 319.402917, "preset": "memes", "results": 20, "t": 1793287251.4087238, "up": 97.7}
+{"attempt": 2, "event": "search", "ms": 296.449792, "preset": "memes", "results": 20, "t": 1793287251.7052321, "up": 98}
+{"attempt": 3, "event": "search", "ms": 297.623125, "preset": "memes", "results": 20, "t": 1793287252.002931, "up": 98.3}
+{"attempt": 4, "event": "search", "ms": 301.118333, "preset": "memes", "results": 20, "t": 1793287252.30413, "up": 98.6}
+{"attempt": 5, "event": "search", "ms": 296.674916, "preset": "memes", "results": 20, "t": 1793287252.600882, "up": 98.9}
+{"attempt": 1, "event": "search", "ms": 111.675875, "preset": "screenshots", "results": 20, "t": 1793287252.712635, "up": 99}
+{"attempt": 2, "event": "search", "ms": 102.231834, "preset": "screenshots", "results": 20, "t": 1793287252.8149319, "up": 99.1}
+{"attempt": 3, "event": "search", "ms": 105.258208, "preset": "screenshots", "results": 20, "t": 1793287252.920251, "up": 99.2}
+{"attempt": 4, "event": "search", "ms": 102.835625, "preset": "screenshots", "results": 20, "t": 1793287253.0231462, "up": 99.3}
+{"attempt": 5, "event": "search", "ms": 102.273, "preset": "screenshots", "results": 20, "t": 1793287253.1254869, "up": 99.4}
+{"attempt": 1, "event": "search", "ms": 114.969416, "preset": "blurry", "results": 20, "t": 1793287253.240519, "up": 99.5}
+{"attempt": 2, "event": "search", "ms": 104.854375, "preset": "blurry", "results": 20, "t": 1793287253.34545, "up": 99.6}
+{"attempt": 3, "event": "search", "ms": 106.070667, "preset": "blurry", "results": 20, "t": 1793287253.451608, "up": 99.7}
+{"attempt": 4, "event": "search", "ms": 104.7645, "preset": "blurry", "results": 20, "t": 1793287253.556417, "up": 99.8}
+{"attempt": 5, "event": "search", "ms": 104.791916, "preset": "blurry", "results": 20, "t": 1793287253.661284, "up": 99.9}
+{"event": "search_bench", "state": "finished", "t": 1793287253.661335, "up": 99.9}

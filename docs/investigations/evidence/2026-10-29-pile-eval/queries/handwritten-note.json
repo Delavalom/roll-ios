@@ -1,0 +1,225 @@
+{
+  "cappedRecallAt200" : 0.505,
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 32,
+    "document" : 266,
+    "livePhoto" : 78,
+    "panorama" : 3,
+    "portrait" : 0,
+    "screenRecording" : 0,
+    "screenshot" : 114,
+    "sensitive" : 0,
+    "textHeavy" : 327,
+    "video" : 106
+  },
+  "cosMean" : 0.6239,
+  "cosSD" : 0.0271,
+  "cosTop" : 0.8037,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681,
+          "strongPrecision" : 0.1366,
+          "strongTrue" : 4055
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681,
+          "strongPrecision" : 0.1366,
+          "strongTrue" : 4055
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681,
+          "strongPrecision" : 0.1366,
+          "strongTrue" : 4055
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "precision" : 0.1366,
+      "recall" : 1,
+      "threshold" : 0.2,
+      "truePassing" : 4055
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 1882,
+          "foldedPrecision" : 0.2237,
+          "foldedTrue" : 421,
+          "foldedTrueShare" : 0.7914,
+          "ratio" : 0.4,
+          "strong" : 249,
+          "strongPrecision" : 0.4458,
+          "strongTrue" : 111
+        },
+        {
+          "folded" : 2046,
+          "foldedPrecision" : 0.2331,
+          "foldedTrue" : 477,
+          "foldedTrueShare" : 0.8966,
+          "ratio" : 0.5,
+          "strong" : 85,
+          "strongPrecision" : 0.6471,
+          "strongTrue" : 55
+        },
+        {
+          "folded" : 2103,
+          "foldedPrecision" : 0.243,
+          "foldedTrue" : 511,
+          "foldedTrueShare" : 0.9605,
+          "ratio" : 0.6,
+          "strong" : 28,
+          "strongPrecision" : 0.75,
+          "strongTrue" : 21
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 2131,
+      "precision" : 0.2496,
+      "recall" : 0.1312,
+      "threshold" : 1.5,
+      "truePassing" : 532
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 634,
+          "foldedPrecision" : 0.2445,
+          "foldedTrue" : 155,
+          "foldedTrueShare" : 0.5827,
+          "ratio" : 0.4,
+          "strong" : 249,
+          "strongPrecision" : 0.4458,
+          "strongTrue" : 111
+        },
+        {
+          "folded" : 798,
+          "foldedPrecision" : 0.2644,
+          "foldedTrue" : 211,
+          "foldedTrueShare" : 0.7932,
+          "ratio" : 0.5,
+          "strong" : 85,
+          "strongPrecision" : 0.6471,
+          "strongTrue" : 55
+        },
+        {
+          "folded" : 855,
+          "foldedPrecision" : 0.2865,
+          "foldedTrue" : 245,
+          "foldedTrueShare" : 0.9211,
+          "ratio" : 0.6,
+          "strong" : 28,
+          "strongPrecision" : 0.75,
+          "strongTrue" : 21
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 883,
+      "precision" : 0.3012,
+      "recall" : 0.0656,
+      "threshold" : 2,
+      "truePassing" : 266
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 80,
+          "foldedPrecision" : 0.3,
+          "foldedTrue" : 24,
+          "foldedTrueShare" : 0.1778,
+          "ratio" : 0.4,
+          "strong" : 249,
+          "strongPrecision" : 0.4458,
+          "strongTrue" : 111
+        },
+        {
+          "folded" : 244,
+          "foldedPrecision" : 0.3279,
+          "foldedTrue" : 80,
+          "foldedTrueShare" : 0.5926,
+          "ratio" : 0.5,
+          "strong" : 85,
+          "strongPrecision" : 0.6471,
+          "strongTrue" : 55
+        },
+        {
+          "folded" : 301,
+          "foldedPrecision" : 0.3787,
+          "foldedTrue" : 114,
+          "foldedTrueShare" : 0.8444,
+          "ratio" : 0.6,
+          "strong" : 28,
+          "strongPrecision" : 0.75,
+          "strongTrue" : 21
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 329,
+      "precision" : 0.4103,
+      "recall" : 0.0333,
+      "threshold" : 2.5,
+      "truePassing" : 135
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 134,
+          "strongPrecision" : 0.597,
+          "strongTrue" : 80
+        },
+        {
+          "folded" : 49,
+          "foldedPrecision" : 0.5102,
+          "foldedTrue" : 25,
+          "foldedTrueShare" : 0.3125,
+          "ratio" : 0.5,
+          "strong" : 85,
+          "strongPrecision" : 0.6471,
+          "strongTrue" : 55
+        },
+        {
+          "folded" : 106,
+          "foldedPrecision" : 0.5566,
+          "foldedTrue" : 59,
+          "foldedTrueShare" : 0.7375,
+          "ratio" : 0.6,
+          "strong" : 28,
+          "strongPrecision" : 0.75,
+          "strongTrue" : 21
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 134,
+      "precision" : 0.597,
+      "recall" : 0.0197,
+      "threshold" : 3,
+      "truePassing" : 80
+    }
+  ],
+  "name" : "handwritten note",
+  "positives" : 4055,
+  "precisionAt20" : 0.75,
+  "prompts" : 1,
+  "recallAt200" : 0.0249,
+  "rule" : "document",
+  "zTop" : 6.6271
+}

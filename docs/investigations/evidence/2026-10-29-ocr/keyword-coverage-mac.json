@@ -1,0 +1,59 @@
+{
+  "run1": {
+    "1 rare term": {
+      "medianMs": 0.9,
+      "results": 177
+    },
+    "1 term in every text": {
+      "medianMs": 8.7,
+      "results": 1000
+    },
+    "3 terms": {
+      "medianMs": 9.2,
+      "results": 1120
+    },
+    "6 terms": {
+      "medianMs": 20.2,
+      "results": 1463
+    },
+    "commitAllMsIn20s": 698,
+    "dbBytes": 10280960,
+    "no match": {
+      "medianMs": 0.3,
+      "results": 0
+    },
+    "note": "run1's prefix query used a term with no prefix match (0.3 ms, 0 results); fixed in run2"
+  },
+  "run2": {
+    "1 rare term": {
+      "medianMs": 0.7,
+      "results": 148
+    },
+    "1 term in every text": {
+      "medianMs": 21.5,
+      "results": 1000
+    },
+    "3 terms": {
+      "medianMs": 12.2,
+      "results": 1105
+    },
+    "6 terms": {
+      "medianMs": 24.1,
+      "results": 1486
+    },
+    "assets": 30000,
+    "commitAllMsIn20s": 1120,
+    "dbBytes": 10321920,
+    "no match": {
+      "medianMs": 0.3,
+      "results": 0
+    },
+    "prefix fallback": {
+      "medianMs": 0.5,
+      "results": 80
+    },
+    "termsPerText": 63,
+    "texts": 6300
+  },
+  "what": "Repositories.keywordCoverage latency on the Mac (M1 Pro, debug build via swift test; the Mac was shared with other lanes' builds, so timings are noisy). Synthetic: 30,000 assets, 6,300 with text, 63 terms each from a 5,000-word vocabulary plus 'uber' and 'total' in every text. Median of 7 calls. Source: keyword-coverage-bench.swift (ran as a temporary test in Tests/StoreTests, not committed there)."
+}

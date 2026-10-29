@@ -1,0 +1,95 @@
+{
+  "date": "2026-10-29T16:00:06Z",
+  "host": {
+    "cpu": "Apple M1 Pro (sysctl machdep.cpu.brand_string)",
+    "os": "Version 26.6.2 (Build 25G83)"
+  },
+  "images": "mac-ocr-images.jsonl (one JSON object per image)",
+  "method": "median of 5 runs after 1 warm-up, one image at a time, image already decoded and resized; recall = share of the reference terms (accurate + language correction, full image) found; terms = lowercase, diacritics folded, split on non-alphanumerics, >= 2 chars",
+  "summary": {
+    "accurate-1600px photo": {
+      "images": 4,
+      "meanMs": 211.29999999999998,
+      "meanRecall": 1,
+      "medianMs": 214.9
+    },
+    "accurate-1600px text": {
+      "images": 28,
+      "meanMs": 313.31428571428575,
+      "meanRecall": 0.9273655159867937,
+      "medianMs": 258.2
+    },
+    "accurate-300px photo": {
+      "images": 4,
+      "meanMs": 228.25,
+      "meanRecall": 1,
+      "medianMs": 205.8
+    },
+    "accurate-300px text": {
+      "images": 28,
+      "meanMs": 241.2607142857143,
+      "meanRecall": 0.303651099714402,
+      "medianMs": 200.5
+    },
+    "accurate-960px photo": {
+      "images": 4,
+      "meanMs": 190.1,
+      "meanRecall": 1,
+      "medianMs": 203
+    },
+    "accurate-960px text": {
+      "images": 28,
+      "meanMs": 316.6571428571428,
+      "meanRecall": 0.925460647232201,
+      "medianMs": 264.2
+    },
+    "accurate-960px-lc photo": {
+      "images": 4,
+      "meanMs": 176.8,
+      "meanRecall": 1,
+      "medianMs": 194.2
+    },
+    "accurate-960px-lc text": {
+      "images": 28,
+      "meanMs": 404.54285714285714,
+      "meanRecall": 0.9377897475303898,
+      "medianMs": 351
+    },
+    "fast-1600px photo": {
+      "images": 4,
+      "meanMs": 24.3,
+      "meanRecall": 1,
+      "medianMs": 22.7
+    },
+    "fast-1600px text": {
+      "images": 28,
+      "meanMs": 26.774999999999995,
+      "meanRecall": 0.2117747206417157,
+      "medianMs": 17.2
+    },
+    "fast-300px photo": {
+      "images": 4,
+      "meanMs": 10.675,
+      "meanRecall": 1,
+      "medianMs": 10.7
+    },
+    "fast-300px text": {
+      "images": 28,
+      "meanMs": 13.314285714285713,
+      "meanRecall": 0.12410714285714285,
+      "medianMs": 10.3
+    },
+    "fast-960px photo": {
+      "images": 4,
+      "meanMs": 12.075,
+      "meanRecall": 1,
+      "medianMs": 11.9
+    },
+    "fast-960px text": {
+      "images": 28,
+      "meanMs": 26.889285714285716,
+      "meanRecall": 0.20145726032425534,
+      "medianMs": 15.7
+    }
+  }
+}

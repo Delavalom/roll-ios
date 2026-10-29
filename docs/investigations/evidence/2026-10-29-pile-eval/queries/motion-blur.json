@@ -1,0 +1,223 @@
+{
+  "cappedRecallAt200" : 0.3134,
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 41,
+    "document" : 33,
+    "livePhoto" : 36,
+    "panorama" : 0,
+    "portrait" : 0,
+    "screenRecording" : 2,
+    "screenshot" : 36,
+    "sensitive" : 0,
+    "textHeavy" : 65,
+    "video" : 288
+  },
+  "cosMean" : 0.6126,
+  "cosSD" : 0.0263,
+  "cosTop" : 0.7645,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681,
+          "strongPrecision" : 0.0023,
+          "strongTrue" : 67
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681,
+          "strongPrecision" : 0.0023,
+          "strongTrue" : 67
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681,
+          "strongPrecision" : 0.0023,
+          "strongTrue" : 67
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "precision" : 0.0023,
+      "recall" : 1,
+      "threshold" : 0.2,
+      "truePassing" : 67
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 1561,
+          "foldedPrecision" : 0.0173,
+          "foldedTrue" : 27,
+          "foldedTrueShare" : 0.4655,
+          "ratio" : 0.4,
+          "strong" : 372,
+          "strongPrecision" : 0.0833,
+          "strongTrue" : 31
+        },
+        {
+          "folded" : 1794,
+          "foldedPrecision" : 0.0234,
+          "foldedTrue" : 42,
+          "foldedTrueShare" : 0.7241,
+          "ratio" : 0.5,
+          "strong" : 139,
+          "strongPrecision" : 0.1151,
+          "strongTrue" : 16
+        },
+        {
+          "folded" : 1885,
+          "foldedPrecision" : 0.0265,
+          "foldedTrue" : 50,
+          "foldedTrueShare" : 0.8621,
+          "ratio" : 0.6,
+          "strong" : 48,
+          "strongPrecision" : 0.1667,
+          "strongTrue" : 8
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 1933,
+      "precision" : 0.03,
+      "recall" : 0.8657,
+      "threshold" : 1.5,
+      "truePassing" : 58
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 291,
+          "foldedPrecision" : 0.0344,
+          "foldedTrue" : 10,
+          "foldedTrueShare" : 0.2439,
+          "ratio" : 0.4,
+          "strong" : 372,
+          "strongPrecision" : 0.0833,
+          "strongTrue" : 31
+        },
+        {
+          "folded" : 524,
+          "foldedPrecision" : 0.0477,
+          "foldedTrue" : 25,
+          "foldedTrueShare" : 0.6098,
+          "ratio" : 0.5,
+          "strong" : 139,
+          "strongPrecision" : 0.1151,
+          "strongTrue" : 16
+        },
+        {
+          "folded" : 615,
+          "foldedPrecision" : 0.0537,
+          "foldedTrue" : 33,
+          "foldedTrueShare" : 0.8049,
+          "ratio" : 0.6,
+          "strong" : 48,
+          "strongPrecision" : 0.1667,
+          "strongTrue" : 8
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 663,
+      "precision" : 0.0618,
+      "recall" : 0.6119,
+      "threshold" : 2,
+      "truePassing" : 41
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 257,
+          "strongPrecision" : 0.0973,
+          "strongTrue" : 25
+        },
+        {
+          "folded" : 118,
+          "foldedPrecision" : 0.0763,
+          "foldedTrue" : 9,
+          "foldedTrueShare" : 0.36,
+          "ratio" : 0.5,
+          "strong" : 139,
+          "strongPrecision" : 0.1151,
+          "strongTrue" : 16
+        },
+        {
+          "folded" : 209,
+          "foldedPrecision" : 0.0813,
+          "foldedTrue" : 17,
+          "foldedTrueShare" : 0.68,
+          "ratio" : 0.6,
+          "strong" : 48,
+          "strongPrecision" : 0.1667,
+          "strongTrue" : 8
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 257,
+      "precision" : 0.0973,
+      "recall" : 0.3731,
+      "threshold" : 2.5,
+      "truePassing" : 25
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 107,
+          "strongPrecision" : 0.1121,
+          "strongTrue" : 12
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 107,
+          "strongPrecision" : 0.1121,
+          "strongTrue" : 12
+        },
+        {
+          "folded" : 59,
+          "foldedPrecision" : 0.0678,
+          "foldedTrue" : 4,
+          "foldedTrueShare" : 0.3333,
+          "ratio" : 0.6,
+          "strong" : 48,
+          "strongPrecision" : 0.1667,
+          "strongTrue" : 8
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 107,
+      "precision" : 0.1121,
+      "recall" : 0.1791,
+      "threshold" : 3,
+      "truePassing" : 12
+    }
+  ],
+  "name" : "motion blur",
+  "positives" : 67,
+  "precisionAt20" : 0.1,
+  "prompts" : 1,
+  "recallAt200" : 0.3134,
+  "rule" : "blurryPhoto",
+  "zTop" : 5.7707
+}

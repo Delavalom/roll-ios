@@ -1,0 +1,220 @@
+{
+  "cappedRecallAt200" : 0.76,
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 0,
+    "document" : 1045,
+    "livePhoto" : 4,
+    "panorama" : 0,
+    "portrait" : 0,
+    "screenRecording" : 14,
+    "screenshot" : 896,
+    "sensitive" : 0,
+    "textHeavy" : 1303,
+    "video" : 98
+  },
+  "cosMean" : 0.6383,
+  "cosSD" : 0.0382,
+  "cosTop" : 0.8029,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681,
+          "strongPrecision" : 0.0853,
+          "strongTrue" : 2532
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681,
+          "strongPrecision" : 0.0853,
+          "strongTrue" : 2532
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681,
+          "strongPrecision" : 0.0853,
+          "strongTrue" : 2532
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "precision" : 0.0853,
+      "recall" : 1,
+      "threshold" : 0.2,
+      "truePassing" : 2532
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 551,
+          "foldedPrecision" : 0.2922,
+          "foldedTrue" : 161,
+          "foldedTrueShare" : 0.1253,
+          "ratio" : 0.4,
+          "strong" : 2057,
+          "strongPrecision" : 0.5464,
+          "strongTrue" : 1124
+        },
+        {
+          "folded" : 1403,
+          "foldedPrecision" : 0.3792,
+          "foldedTrue" : 532,
+          "foldedTrueShare" : 0.414,
+          "ratio" : 0.5,
+          "strong" : 1205,
+          "strongPrecision" : 0.6249,
+          "strongTrue" : 753
+        },
+        {
+          "folded" : 1993,
+          "foldedPrecision" : 0.4295,
+          "foldedTrue" : 856,
+          "foldedTrueShare" : 0.6661,
+          "ratio" : 0.6,
+          "strong" : 615,
+          "strongPrecision" : 0.6976,
+          "strongTrue" : 429
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 2608,
+      "precision" : 0.4927,
+      "recall" : 0.5075,
+      "threshold" : 1.5,
+      "truePassing" : 1285
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 1495,
+          "strongPrecision" : 0.5993,
+          "strongTrue" : 896
+        },
+        {
+          "folded" : 290,
+          "foldedPrecision" : 0.4931,
+          "foldedTrue" : 143,
+          "foldedTrueShare" : 0.1596,
+          "ratio" : 0.5,
+          "strong" : 1205,
+          "strongPrecision" : 0.6249,
+          "strongTrue" : 753
+        },
+        {
+          "folded" : 880,
+          "foldedPrecision" : 0.5307,
+          "foldedTrue" : 467,
+          "foldedTrueShare" : 0.5212,
+          "ratio" : 0.6,
+          "strong" : 615,
+          "strongPrecision" : 0.6976,
+          "strongTrue" : 429
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 1495,
+      "precision" : 0.5993,
+      "recall" : 0.3539,
+      "threshold" : 2,
+      "truePassing" : 896
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 706,
+          "strongPrecision" : 0.6912,
+          "strongTrue" : 488
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 706,
+          "strongPrecision" : 0.6912,
+          "strongTrue" : 488
+        },
+        {
+          "folded" : 91,
+          "foldedPrecision" : 0.6484,
+          "foldedTrue" : 59,
+          "foldedTrueShare" : 0.1209,
+          "ratio" : 0.6,
+          "strong" : 615,
+          "strongPrecision" : 0.6976,
+          "strongTrue" : 429
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 706,
+      "precision" : 0.6912,
+      "recall" : 0.1927,
+      "threshold" : 2.5,
+      "truePassing" : 488
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 272,
+          "strongPrecision" : 0.761,
+          "strongTrue" : 207
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 272,
+          "strongPrecision" : 0.761,
+          "strongTrue" : 207
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 272,
+          "strongPrecision" : 0.761,
+          "strongTrue" : 207
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 272,
+      "precision" : 0.761,
+      "recall" : 0.0818,
+      "threshold" : 3,
+      "truePassing" : 207
+    }
+  ],
+  "name" : "phone screen",
+  "positives" : 2532,
+  "precisionAt20" : 0.8,
+  "prompts" : 1,
+  "recallAt200" : 0.06,
+  "rule" : "screenshot",
+  "zTop" : 4.3047
+}

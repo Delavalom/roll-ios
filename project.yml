@@ -1,0 +1,111 @@
+name: Roll
+options:
+  bundleIdPrefix: com.delavalom
+  deploymentTarget: { iOS: "18.0" }
+  createIntermediateGroups: true
+configFiles:
+  Debug: Team.xcconfig
+  Release: Team.xcconfig
+packages:
+  RollCore: { path: Packages/RollCore }
+  EmbeddingGemma: { path: ../embeddinggemma-coreml/swift }
+  RevenueCat: { url: https://github.com/RevenueCat/purchases-ios-spm, from: "5.0.0" }
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "2"
+    SWIFT_STRICT_CONCURRENCY: complete
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+targets:
+  Roll:
+    type: application
+    platform: iOS
+    sources: [App]
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: Roll
+        # From the build settings, so bumping CURRENT_PROJECT_VERSION bumps the uploaded build number.
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSPhotoLibraryUsageDescription: Roll looks at your photos on your iPhone to find what you can delete or shrink. Nothing leaves your phone.
+        NSPhotoLibraryAddUsageDescription: Roll saves the smaller copy of photos and videos you squish.
+        NSFaceIDUsageDescription: Roll uses Face ID to lock your Private swipefile.
+        BGTaskSchedulerPermittedIdentifiers: [com.delavalom.roll.index]
+        UIBackgroundModes: [processing]
+        UILaunchScreen: {}
+        ITSAppUsesNonExemptEncryption: false
+        # RevenueCat public SDK key, from RC_PUBLIC_KEY in the gitignored Team.xcconfig (empty = free tier only).
+        RCPublicKey: $(RC_PUBLIC_KEY)
+        # RevenueCat Test Store key, used only by DEBUG builds launched with -RCTestStore (Release forces it empty below).
+        RCTestStoreKey: $(RC_TEST_STORE_KEY)
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+    entitlements:
+      path: App/Roll.entitlements
+      properties:
+        com.apple.developer.sensitivecontentanalysis.client: [analysis]
+    settings:
+      base:
+        # iPhone only. XcodeGen's iOS target preset sets "1,2", which overrides the project-level value above.
+        TARGETED_DEVICE_FAMILY: "1"
+        PRODUCT_BUNDLE_IDENTIFIER: com.delavalom.roll
+      configs:
+        # Debug only: the local-model script copies a whole folder, which the user script sandbox can't allow
+        # (it needs every file listed). Release keeps the sandbox on and never bundles a model.
+        Debug:
+          ENABLE_USER_SCRIPT_SANDBOXING: NO
+        # Release and archive builds never carry the Test Store key.
+        Release:
+          RC_TEST_STORE_KEY: ""
+    # DEBUG only: a local model folder (the package's `.file` layout, e.g. `b70/` + `b280/` as embeddinggemma-coreml's
+    # s6 writes them) in the gitignored artifacts/local-model/ is bundled as `EmbeddingGemma`, which
+    # `GemmaEmbedder.developerSource` loads instead of the download (device proofs before the model is published).
+    # Release builds never bundle it, and their code has no developer source.
+    postCompileScripts:
+      - name: Bundle a local model (Debug only)
+        basedOnDependencyAnalysis: false
+        inputFiles: [$(SRCROOT)/artifacts/local-model]
+        outputFiles: [$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/EmbeddingGemma]
+        script: |
+          dest="$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/EmbeddingGemma"
+          src="$SRCROOT/artifacts/local-model"
+          if [ "$CONFIGURATION" = "Debug" ] && [ -d "$src" ] && [ -n "$(ls -A "$src" 2>/dev/null)" ]; then
+            mkdir -p "$dest" && rsync -a --delete "$src/" "$dest/"
+          else
+            rm -rf "$dest"
+          fi
+    dependencies:
+      - package: RollCore
+        products: [Embedding, ModelInstall, Store, Library, Signals, Indexer, Ranking, Dedupe, Squish, Monitor, Entitlements, Commit, Overview, SquishBridge]
+      - package: EmbeddingGemma
+        products: [EmbeddingGemma]
+      - package: RevenueCat
+        product: RevenueCat
+  RollUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [UITests]
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: com.delavalom.roll.uitests
+    dependencies:
+      - target: Roll
+schemes:
+  Roll:
+    build:
+      targets:
+        Roll: all
+        RollUITests: [test]
+    # Local StoreKit testing (Roll.storekit: both Roll Pro plans, the annual 3-day trial). Run action only, so
+    # Release, Profile and Archive keep talking to the real App Store.
+    run:
+      config: Debug
+      storeKitConfiguration: Roll.storekit
+      # Off by default; tick it in Edit Scheme to open straight on the paywall (DEBUG only).
+      commandLineArguments:
+        "-UITestOpen paywall": false
+    test:
+      targets: [RollUITests]

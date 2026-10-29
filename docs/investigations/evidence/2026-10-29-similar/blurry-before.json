@@ -1,0 +1,95 @@
+{
+  "aestheticBelow-0.3_qualityTrusted" : {
+    "count" : 2869,
+    "GB" : 40.07,
+    "photos" : {
+      "count" : 1133,
+      "GB" : 3.4900000000000002
+    },
+    "videos" : {
+      "count" : 1736,
+      "GB" : 36.579999999999998
+    }
+  },
+  "blurBelow25_anySize" : {
+    "count" : 122,
+    "GB" : 2.1899999999999999,
+    "photos" : {
+      "count" : 67,
+      "GB" : 0.32000000000000001
+    },
+    "videos" : {
+      "count" : 55,
+      "GB" : 1.8700000000000001
+    }
+  },
+  "blurBelow25_notQualityTrusted" : {
+    "count" : 0,
+    "GB" : 0,
+    "photos" : {
+      "count" : 0,
+      "GB" : 0
+    },
+    "videos" : {
+      "count" : 0,
+      "GB" : 0
+    }
+  },
+  "blurBelow25_qualityTrusted" : {
+    "count" : 122,
+    "GB" : 2.1899999999999999,
+    "photos" : {
+      "count" : 67,
+      "GB" : 0.32000000000000001
+    },
+    "videos" : {
+      "count" : 55,
+      "GB" : 1.8700000000000001
+    }
+  },
+  "blurryPhotoPreviewSide" : {
+    "256to287" : 0,
+    "288OrMore" : 67,
+    "below256" : 0,
+    "max" : 320,
+    "min" : 300,
+    "n" : 67
+  },
+  "homeCard" : {
+    "count" : 2877,
+    "GB" : 40.270000000000003,
+    "onDeviceGB" : 0
+  },
+  "liveAssets" : 29685,
+  "oldFilter(blur<25 OR aesthetic<-0.3)" : {
+    "count" : 2877,
+    "GB" : 40.270000000000003,
+    "photos" : {
+      "count" : 1139,
+      "GB" : 3.5
+    },
+    "videos" : {
+      "count" : 1738,
+      "GB" : 36.770000000000003
+    }
+  },
+  "presetNow" : {
+    "count" : 2877,
+    "GB" : 40.270000000000003,
+    "photos" : {
+      "count" : 1139,
+      "GB" : 3.5
+    },
+    "videos" : {
+      "count" : 1738,
+      "GB" : 36.770000000000003
+    }
+  },
+  "presetNowFilter" : "CandidateFilter(mediaType: -, subtypesAny: -, bytesAbove: -, blurBelow: 25.0, aestheticBelow: -0.3)",
+  "presetNowSQLPool" : {
+    "count" : 2877,
+    "GB" : 40.270000000000003,
+    "sameIdsAsSwift" : true,
+    "videos" : 1738
+  }
+}

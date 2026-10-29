@@ -1,0 +1,348 @@
+{
+  "rules" : [
+    {
+      "capHits" : 62,
+      "comparisons" : 52362,
+      "duplicates" : {
+        "exactHashGroups" : 1276,
+        "extras" : 1755,
+        "extrasGB" : 9.95,
+        "groups" : 1543,
+        "groupsOf10OrMore" : 1,
+        "largest" : 12,
+        "members" : 3298,
+        "p50Size" : 2,
+        "p95Size" : 3,
+        "pctMembersInOneTimestampGroups" : 12.159,
+        "pctMembersScreenshots" : 3.214,
+        "pctOfLibrary" : 11.11,
+        "sanity" : {
+          "anchorToMemberDistance" : {
+            "max" : 0.892,
+            "n" : 1755,
+            "p10" : 0,
+            "p50" : 0.007,
+            "p90" : 0.051,
+            "p99" : 0.22
+          },
+          "groupSpanSeconds" : {
+            "max" : 226668096,
+            "n" : 1543,
+            "p10" : 0,
+            "p50" : 35,
+            "p90" : 167753.234,
+            "p99" : 53572832
+          },
+          "widestPairDistance(groups<=60)" : {
+            "max" : 0.892,
+            "n" : 1543,
+            "p10" : 0,
+            "p50" : 0.007,
+            "p90" : 0.043,
+            "p99" : 0.219
+          }
+        }
+      },
+      "orphanedExactCopies" : 0,
+      "rule" : "anchor t=0.25 span=120s cap=64",
+      "similar" : {
+        "exactHashGroups" : 0,
+        "extras" : 5983,
+        "extrasGB" : 24,
+        "groups" : 2840,
+        "groupsOf10OrMore" : 46,
+        "largest" : 35,
+        "members" : 8823,
+        "p50Size" : 2,
+        "p95Size" : 7,
+        "pctMembersInOneTimestampGroups" : 15.301,
+        "pctMembersScreenshots" : 3.457,
+        "pctOfLibrary" : 29.722,
+        "sanity" : {
+          "anchorToMemberDistance" : {
+            "max" : 0.49,
+            "n" : 5983,
+            "p10" : 0.064,
+            "p50" : 0.155,
+            "p90" : 0.232,
+            "p99" : 0.249
+          },
+          "groupSpanSeconds" : {
+            "max" : 120,
+            "n" : 2840,
+            "p10" : 0,
+            "p50" : 2.233,
+            "p90" : 37.76,
+            "p99" : 109
+          },
+          "widestPairDistance(groups<=60)" : {
+            "max" : 0.602,
+            "n" : 2840,
+            "p10" : 0.082,
+            "p50" : 0.184,
+            "p90" : 0.254,
+            "p99" : 0.382
+          }
+        }
+      }
+    },
+    {
+      "capHits" : 29,
+      "comparisons" : 50884,
+      "duplicates" : {
+        "exactHashGroups" : 1276,
+        "extras" : 1830,
+        "extrasGB" : 10.31,
+        "groups" : 1609,
+        "groupsOf10OrMore" : 1,
+        "largest" : 12,
+        "members" : 3439,
+        "p50Size" : 2,
+        "p95Size" : 3,
+        "pctMembersInOneTimestampGroups" : 12.736,
+        "pctMembersScreenshots" : 2.966,
+        "pctOfLibrary" : 11.585,
+        "sanity" : {
+          "anchorToMemberDistance" : {
+            "max" : 0.892,
+            "n" : 1830,
+            "p10" : 0,
+            "p50" : 0.008,
+            "p90" : 0.055,
+            "p99" : 0.2
+          },
+          "groupSpanSeconds" : {
+            "max" : 226668096,
+            "n" : 1609,
+            "p10" : 0,
+            "p50" : 26,
+            "p90" : 143130,
+            "p99" : 53111748
+          },
+          "widestPairDistance(groups<=60)" : {
+            "max" : 0.892,
+            "n" : 1609,
+            "p10" : 0,
+            "p50" : 0.008,
+            "p90" : 0.05,
+            "p99" : 0.195
+          }
+        }
+      },
+      "orphanedExactCopies" : 0,
+      "rule" : "anchor t=0.2 span=60s cap=64",
+      "similar" : {
+        "exactHashGroups" : 0,
+        "extras" : 4833,
+        "extrasGB" : 19.22,
+        "groups" : 2543,
+        "groupsOf10OrMore" : 26,
+        "largest" : 30,
+        "members" : 7376,
+        "p50Size" : 2,
+        "p95Size" : 6,
+        "pctMembersInOneTimestampGroups" : 16.92,
+        "pctMembersScreenshots" : 2.942,
+        "pctOfLibrary" : 24.848,
+        "sanity" : {
+          "anchorToMemberDistance" : {
+            "max" : 0.281,
+            "n" : 4833,
+            "p10" : 0.056,
+            "p50" : 0.131,
+            "p90" : 0.186,
+            "p99" : 0.199
+          },
+          "groupSpanSeconds" : {
+            "max" : 59.803,
+            "n" : 2543,
+            "p10" : 0,
+            "p50" : 2,
+            "p90" : 23,
+            "p99" : 53
+          },
+          "widestPairDistance(groups<=60)" : {
+            "max" : 0.459,
+            "n" : 2543,
+            "p10" : 0.07,
+            "p50" : 0.151,
+            "p90" : 0.199,
+            "p99" : 0.305
+          }
+        }
+      }
+    },
+    {
+      "capHits" : 67,
+      "comparisons" : 59261,
+      "duplicates" : {
+        "exactHashGroups" : 1276,
+        "extras" : 1839,
+        "extrasGB" : 10.32,
+        "groups" : 1619,
+        "groupsOf10OrMore" : 1,
+        "largest" : 12,
+        "members" : 3458,
+        "p50Size" : 2,
+        "p95Size" : 3,
+        "pctMembersInOneTimestampGroups" : 12.58,
+        "pctMembersScreenshots" : 3.239,
+        "pctOfLibrary" : 11.649,
+        "sanity" : {
+          "anchorToMemberDistance" : {
+            "max" : 0.892,
+            "n" : 1839,
+            "p10" : 0,
+            "p50" : 0.008,
+            "p90" : 0.056,
+            "p99" : 0.22
+          },
+          "groupSpanSeconds" : {
+            "max" : 226668096,
+            "n" : 1619,
+            "p10" : 0,
+            "p50" : 27,
+            "p90" : 134626,
+            "p99" : 53111748
+          },
+          "widestPairDistance(groups<=60)" : {
+            "max" : 0.892,
+            "n" : 1619,
+            "p10" : 0,
+            "p50" : 0.008,
+            "p90" : 0.05,
+            "p99" : 0.21
+          }
+        }
+      },
+      "orphanedExactCopies" : 0,
+      "rule" : "anchor t=0.2 span=120s cap=64",
+      "similar" : {
+        "exactHashGroups" : 0,
+        "extras" : 4920,
+        "extrasGB" : 19.63,
+        "groups" : 2545,
+        "groupsOf10OrMore" : 27,
+        "largest" : 30,
+        "members" : 7465,
+        "p50Size" : 2,
+        "p95Size" : 6,
+        "pctMembersInOneTimestampGroups" : 16.651,
+        "pctMembersScreenshots" : 3.041,
+        "pctOfLibrary" : 25.147,
+        "sanity" : {
+          "anchorToMemberDistance" : {
+            "max" : 0.281,
+            "n" : 4920,
+            "p10" : 0.057,
+            "p50" : 0.132,
+            "p90" : 0.187,
+            "p99" : 0.199
+          },
+          "groupSpanSeconds" : {
+            "max" : 120,
+            "n" : 2545,
+            "p10" : 0,
+            "p50" : 2,
+            "p90" : 27.335,
+            "p99" : 106
+          },
+          "widestPairDistance(groups<=60)" : {
+            "max" : 0.459,
+            "n" : 2545,
+            "p10" : 0.071,
+            "p50" : 0.153,
+            "p90" : 0.2,
+            "p99" : 0.309
+          }
+        }
+      }
+    },
+    {
+      "capHits" : 398,
+      "comparisons" : 35530,
+      "duplicates" : {
+        "exactHashGroups" : 1276,
+        "extras" : 1714,
+        "extrasGB" : 9.76,
+        "groups" : 1501,
+        "groupsOf10OrMore" : 1,
+        "largest" : 12,
+        "members" : 3215,
+        "p50Size" : 2,
+        "p95Size" : 3,
+        "pctMembersInOneTimestampGroups" : 11.882,
+        "pctMembersScreenshots" : 2.986,
+        "pctOfLibrary" : 10.83,
+        "sanity" : {
+          "anchorToMemberDistance" : {
+            "max" : 0.892,
+            "n" : 1714,
+            "p10" : 0,
+            "p50" : 0.007,
+            "p90" : 0.048,
+            "p99" : 0.186
+          },
+          "groupSpanSeconds" : {
+            "max" : 226668096,
+            "n" : 1501,
+            "p10" : 0,
+            "p50" : 37,
+            "p90" : 187000,
+            "p99" : 53572832
+          },
+          "widestPairDistance(groups<=60)" : {
+            "max" : 0.892,
+            "n" : 1501,
+            "p10" : 0,
+            "p50" : 0.007,
+            "p90" : 0.039,
+            "p99" : 0.174
+          }
+        }
+      },
+      "orphanedExactCopies" : 0,
+      "rule" : "anchor t=0.3 span=60s cap=24",
+      "similar" : {
+        "exactHashGroups" : 0,
+        "extras" : 6617,
+        "extrasGB" : 26.83,
+        "groups" : 3009,
+        "groupsOf10OrMore" : 67,
+        "largest" : 25,
+        "members" : 9626,
+        "p50Size" : 2,
+        "p95Size" : 8,
+        "pctMembersInOneTimestampGroups" : 14.43,
+        "pctMembersScreenshots" : 3.563,
+        "pctOfLibrary" : 32.427,
+        "sanity" : {
+          "anchorToMemberDistance" : {
+            "max" : 0.49,
+            "n" : 6617,
+            "p10" : 0.07,
+            "p50" : 0.177,
+            "p90" : 0.277,
+            "p99" : 0.298
+          },
+          "groupSpanSeconds" : {
+            "max" : 59.803,
+            "n" : 3009,
+            "p10" : 0,
+            "p50" : 2.994,
+            "p90" : 29,
+            "p99" : 56.28
+          },
+          "widestPairDistance(groups<=60)" : {
+            "max" : 0.644,
+            "n" : 3009,
+            "p10" : 0.089,
+            "p50" : 0.215,
+            "p90" : 0.306,
+            "p99" : 0.443
+          }
+        }
+      }
+    }
+  ]
+}

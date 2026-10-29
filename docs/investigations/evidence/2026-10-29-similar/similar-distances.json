@@ -1,0 +1,602 @@
+{
+  "groupableRows" : 29669,
+  "images" : 24495,
+  "liveAssets" : 29685,
+  "oldLargestGroups" : [
+    {
+      "allPairDistance" : {
+        "max" : 0.971,
+        "n" : 15225,
+        "p10" : 0.161,
+        "p50" : 0.339,
+        "p90" : 0.585,
+        "p99" : 0.795
+      },
+      "linkedPairDistance" : {
+        "max" : 0.35,
+        "n" : 1906,
+        "p10" : 0.075,
+        "p50" : 0.215,
+        "p90" : 0.324,
+        "p99" : 0.348
+      },
+      "members" : 175,
+      "pctPairsNotSimilar(>=0.35)" : 47.225,
+      "sanity" : {
+        "anchorToMemberDistance" : {
+          "max" : 0.726,
+          "n" : 174,
+          "p10" : 0.317,
+          "p50" : 0.414,
+          "p90" : 0.491,
+          "p99" : 0.698
+        },
+        "groupSpanSeconds" : {
+          "max" : 14071,
+          "n" : 1,
+          "p10" : 14071,
+          "p50" : 14071,
+          "p90" : 14071,
+          "p99" : 14071
+        },
+        "widestPairDistance(groups<=60)" : {
+          "n" : 0
+        }
+      }
+    },
+    {
+      "allPairDistance" : {
+        "max" : 1.213,
+        "n" : 9870,
+        "p10" : 0.302,
+        "p50" : 0.571,
+        "p90" : 0.868,
+        "p99" : 1.048
+      },
+      "linkedPairDistance" : {
+        "max" : 0.35,
+        "n" : 1024,
+        "p10" : 0.14,
+        "p50" : 0.262,
+        "p90" : 0.335,
+        "p99" : 0.347
+      },
+      "members" : 141,
+      "pctPairsNotSimilar(>=0.35)" : 84.205,
+      "sanity" : {
+        "anchorToMemberDistance" : {
+          "max" : 1.154,
+          "n" : 140,
+          "p10" : 0.352,
+          "p50" : 0.494,
+          "p90" : 0.891,
+          "p99" : 1.077
+        },
+        "groupSpanSeconds" : {
+          "max" : 3603,
+          "n" : 1,
+          "p10" : 3603,
+          "p50" : 3603,
+          "p90" : 3603,
+          "p99" : 3603
+        },
+        "widestPairDistance(groups<=60)" : {
+          "n" : 0
+        }
+      }
+    },
+    {
+      "allPairDistance" : {
+        "max" : 1.107,
+        "n" : 6216,
+        "p10" : 0.246,
+        "p50" : 0.563,
+        "p90" : 0.765,
+        "p99" : 0.941
+      },
+      "linkedPairDistance" : {
+        "max" : 0.35,
+        "n" : 573,
+        "p10" : 0.067,
+        "p50" : 0.244,
+        "p90" : 0.328,
+        "p99" : 0.348
+      },
+      "members" : 112,
+      "pctPairsNotSimilar(>=0.35)" : 77.075,
+      "sanity" : {
+        "anchorToMemberDistance" : {
+          "max" : 0.984,
+          "n" : 111,
+          "p10" : 0.474,
+          "p50" : 0.805,
+          "p90" : 0.923,
+          "p99" : 0.982
+        },
+        "groupSpanSeconds" : {
+          "max" : 2208,
+          "n" : 1,
+          "p10" : 2208,
+          "p50" : 2208,
+          "p90" : 2208,
+          "p99" : 2208
+        },
+        "widestPairDistance(groups<=60)" : {
+          "n" : 0
+        }
+      }
+    },
+    {
+      "allPairDistance" : {
+        "max" : 1.092,
+        "n" : 4465,
+        "p10" : 0.275,
+        "p50" : 0.467,
+        "p90" : 0.807,
+        "p99" : 1.006
+      },
+      "linkedPairDistance" : {
+        "max" : 0.349,
+        "n" : 674,
+        "p10" : 0.09,
+        "p50" : 0.264,
+        "p90" : 0.337,
+        "p99" : 0.348
+      },
+      "members" : 95,
+      "pctPairsNotSimilar(>=0.35)" : 77.156,
+      "sanity" : {
+        "anchorToMemberDistance" : {
+          "max" : 1.092,
+          "n" : 94,
+          "p10" : 0.344,
+          "p50" : 0.808,
+          "p90" : 0.935,
+          "p99" : 1.092
+        },
+        "groupSpanSeconds" : {
+          "max" : 124,
+          "n" : 1,
+          "p10" : 124,
+          "p50" : 124,
+          "p90" : 124,
+          "p99" : 124
+        },
+        "widestPairDistance(groups<=60)" : {
+          "n" : 0
+        }
+      }
+    },
+    {
+      "allPairDistance" : {
+        "max" : 0.972,
+        "n" : 2701,
+        "p10" : 0.228,
+        "p50" : 0.464,
+        "p90" : 0.692,
+        "p99" : 0.884
+      },
+      "linkedPairDistance" : {
+        "max" : 0.35,
+        "n" : 368,
+        "p10" : 0.089,
+        "p50" : 0.221,
+        "p90" : 0.333,
+        "p99" : 0.349
+      },
+      "members" : 74,
+      "pctPairsNotSimilar(>=0.35)" : 73.047,
+      "sanity" : {
+        "anchorToMemberDistance" : {
+          "max" : 0.673,
+          "n" : 73,
+          "p10" : 0.132,
+          "p50" : 0.402,
+          "p90" : 0.53,
+          "p99" : 0.673
+        },
+        "groupSpanSeconds" : {
+          "max" : 2972,
+          "n" : 1,
+          "p10" : 2972,
+          "p50" : 2972,
+          "p90" : 2972,
+          "p99" : 2972
+        },
+        "widestPairDistance(groups<=60)" : {
+          "n" : 0
+        }
+      }
+    }
+  ],
+  "windowPairs" : {
+    "all" : {
+      "distance" : {
+        "max" : 2.003,
+        "n" : 111645,
+        "p10" : 0.146,
+        "p50" : 0.507,
+        "p90" : 1.074,
+        "p99" : 1.531
+      },
+      "histogram" : [
+        {
+          "count" : 2582,
+          "from" : 0,
+          "to" : 0.05
+        },
+        {
+          "count" : 3921,
+          "from" : 0.05,
+          "to" : 0.1
+        },
+        {
+          "count" : 5145,
+          "from" : 0.1,
+          "to" : 0.15
+        },
+        {
+          "count" : 5943,
+          "from" : 0.15,
+          "to" : 0.2
+        },
+        {
+          "count" : 6016,
+          "from" : 0.2,
+          "to" : 0.25
+        },
+        {
+          "count" : 6157,
+          "from" : 0.25,
+          "to" : 0.3
+        },
+        {
+          "count" : 6671,
+          "from" : 0.3,
+          "to" : 0.35
+        },
+        {
+          "count" : 6632,
+          "from" : 0.35,
+          "to" : 0.4
+        },
+        {
+          "count" : 12013,
+          "from" : 0.4,
+          "to" : 0.5
+        },
+        {
+          "count" : 10960,
+          "from" : 0.5,
+          "to" : 0.6
+        },
+        {
+          "count" : 17896,
+          "from" : 0.6,
+          "to" : 0.8
+        },
+        {
+          "count" : 12970,
+          "from" : 0.8,
+          "to" : 1
+        },
+        {
+          "count" : 14739,
+          "from" : 1,
+          "to" : "inf"
+        }
+      ]
+    },
+    "cameraPhotos0to2sApart" : {
+      "distance" : {
+        "max" : 1.902,
+        "n" : 29438,
+        "p10" : 0.119,
+        "p50" : 0.452,
+        "p90" : 1.001,
+        "p99" : 1.406
+      },
+      "histogram" : [
+        {
+          "count" : 904,
+          "from" : 0,
+          "to" : 0.05
+        },
+        {
+          "count" : 1403,
+          "from" : 0.05,
+          "to" : 0.1
+        },
+        {
+          "count" : 1826,
+          "from" : 0.1,
+          "to" : 0.15
+        },
+        {
+          "count" : 1937,
+          "from" : 0.15,
+          "to" : 0.2
+        },
+        {
+          "count" : 1815,
+          "from" : 0.2,
+          "to" : 0.25
+        },
+        {
+          "count" : 1787,
+          "from" : 0.25,
+          "to" : 0.3
+        },
+        {
+          "count" : 1775,
+          "from" : 0.3,
+          "to" : 0.35
+        },
+        {
+          "count" : 1687,
+          "from" : 0.35,
+          "to" : 0.4
+        },
+        {
+          "count" : 3043,
+          "from" : 0.4,
+          "to" : 0.5
+        },
+        {
+          "count" : 2795,
+          "from" : 0.5,
+          "to" : 0.6
+        },
+        {
+          "count" : 4430,
+          "from" : 0.6,
+          "to" : 0.8
+        },
+        {
+          "count" : 3078,
+          "from" : 0.8,
+          "to" : 1
+        },
+        {
+          "count" : 2958,
+          "from" : 1,
+          "to" : "inf"
+        }
+      ]
+    },
+    "cameraPhotos30to120sApart" : {
+      "distance" : {
+        "max" : 1.963,
+        "n" : 18489,
+        "p10" : 0.228,
+        "p50" : 0.581,
+        "p90" : 1.19,
+        "p99" : 1.645
+      },
+      "histogram" : [
+        {
+          "count" : 222,
+          "from" : 0,
+          "to" : 0.05
+        },
+        {
+          "count" : 284,
+          "from" : 0.05,
+          "to" : 0.1
+        },
+        {
+          "count" : 390,
+          "from" : 0.1,
+          "to" : 0.15
+        },
+        {
+          "count" : 543,
+          "from" : 0.15,
+          "to" : 0.2
+        },
+        {
+          "count" : 772,
+          "from" : 0.2,
+          "to" : 0.25
+        },
+        {
+          "count" : 976,
+          "from" : 0.25,
+          "to" : 0.3
+        },
+        {
+          "count" : 1238,
+          "from" : 0.3,
+          "to" : 0.35
+        },
+        {
+          "count" : 1201,
+          "from" : 0.35,
+          "to" : 0.4
+        },
+        {
+          "count" : 2118,
+          "from" : 0.4,
+          "to" : 0.5
+        },
+        {
+          "count" : 1835,
+          "from" : 0.5,
+          "to" : 0.6
+        },
+        {
+          "count" : 2794,
+          "from" : 0.6,
+          "to" : 0.8
+        },
+        {
+          "count" : 2144,
+          "from" : 0.8,
+          "to" : 1
+        },
+        {
+          "count" : 3972,
+          "from" : 1,
+          "to" : "inf"
+        }
+      ]
+    },
+    "compared" : 111645,
+    "linkedByHash" : 2471,
+    "linkedByPrint(<0.35)" : 33984,
+    "nearHashPairs" : {
+      "distance" : {
+        "max" : 0.601,
+        "n" : 2471,
+        "p10" : 0,
+        "p50" : 0.026,
+        "p90" : 0.088,
+        "p99" : 0.304
+      },
+      "histogram" : [
+        {
+          "count" : 1781,
+          "from" : 0,
+          "to" : 0.05
+        },
+        {
+          "count" : 504,
+          "from" : 0.05,
+          "to" : 0.1
+        },
+        {
+          "count" : 112,
+          "from" : 0.1,
+          "to" : 0.15
+        },
+        {
+          "count" : 31,
+          "from" : 0.15,
+          "to" : 0.2
+        },
+        {
+          "count" : 13,
+          "from" : 0.2,
+          "to" : 0.25
+        },
+        {
+          "count" : 5,
+          "from" : 0.25,
+          "to" : 0.3
+        },
+        {
+          "count" : 5,
+          "from" : 0.3,
+          "to" : 0.35
+        },
+        {
+          "count" : 11,
+          "from" : 0.35,
+          "to" : 0.4
+        },
+        {
+          "count" : 6,
+          "from" : 0.4,
+          "to" : 0.5
+        },
+        {
+          "count" : 2,
+          "from" : 0.5,
+          "to" : 0.6
+        },
+        {
+          "count" : 1,
+          "from" : 0.6,
+          "to" : 0.8
+        },
+        {
+          "count" : 0,
+          "from" : 0.8,
+          "to" : 1
+        },
+        {
+          "count" : 0,
+          "from" : 1,
+          "to" : "inf"
+        }
+      ]
+    },
+    "sameTimestamp" : {
+      "distance" : {
+        "max" : 1.911,
+        "n" : 12368,
+        "p10" : 0.078,
+        "p50" : 0.339,
+        "p90" : 0.903,
+        "p99" : 1.387
+      },
+      "histogram" : [
+        {
+          "count" : 699,
+          "from" : 0,
+          "to" : 0.05
+        },
+        {
+          "count" : 1050,
+          "from" : 0.05,
+          "to" : 0.1
+        },
+        {
+          "count" : 1055,
+          "from" : 0.1,
+          "to" : 0.15
+        },
+        {
+          "count" : 1021,
+          "from" : 0.15,
+          "to" : 0.2
+        },
+        {
+          "count" : 925,
+          "from" : 0.2,
+          "to" : 0.25
+        },
+        {
+          "count" : 826,
+          "from" : 0.25,
+          "to" : 0.3
+        },
+        {
+          "count" : 766,
+          "from" : 0.3,
+          "to" : 0.35
+        },
+        {
+          "count" : 703,
+          "from" : 0.35,
+          "to" : 0.4
+        },
+        {
+          "count" : 1159,
+          "from" : 0.4,
+          "to" : 0.5
+        },
+        {
+          "count" : 981,
+          "from" : 0.5,
+          "to" : 0.6
+        },
+        {
+          "count" : 1438,
+          "from" : 0.6,
+          "to" : 0.8
+        },
+        {
+          "count" : 885,
+          "from" : 0.8,
+          "to" : 1
+        },
+        {
+          "count" : 860,
+          "from" : 1,
+          "to" : "inf"
+        }
+      ]
+    }
+  }
+}

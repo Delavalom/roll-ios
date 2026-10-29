@@ -1,0 +1,218 @@
+{
+  "cappedRecallAt200" : 0.68,
+  "composition" : {
+    "animated" : 0,
+    "blurryPhoto" : 8,
+    "document" : 721,
+    "livePhoto" : 11,
+    "panorama" : 0,
+    "portrait" : 0,
+    "screenRecording" : 12,
+    "screenshot" : 655,
+    "sensitive" : 0,
+    "textHeavy" : 930,
+    "video" : 115
+  },
+  "cosMean" : 0.6608,
+  "cosSD" : 0.0329,
+  "cosTop" : 0.7879,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681,
+          "strongPrecision" : 0.0853,
+          "strongTrue" : 2532
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681,
+          "strongPrecision" : 0.0853,
+          "strongTrue" : 2532
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681,
+          "strongPrecision" : 0.0853,
+          "strongTrue" : 2532
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "precision" : 0.0853,
+      "recall" : 1,
+      "threshold" : 0.2,
+      "truePassing" : 2532
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 170,
+          "foldedPrecision" : 0.2706,
+          "foldedTrue" : 46,
+          "foldedTrueShare" : 0.0407,
+          "ratio" : 0.4,
+          "strong" : 2369,
+          "strongPrecision" : 0.458,
+          "strongTrue" : 1085
+        },
+        {
+          "folded" : 1216,
+          "foldedPrecision" : 0.3372,
+          "foldedTrue" : 410,
+          "foldedTrueShare" : 0.3625,
+          "ratio" : 0.5,
+          "strong" : 1323,
+          "strongPrecision" : 0.545,
+          "strongTrue" : 721
+        },
+        {
+          "folded" : 1861,
+          "foldedPrecision" : 0.3772,
+          "foldedTrue" : 702,
+          "foldedTrueShare" : 0.6207,
+          "ratio" : 0.6,
+          "strong" : 678,
+          "strongPrecision" : 0.6327,
+          "strongTrue" : 429
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 2539,
+      "precision" : 0.4455,
+      "recall" : 0.4467,
+      "threshold" : 1.5,
+      "truePassing" : 1131
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 1164,
+          "strongPrecision" : 0.5627,
+          "strongTrue" : 655
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 1164,
+          "strongPrecision" : 0.5627,
+          "strongTrue" : 655
+        },
+        {
+          "folded" : 486,
+          "foldedPrecision" : 0.465,
+          "foldedTrue" : 226,
+          "foldedTrueShare" : 0.345,
+          "ratio" : 0.6,
+          "strong" : 678,
+          "strongPrecision" : 0.6327,
+          "strongTrue" : 429
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 1164,
+      "precision" : 0.5627,
+      "recall" : 0.2587,
+      "threshold" : 2,
+      "truePassing" : 655
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 449,
+          "strongPrecision" : 0.6503,
+          "strongTrue" : 292
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 449,
+          "strongPrecision" : 0.6503,
+          "strongTrue" : 292
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 449,
+          "strongPrecision" : 0.6503,
+          "strongTrue" : 292
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 449,
+      "precision" : 0.6503,
+      "recall" : 0.1153,
+      "threshold" : 2.5,
+      "truePassing" : 292
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 119,
+          "strongPrecision" : 0.6555,
+          "strongTrue" : 78
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 119,
+          "strongPrecision" : 0.6555,
+          "strongTrue" : 78
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 119,
+          "strongPrecision" : 0.6555,
+          "strongTrue" : 78
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 119,
+      "precision" : 0.6555,
+      "recall" : 0.0308,
+      "threshold" : 3,
+      "truePassing" : 78
+    }
+  ],
+  "name" : "pile.screenshots",
+  "positives" : 2532,
+  "precisionAt20" : 0.8,
+  "prompts" : 1,
+  "recallAt200" : 0.0537,
+  "rule" : "screenshot",
+  "zTop" : 3.8609
+}

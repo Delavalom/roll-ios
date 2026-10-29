@@ -1,0 +1,36 @@
+{
+  "constants" : "anchor t=0.3 span=60s cap=64",
+  "duplicates" : {
+    "extras" : 1716,
+    "extrasGB" : 9.76,
+    "groups" : 1503,
+    "groupsOf10OrMore" : 1,
+    "largest" : 12,
+    "members" : 3219,
+    "p50Size" : 2,
+    "p95Size" : 3,
+    "pctOfLibrary" : 10.844
+  },
+  "equalsAnchorWithShippedConstants" : true,
+  "equalsOldUnionFind" : false,
+  "home" : {
+    "blurry" : 67,
+    "blurryGB" : 0.32,
+    "duplicateExtras" : 1716,
+    "freeableGB" : 39.1,
+    "freeableOnDeviceGB" : 0.02,
+    "similarExtras" : 6629
+  },
+  "macDebugSeconds" : 4.383,
+  "similar" : {
+    "extras" : 6629,
+    "extrasGB" : 26.85,
+    "groups" : 3007,
+    "groupsOf10OrMore" : 64,
+    "largest" : 35,
+    "members" : 9636,
+    "p50Size" : 2,
+    "p95Size" : 8,
+    "pctOfLibrary" : 32.461
+  }
+}

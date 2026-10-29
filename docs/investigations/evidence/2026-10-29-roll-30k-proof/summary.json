@@ -1,0 +1,122 @@
+{
+ "device": {
+  "cores": 6,
+  "machine": "iPhone14,3",
+  "osVersion": "27.0.1",
+  "photosAccess": "3",
+  "physicalMemory": 5913821184
+ },
+ "index_full": {
+  "batch_items_per_s_median": 18.5,
+  "failed": 0,
+  "finished_up_s": 5593,
+  "full": 24498,
+  "inCloud": 4,
+  "minutes": 75.8,
+  "overall_items_per_s": 6.52,
+  "previews": 5183,
+  "seconds": 4549.9,
+  "started_up_s": 1043,
+  "thermal_pauses": 46,
+  "thermal_share": {
+   "fair": 0.308,
+   "nominal": 0.071,
+   "serious": 0.621
+  },
+  "thumbs": 29685
+ },
+ "library_totals": {
+  "all": 29685,
+  "audio": 0,
+  "cinematic": 0,
+  "favorites": 380,
+  "hdrPhotos": 69,
+  "hidden": 0,
+  "images": 24495,
+  "livePhotos": 2169,
+  "panoramas": 16,
+  "portrait": 19,
+  "screenRecordings": 30,
+  "screenshots": 2532,
+  "slomo": 9,
+  "timelapse": 1,
+  "userAlbums": 24,
+  "videos": 5190
+ },
+ "memory_mb": {
+  "limit_mb": 3072,
+  "peak_at_handover": 811.6,
+  "peak_while_indexing": 427,
+  "peak_while_preparing": 1380.6
+ },
+ "prepare": {
+  "minutes": 17.2,
+  "ready_up_s": 1044.5,
+  "started_up_s": 15.3,
+  "step_up_s": [
+   15,
+   73,
+   133,
+   189,
+   247,
+   376,
+   504,
+   788,
+   918
+  ]
+ },
+ "search_ms": {
+  "blurry": {
+   "attempts": [
+    115.0,
+    104.9,
+    106.1,
+    104.8,
+    104.8
+   ],
+   "median_warm": 104.8
+  },
+  "memes": {
+   "attempts": [
+    319.4,
+    296.4,
+    297.6,
+    301.1,
+    296.7
+   ],
+   "median_warm": 297.1
+  },
+  "privateStuff": {
+   "attempts": [
+    324.0,
+    315.0,
+    309.1,
+    309.9,
+    313.6
+   ],
+   "median_warm": 311.7
+  },
+  "receipts": {
+   "attempts": [
+    52525.5,
+    719.6,
+    317.9,
+    312.0,
+    318.8
+   ],
+   "median_warm": 318.4
+  },
+  "screenshots": {
+   "attempts": [
+    111.7,
+    102.2,
+    105.3,
+    102.8,
+    102.3
+   ],
+   "median_warm": 102.6
+  }
+ },
+ "store_embedded": 29681,
+ "store_signalsDone": 29681
+}

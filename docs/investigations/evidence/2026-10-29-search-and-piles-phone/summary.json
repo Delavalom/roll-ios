@@ -1,0 +1,288 @@
+{
+ "device": {
+  "cores": 6,
+  "machine": "iPhone14,3",
+  "osVersion": "27.0.1"
+ },
+ "home": {
+  "blurryBytes": 319438288,
+  "blurryCount": 67,
+  "dupGroups": 1503,
+  "dupLargest": 12,
+  "dupMembers": 3219,
+  "screenshotsCount": 2532,
+  "similarGroups": 3007,
+  "similarLargest": 35,
+  "similarMembers": 9636
+ },
+ "last_up_s": 1796.5,
+ "memory_mb": {
+  "peak": 1618.7,
+  "peak_during_bench": 360.5
+ },
+ "piles": {
+  "blurry": {
+   "first_ms": 7.9,
+   "first_steps_ms": {
+    "decisions": 0.1,
+    "dot": 6.7,
+    "lookup": 0.2,
+    "pool": 0.0,
+    "queries": 0.0,
+    "score": 0.7,
+    "sql": 0
+   },
+   "pool": 67,
+   "results": 20,
+   "warm_max_ms": 7.8,
+   "warm_median_ms": 7.8,
+   "warm_steps_median_ms": {
+    "decisions": 0.07,
+    "dot": 6.71,
+    "lookup": 0.22,
+    "pool": 0.0,
+    "queries": 0.0,
+    "score": 0.64,
+    "sql": 0.0
+   }
+  },
+  "memes": {
+   "first_ms": 46.8,
+   "first_steps_ms": {
+    "decisions": 0.1,
+    "dot": 9.5,
+    "lookup": 0.3,
+    "pool": 10.2,
+    "queries": 21.2,
+    "score": 5.4,
+    "sql": 0
+   },
+   "pool": 24496,
+   "results": 20,
+   "warm_max_ms": 14.4,
+   "warm_median_ms": 14.1,
+   "warm_steps_median_ms": {
+    "decisions": 0.07,
+    "dot": 8.19,
+    "lookup": 0.23,
+    "pool": 0.0,
+    "queries": 0.0,
+    "score": 5.21,
+    "sql": 0.0
+   }
+  },
+  "privateStuff": {
+   "first_ms": 50.9,
+   "first_steps_ms": {
+    "decisions": 0.1,
+    "dot": 8.8,
+    "lookup": 0.2,
+    "pool": 10.6,
+    "queries": 25.2,
+    "score": 5.8,
+    "sql": 0
+   },
+   "pool": 29682,
+   "results": 20,
+   "warm_max_ms": 14.7,
+   "warm_median_ms": 14.5,
+   "warm_steps_median_ms": {
+    "decisions": 0.08,
+    "dot": 8.14,
+    "lookup": 0.25,
+    "pool": 0.0,
+    "queries": 0.0,
+    "score": 5.83,
+    "sql": 0.0
+   }
+  },
+  "receipts": {
+   "first_ms": 117.0,
+   "first_steps_ms": {
+    "decisions": 0.6,
+    "dot": 34.5,
+    "lookup": 3.7,
+    "pool": 19.6,
+    "queries": 50.3,
+    "score": 7.9,
+    "sql": 0
+   },
+   "pool": 29682,
+   "results": 20,
+   "warm_max_ms": 16.8,
+   "warm_median_ms": 14.5,
+   "warm_steps_median_ms": {
+    "decisions": 0.08,
+    "dot": 8.03,
+    "lookup": 0.29,
+    "pool": 0.0,
+    "queries": 0.0,
+    "score": 5.95,
+    "sql": 0.0
+   }
+  },
+  "screenshots": {
+   "first_ms": 8.3,
+   "first_steps_ms": {
+    "decisions": 0.1,
+    "dot": 6.8,
+    "lookup": 0.2,
+    "pool": 0.0,
+    "queries": 0.0,
+    "score": 1.1,
+    "sql": 0
+   },
+   "pool": 2532,
+   "results": 20,
+   "warm_max_ms": 8.3,
+   "warm_median_ms": 8.2,
+   "warm_steps_median_ms": {
+    "decisions": 0.07,
+    "dot": 6.72,
+    "lookup": 0.24,
+    "pool": 0.0,
+    "queries": 0.0,
+    "score": 1.05,
+    "sql": 0.0
+   }
+  }
+ },
+ "prepare": {
+  "minutes": 21.1,
+  "ready_up_s": 1269.8,
+  "started_up_s": 5.9,
+  "step_up_s": [
+   6,
+   67,
+   122,
+   176,
+   232,
+   365,
+   680,
+   849,
+   1120,
+   1268
+  ]
+ },
+ "text_pass": [
+  {
+   "event": "text_pass",
+   "state": "started",
+   "up": 63.7
+  },
+  {
+   "event": "text_pass",
+   "failed": 0,
+   "ms": 1600584.481666,
+   "read": 483,
+   "state": "finished",
+   "unread": 4715,
+   "up": 1664.3,
+   "withWords": 461
+  }
+ ],
+ "thermal": [
+  [
+   1,
+   "nominal"
+  ],
+  [
+   37,
+   "fair"
+  ],
+  [
+   57,
+   "serious"
+  ],
+  [
+   547,
+   "fair"
+  ],
+  [
+   592,
+   "serious"
+  ],
+  [
+   967,
+   "fair"
+  ],
+  [
+   1027,
+   "serious"
+  ],
+  [
+   1417,
+   "fair"
+  ],
+  [
+   1512,
+   "nominal"
+  ]
+ ],
+ "typed": {
+  "a dog on the beach": {
+   "byWords": 0,
+   "compared": 29682,
+   "first_ms": 25.9,
+   "matches": 596,
+   "warm_median_ms": 23.7,
+   "weaker": 281
+  },
+  "birthday cake": {
+   "byWords": 0,
+   "compared": 29682,
+   "first_ms": 31.3,
+   "matches": 1623,
+   "warm_median_ms": 29.4,
+   "weaker": 0
+  },
+  "boarding pass": {
+   "byWords": 0,
+   "compared": 29682,
+   "first_ms": 25.9,
+   "matches": 570,
+   "warm_median_ms": 23.9,
+   "weaker": 328
+  },
+  "screenshot of a chat": {
+   "byWords": 0,
+   "compared": 29682,
+   "first_ms": 26.3,
+   "matches": 991,
+   "warm_median_ms": 24.5,
+   "weaker": 0
+  },
+  "sunset over the ocean": {
+   "byWords": 0,
+   "compared": 29682,
+   "first_ms": 27.1,
+   "matches": 694,
+   "warm_median_ms": 24.8,
+   "weaker": 288
+  },
+  "uber receipt": {
+   "byWords": 0,
+   "compared": 29682,
+   "first_ms": 41.1,
+   "matches": 615,
+   "warm_median_ms": 26.7,
+   "weaker": 395
+  },
+  "wifi password": {
+   "byWords": 0,
+   "compared": 29682,
+   "first_ms": 25.7,
+   "matches": 434,
+   "warm_median_ms": 24.1,
+   "weaker": 481
+  },
+  "xkqzv plorb": {
+   "byWords": 0,
+   "compared": 29682,
+   "first_ms": 26.1,
+   "matches": 890,
+   "warm_median_ms": 23.9,
+   "weaker": 0
+  }
+ }
+}

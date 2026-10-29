@@ -1,0 +1,36 @@
+{"cores": 6, "event": "session", "lowPowerMode": false, "machine": "iPhone14,3", "mode": "read-only", "model": "iPhone", "osVersion": "27.0.1", "photosAccess": "3", "physicalMemory": 5913821184, "system": "iOS", "up": 1.4}
+{"event": "thermal", "reason": "start", "state": "nominal", "up": 1.4}
+{"event": "model", "state": "loading", "up": 1.5}
+{"event": "model", "state": "preparing 0/9", "up": 5.9}
+{"all": 29686, "audio": 0, "cinematic": 0, "event": "library_totals", "favorites": 380, "hdrPhotos": 69, "hidden": 0, "images": 24496, "livePhotos": 2169, "panoramas": 16, "portrait": 19, "screenRecordings": 30, "screenshots": 2532, "slomo": 9, "timelapse": 1, "up": 7.5, "userAlbums": 24, "videos": 5190}
+{"event": "thermal", "reason": "change", "state": "fair", "up": 37.1}
+{"event": "sync_read", "ms": 49934, "step": "fetchAll", "up": 51.4}
+{"event": "index_run", "state": "started", "total": 0, "up": 53.9}
+{"event": "thermal", "reason": "change", "state": "serious", "up": 57}
+{"event": "index_run", "failed": 0, "full": 1, "inCloud": 0, "itemsPerSecond": 0.1063970697249419, "previews": 0, "processed": 1, "seconds": 9.398755084, "state": "finished", "thumbs": 1, "total": 1, "up": 63.3}
+{"event": "index_run", "state": "started", "total": 0, "up": 63.6}
+{"event": "index_run", "failed": 0, "full": 0, "inCloud": 0, "itemsPerSecond": 0, "previews": 0, "processed": 0, "seconds": 0.003387, "state": "finished", "thumbs": 0, "total": 0, "up": 63.6}
+{"event": "text_pass", "state": "started", "up": 63.7}
+{"event": "model", "state": "preparing 1/9", "up": 66.6}
+{"event": "model", "state": "preparing 2/9", "up": 121.9}
+{"candidates": 18246, "checked": 2000, "event": "locality_scan", "formats": 1, "iCloud": 1997, "local": 3, "ms": 64210, "rounds": 1, "timedOut": 0, "unanswered": 0, "up": 128}
+{"event": "model", "state": "preparing 3/9", "up": 176.1}
+{"event": "model", "state": "preparing 4/9", "up": 232.5}
+{"event": "model", "state": "preparing 5/9", "up": 364.9}
+{"event": "thermal", "reason": "change", "state": "fair", "up": 547.1}
+{"event": "thermal", "reason": "change", "state": "serious", "up": 592}
+{"event": "model", "state": "preparing 6/9", "up": 679.8}
+{"event": "model", "state": "preparing 7/9", "up": 848.8}
+{"event": "thermal", "reason": "change", "state": "fair", "up": 967}
+{"event": "thermal", "reason": "change", "state": "serious", "up": 1027}
+{"event": "model", "state": "preparing 8/9", "up": 1119.9}
+{"event": "model", "state": "preparing 9/9", "up": 1267.5}
+{"event": "index_run", "state": "started", "total": 0, "up": 1268.2}
+{"event": "index_run", "processed": 0, "state": "thermalPause", "up": 1268.7}
+{"event": "model", "state": "ready", "up": 1269.8}
+{"event": "thermal", "reason": "change", "state": "fair", "up": 1417}
+{"event": "index_run", "failed": 0, "full": 1, "inCloud": 0, "itemsPerSecond": 0.00663291216538987, "previews": 0, "processed": 1, "seconds": 150.763341209, "state": "finished", "thumbs": 1, "total": 1, "up": 1418.9}
+{"event": "search_bench", "state": "started", "up": 1451.8}
+{"event": "search_bench", "state": "finished", "up": 1452.3}
+{"event": "thermal", "reason": "change", "state": "nominal", "up": 1512}
+{"event": "text_pass", "failed": 0, "ms": 1600584.481666, "read": 483, "state": "finished", "unread": 4715, "up": 1664.3, "withWords": 461}

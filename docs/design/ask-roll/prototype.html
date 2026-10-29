@@ -1,0 +1,418 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ask Roll: prototype</title>
+<style>
+/* Roll's own palette: warm paper, ink, one ember accent. The ring-and-dot mark is the app icon. */
+:root{
+  --paper:#F6F4EF; --card:#FFFFFF; --ink:#141414; --ink2:#6E6A62; --ink3:#A8A39A; --hair:rgba(20,20,20,.08);
+  --ember:#FF5A36; --keep:#2FB45A; --album:#2F7CF6;
+  --ease:cubic-bezier(.2,.8,.2,1); --spring:cubic-bezier(.34,1.4,.5,1);
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--font-sans, -apple-system, system-ui, sans-serif)}
+.stage{display:flex;flex-direction:column;align-items:center;gap:14px;padding:6px 0 4px}
+.device{width:372px;height:792px;border-radius:56px;padding:6px;background:#0d0d0d;box-shadow:0 0 0 1.5px #2a2a2a, 0 30px 60px -20px rgba(0,0,0,.45)}
+.screen{position:relative;width:360px;height:780px;border-radius:50px;overflow:hidden;background:var(--paper);color:var(--ink);
+  font-family:-apple-system,"SF Pro Text",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.island{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:104px;height:31px;border-radius:20px;background:#000;z-index:50}
+.sb{position:absolute;top:0;left:0;right:0;height:54px;display:flex;justify-content:space-between;align-items:center;padding:4px 30px 0 36px;font:600 15px/1 -apple-system,system-ui;z-index:40;letter-spacing:-.2px}
+.sb svg{display:block}
+.topfade{position:absolute;left:0;right:0;top:0;height:64px;background:linear-gradient(var(--paper) 62%,rgba(246,244,239,0));z-index:35;pointer-events:none}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:var(--ink);z-index:60;opacity:.9}
+.layer{position:absolute;inset:0;transition:opacity .45s var(--ease), transform .55s var(--ease)}
+.hide{opacity:0;pointer-events:none}
+
+/* mark */
+.mark{display:inline-grid;place-items:center;border-radius:50%;background:var(--ink);flex:none}
+.mark svg{overflow:visible}
+.mark .arc{opacity:0;transform-origin:50% 50%}
+.mark.busy .arc{opacity:1;animation:spin .9s linear infinite}
+.mark.busy .ring{opacity:.28}
+.mark.busy .dot{animation:pulse 1.1s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes pulse{50%{transform:scale(.55)}}
+.mark .dot{transform-origin:50% 50%}
+
+/* home */
+.home{padding:66px 20px 0}
+.hello{display:flex;align-items:center;gap:10px;color:var(--ink2);font-size:15px;font-weight:500}
+.h1{font:700 31px/1.08 -apple-system,"SF Pro Display",system-ui;letter-spacing:-.9px;margin:14px 0 8px}
+.lib{font-size:13.5px;color:var(--ink2);letter-spacing:-.1px}
+.lib b{color:var(--ink);font-weight:600}
+.sugs{margin-top:26px;display:flex;flex-direction:column;gap:10px}
+.sug{display:flex;align-items:center;gap:14px;background:var(--card);border-radius:20px;padding:12px 14px 12px 12px;box-shadow:0 0 0 .5px var(--hair),0 1px 2px rgba(0,0,0,.03);transition:transform .5s var(--ease),opacity .4s}
+.fan{position:relative;width:52px;height:52px;flex:none}
+.fan img{position:absolute;width:38px;height:46px;object-fit:cover;object-position:top;border-radius:8px;border:2px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.14)}
+.fan img:nth-child(1){left:0;top:4px;transform:rotate(-9deg)}
+.fan img:nth-child(2){left:8px;top:2px;transform:rotate(-1deg)}
+.fan img:nth-child(3){left:15px;top:4px;transform:rotate(8deg)}
+.sug .t{font-size:15.5px;font-weight:600;letter-spacing:-.3px}
+.sug .s{font-size:13px;color:var(--ink2);margin-top:2px}
+.sug .go{margin-left:auto;color:var(--ink3);font-size:18px}
+.sec{font-size:12px;font-weight:600;color:var(--ink3);letter-spacing:.4px;text-transform:uppercase;margin:28px 2px 0}
+
+/* composer */
+.composer{position:absolute;left:14px;right:14px;bottom:30px;z-index:30}
+.live{display:flex;align-items:center;gap:10px;margin:0 6px 10px;opacity:0;transform:translateY(8px);transition:all .35s var(--ease)}
+.live.on{opacity:1;transform:none}
+.live .strip{display:flex}
+.live .strip img{width:30px;height:30px;border-radius:8px;object-fit:cover;object-position:top;border:2px solid var(--paper);margin-left:-9px;transition:all .3s var(--spring)}
+.live .strip img:first-child{margin-left:0}
+.live .n{font-size:13px;color:var(--ink2)}
+.live .n b{color:var(--ink);font-variant-numeric:tabular-nums}
+.bar{display:flex;align-items:center;gap:10px;background:var(--card);border-radius:28px;min-height:56px;padding:8px 8px 8px 20px;box-shadow:0 0 0 .5px var(--hair),0 10px 30px -10px rgba(0,0,0,.18)}
+.bar .in{flex:1;font-size:16.5px;letter-spacing:-.2px;color:var(--ink)}
+.bar .in .ph{color:var(--ink3)}
+.caret{display:inline-block;width:2px;height:20px;background:var(--ember);vertical-align:-4px;margin-left:1px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.send{width:40px;height:40px}
+
+/* chat */
+.chat{padding:62px 16px 0;overflow:hidden}
+.chatin{display:flex;flex-direction:column;gap:14px;transition:transform .6s var(--ease)}
+.me{align-self:flex-end;max-width:78%;background:var(--ink);color:#fff;font-size:16px;line-height:1.3;letter-spacing:-.2px;padding:11px 15px;border-radius:22px 22px 6px 22px;transform-origin:100% 100%;animation:pop .45s var(--spring)}
+.me.chip{font-size:14.5px;padding:8px 14px;border-radius:18px 18px 6px 18px}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.92)}}
+.roll{display:flex;gap:10px;align-items:flex-start}
+.roll .body{flex:1;min-width:0}
+.status{display:flex;align-items:center;gap:8px;height:28px;font-size:14px;font-weight:500}
+.shim{background:linear-gradient(90deg,var(--ink3) 0%,var(--ink) 40%,var(--ink3) 80%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:sh 1.4s linear infinite}
+@keyframes sh{from{background-position:120% 0}to{background-position:-100% 0}}
+.status.done{color:var(--ink2)}
+.status .ok{color:var(--keep);font-weight:700}
+.found{font:700 22px/1.15 -apple-system,"SF Pro Display",system-ui;letter-spacing:-.6px;margin:6px 0 10px}
+.found span{color:var(--ink2);font-weight:500;font-size:15px;letter-spacing:-.2px;display:block;margin-top:3px}
+.sticker{display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px 0 8px;margin:-2px 0 10px;border-radius:13px;background:var(--card);box-shadow:0 0 0 .5px var(--hair),0 1px 2px rgba(0,0,0,.04);font-size:12px;font-weight:600;letter-spacing:-.1px;animation:pop .45s var(--spring)}
+.sticker i{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 2.5px var(--ink);position:relative}
+.sticker i:after{content:'';position:absolute;inset:4px;border-radius:50%;background:var(--ink)}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.cell{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;background:#e9e6df;opacity:0;transform:translateY(10px) scale(.94);filter:blur(8px);transition:opacity .5s var(--ease),transform .6s var(--spring),filter .6s var(--ease)}
+.cell.in{opacity:1;transform:none;filter:none}
+.cell.out{opacity:0;transform:scale(.85);filter:blur(4px)}
+.cell img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.cell .why{position:absolute;left:6px;bottom:6px;right:6px;font-size:10px;font-weight:600;color:#fff;background:rgba(20,20,20,.62);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:8px;padding:4px 6px;line-height:1.15;opacity:0;transition:opacity .4s .2s}
+.cell.in .why{opacity:1}
+.more{font-size:12.5px;color:var(--ink2);margin:8px 2px 0;opacity:0;transition:opacity .4s}
+.reply{font-size:15.5px;line-height:1.4;letter-spacing:-.2px;margin-top:12px;min-height:44px}
+.reply .w{opacity:0;transition:opacity .25s}
+.reply .w.on{opacity:1}
+.acts{display:flex;gap:8px;margin-top:14px;opacity:0;transform:translateY(8px);transition:all .4s var(--ease)}
+.acts.on{opacity:1;transform:none}
+.btn{height:44px;border-radius:22px;padding:0 16px;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:600;letter-spacing:-.2px;border:0;transition:transform .15s}
+.btn.p{background:var(--ink);color:#fff}
+.btn.s{background:var(--card);color:var(--ink);box-shadow:0 0 0 .5px var(--hair)}
+.btn.press{transform:scale(.95)}
+.btn.p.press{background:#3a3a3a}
+.refine{display:flex;gap:8px;margin:12px -16px 0 0;overflow:hidden;-webkit-mask-image:linear-gradient(90deg,#000 80%,transparent);mask-image:linear-gradient(90deg,#000 80%,transparent);opacity:0;transition:opacity .4s .1s}
+.refine.on{opacity:1}
+.pill{height:34px;border-radius:17px;padding:0 13px;display:inline-flex;align-items:center;font-size:13.5px;font-weight:500;background:transparent;box-shadow:inset 0 0 0 1px rgba(20,20,20,.14);color:var(--ink);white-space:nowrap;transition:all .2s}
+.pill.press{background:var(--ink);color:#fff;box-shadow:none;transform:scale(.96)}
+.tap{position:absolute;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;background:rgba(20,20,20,.16);box-shadow:0 0 0 2px rgba(255,255,255,.7);pointer-events:none;z-index:90;opacity:0;transform:scale(.6);transition:opacity .2s,transform .25s}
+.tap.on{opacity:1;transform:scale(1)}
+
+/* swipe step: same paper, cards, pills and type as the chat; the composer becomes the action bar */
+.swipe{padding:62px 16px 0;z-index:28}
+.shead{display:flex;justify-content:space-between;align-items:center}
+.circ{width:36px;height:36px;border-radius:50%;background:var(--card);box-shadow:0 0 0 .5px var(--hair),0 1px 2px rgba(0,0,0,.04);display:grid;place-items:center;font-size:19px;color:var(--ink);transition:transform .15s,background .15s}
+.circ.press{transform:scale(.9);background:#eeebe4}
+.circ.off{opacity:.35}
+.swipe .found{margin:14px 0 10px}
+.deck{position:relative;height:400px;margin-top:2px}
+.card{position:absolute;left:0;right:0;top:0;height:380px;border-radius:24px;padding:6px;background:var(--card);box-shadow:0 0 0 .5px var(--hair),0 12px 28px -14px rgba(0,0,0,.28);transition:transform .5s var(--ease),opacity .4s;transform-origin:50% 100%}
+.card .ph{height:calc(100% - 42px);border-radius:18px;overflow:hidden;background:#e9e6df}
+.card .ph img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+.card .ft{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 10px;font-size:13px;color:var(--ink2)}
+.card .ft b{color:var(--ink);font-weight:600}
+.verdict{position:absolute;top:18px;left:18px;display:inline-flex;align-items:center;gap:7px;height:32px;padding:0 13px 0 11px;border-radius:16px;background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);box-shadow:0 2px 10px rgba(0,0,0,.12);font-size:14px;font-weight:600;letter-spacing:-.2px;opacity:0;transform:scale(.9);transition:all .2s var(--spring)}
+.verdict i{width:8px;height:8px;border-radius:50%}
+.verdict.del i{background:var(--ember)}.verdict.keep i{background:var(--keep)}
+.verdict.on{opacity:1;transform:none}
+.queued{position:absolute;left:20px;right:20px;bottom:98px;text-align:center;font-size:15px;letter-spacing:-.2px;color:var(--ink2);z-index:31;opacity:0;transition:opacity .4s}
+.queued.on{opacity:1}
+.queued b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+.queued span{display:block;font-size:12px;color:var(--ink3);margin-top:3px}
+.fly{position:absolute;z-index:80;overflow:hidden;border-radius:12px;transition:all .6s cubic-bezier(.3,.9,.3,1);box-shadow:0 12px 28px -14px rgba(0,0,0,.3)}
+.fly img{width:100%;height:100%;object-fit:cover;object-position:top;display:block}
+/* the composer's two faces */
+.composer .bar{transition:opacity .3s var(--ease),transform .4s var(--ease)}
+.actbar{position:absolute;left:0;right:0;bottom:0;display:flex;gap:6px;background:var(--card);border-radius:28px;height:56px;padding:6px;box-shadow:0 0 0 .5px var(--hair),0 10px 30px -10px rgba(0,0,0,.18);opacity:0;transform:translateY(6px) scale(.98);pointer-events:none;transition:opacity .3s var(--ease),transform .4s var(--ease)}
+.composer.acting .bar{opacity:0;transform:scale(.98)}
+.composer.acting .live{opacity:0}
+.composer.acting .actbar{opacity:1;transform:none}
+.seg{flex:1;border-radius:22px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:15px;font-weight:600;letter-spacing:-.2px;color:var(--ink);transition:transform .15s,background .15s}
+.seg i{width:8px;height:8px;border-radius:50%}
+.seg.p{background:var(--ink);color:#fff}
+.seg.press{transform:scale(.95);background:#eeebe4}
+.seg.p.press{background:#3a3a3a}
+.seg.full{display:none}
+.actbar.ready .seg{display:none}.actbar.ready .seg.full{display:flex}
+/* system alert, drawn as iOS draws it */
+.alert{position:absolute;left:50%;top:50%;width:270px;transform:translate(-50%,-50%) scale(1.12);opacity:0;z-index:85;border-radius:14px;background:rgba(242,242,242,.86);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px);text-align:center;transition:all .25s var(--ease);overflow:hidden}
+.alert.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.alert .a1{padding:19px 16px 18px}
+.alert h4{margin:0;font-size:17px;font-weight:600;letter-spacing:-.4px;line-height:1.25}
+.alert p{margin:4px 0 0;font-size:13px;line-height:1.3}
+.alert .ab{display:flex;border-top:.5px solid rgba(60,60,67,.29)}
+.alert .ab div{flex:1;padding:11px 0;font-size:17px;color:#007AFF}
+.alert .ab div+div{border-left:.5px solid rgba(60,60,67,.29);color:#FF3B30;font-weight:600}
+.alert .ab div.press{background:rgba(0,0,0,.08)}
+
+/* done */
+.big{display:flex;flex-direction:column;align-items:flex-start}
+.ringdone circle.prog{stroke-dasharray:126;stroke-dashoffset:126;transition:stroke-dashoffset 1s var(--ease)}
+.ringdone.on circle.prog{stroke-dashoffset:0}
+.next{margin-top:16px;width:100%}
+
+/* end card */
+.end{background:#0E0E0E;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:95}
+.end .logo{transform:scale(.6);opacity:0;transition:all .8s var(--spring)}
+.end.on .logo{transform:none;opacity:1}
+.end h2{font:700 44px/1 -apple-system,"SF Pro Display",system-ui;letter-spacing:-1.6px;margin:22px 0 10px;opacity:0;transition:opacity .6s .3s}
+.end .tl{font-size:19px;letter-spacing:-.3px;color:#cfcac0;opacity:0;transition:opacity .6s .6s}
+.end .tl b{color:#fff;font-weight:600}
+.end .fine{position:absolute;bottom:58px;left:30px;right:30px;font-size:12px;line-height:1.45;color:#8a857c;opacity:0;transition:opacity .6s 1s}
+.end.on h2,.end.on .tl,.end.on .fine{opacity:1}
+
+/* scrubber */
+.scrub{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;max-width:560px}
+.scrub button{font:500 12px var(--font-sans,system-ui);padding:6px 11px;border-radius:14px;border:0;background:var(--secondary,#eee);color:var(--secondary-foreground,#333);cursor:pointer;opacity:.7}
+.scrub button.on{opacity:1;background:var(--primary,#111);color:var(--primary-foreground,#fff)}
+#pool{display:none}
+</style></head>
+<body><div class="stage">
+<div class="device"><div class="screen" id="screen">
+  <div class="island"></div>
+  <div class="sb" id="sb"><span>9:41</span><span style="display:flex;gap:6px;align-items:center">
+    <svg width="18" height="12" viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1" fill="currentColor"/><rect x="5" y="5.5" width="3" height="6.5" rx="1" fill="currentColor"/><rect x="10" y="3" width="3" height="9" rx="1" fill="currentColor"/><rect x="15" y="0" width="3" height="12" rx="1" fill="currentColor"/></svg>
+    <svg width="16" height="12" viewBox="0 0 16 12"><path d="M8 11.5l2.4-2.9a3.6 3.6 0 0 0-4.8 0z" fill="currentColor"/><path d="M3.6 6.3a6.6 6.6 0 0 1 8.8 0l1.3-1.6a8.7 8.7 0 0 0-11.4 0z" fill="currentColor"/><path d="M.6 2.9a11 11 0 0 1 14.8 0l1-1.3A12.9 12.9 0 0 0-.4 1.6z" fill="currentColor"/></svg>
+    <svg width="27" height="13" viewBox="0 0 27 13"><rect x=".5" y=".5" width="23" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".4"/><rect x="2" y="2" width="18" height="9" rx="2" fill="currentColor"/><path d="M25 4.5v4a2 2 0 0 0 0-4z" fill="currentColor" opacity=".45"/></svg></span></div>
+
+  <!-- HOME -->
+  <div class="layer home" id="home">
+    <div class="hello"><span class="mark" style="width:28px;height:28px"><svg width="28" height="28" viewBox="0 0 28 28"><circle class="ring" cx="14" cy="14" r="7" fill="none" stroke="#fff" stroke-width="3"/><circle class="dot" cx="14" cy="14" r="2.2" fill="#fff"/></svg></span>Good evening</div>
+    <div class="h1">What should we<br>clear today?</div>
+    <div class="lib"><b>29,589</b> photos · about <b>61 GB</b> on this iPhone</div>
+    <div class="sec">Found in your library</div>
+    <div class="sugs" id="sugs">
+      <div class="sug"><div class="fan" data-imgs="i100,i106,i112"></div><div><div class="t">Screenshots of chats</div><div class="s">412 · about 1.2 GB</div></div><div class="go">›</div></div>
+      <div class="sug"><div class="fan" data-imgs="i150,i151,i152"></div><div><div class="t">Blurry shots</div><div class="s">96 · about 520 MB</div></div><div class="go">›</div></div>
+      <div class="sug"><div class="fan" data-imgs="i130,i131,i135"></div><div><div class="t">Memes</div><div class="s">58 · about 380 MB</div></div><div class="go">›</div></div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="layer chat hide" id="chat"><div class="chatin" id="chatin"></div></div>
+
+  <!-- COMPOSER -->
+  <div class="composer" id="composer">
+    <div class="live" id="live"><div class="strip" id="strip"></div><div class="n" id="liven"></div></div>
+    <div class="actbar" id="actbar"><span class="seg" id="bk"><i style="background:var(--keep)"></i>Keep</span><span class="seg" id="ba">Album</span><span class="seg p" id="bx">Delete</span><span class="seg p full" id="apply">Review &amp; apply · 22 photos</span></div>
+    <div class="bar"><div class="in" id="input"><span class="ph">Describe what to clear…</span></div>
+      <span class="mark send" id="sendmark"><svg width="40" height="40" viewBox="0 0 40 40"><circle class="ring" cx="20" cy="20" r="8" fill="none" stroke="#fff" stroke-width="3.2"/><circle class="arc" cx="20" cy="20" r="8" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="14 60"/><circle class="dot" cx="20" cy="20" r="2.4" fill="#fff"/></svg></span></div>
+  </div>
+
+  <!-- SWIPE: a step of the same conversation -->
+  <div class="layer swipe hide" id="swipe">
+    <div class="shead"><span class="circ" id="back">‹</span><span class="circ off" id="undo">↺</span></div>
+    <div class="found">Screenshots of chats<span>older than a year · 22 photos</span></div>
+    <div class="sticker" id="conf"><i></i>Learns from every swipe</div>
+    <div class="deck" id="deck"></div>
+  </div>
+  <div class="queued" id="queued">about <b id="odo">0 MB</b> queued<span>Nothing is deleted until you apply</span></div>
+  <div class="alert" id="alert"><div class="a1"><h4>Allow “Roll” to delete 22 photos?</h4><p>They'll stay in Recently Deleted for 30 days.</p></div><div class="ab"><div>Don’t Allow</div><div id="adel">Delete</div></div></div>
+
+  <!-- END -->
+  <div class="layer end hide" id="end">
+    <div class="logo"><span class="mark" style="width:96px;height:96px;background:#fff"><svg width="96" height="96" viewBox="0 0 96 96"><circle cx="48" cy="48" r="23" fill="none" stroke="#0E0E0E" stroke-width="10"/><circle cx="48" cy="48" r="7" fill="#0E0E0E"/></svg></span></div>
+    <h2>Roll</h2>
+    <div class="tl">Describe it. <b>Roll finds it.</b></div>
+    <div class="fine">EmbeddingGemma 2, running on the iPhone Neural Engine.<br>Nothing about your photos leaves your phone.</div>
+  </div>
+  <div class="topfade" id="topfade"></div>
+  <div class="tap" id="tap"></div>
+  <div class="homebar" id="homebar"></div>
+</div></div>
+<div class="scrub" id="scrub"></div>
+</div>
+
+<!-- image pool: static tags so every path is inlined; scenes clone them -->
+<div id="pool">
+<img data-k="i100" src="img/i100.jpg"><img data-k="i103" src="img/i103.jpg"><img data-k="i106" src="img/i106.jpg"><img data-k="i109" src="img/i109.jpg"><img data-k="i112" src="img/i112.jpg"><img data-k="i115" src="img/i115.jpg"><img data-k="i118" src="img/i118.jpg"><img data-k="i121" src="img/i121.jpg"><img data-k="i124" src="img/i124.jpg"><img data-k="i127" src="img/i127.jpg"><img data-k="i101" src="img/i101.jpg"><img data-k="i104" src="img/i104.jpg"><img data-k="i130" src="img/i130.jpg"><img data-k="i131" src="img/i131.jpg"><img data-k="i135" src="img/i135.jpg"><img data-k="i150" src="img/i150.jpg"><img data-k="i151" src="img/i151.jpg"><img data-k="i152" src="img/i152.jpg"><img data-k="i160" src="img/i160.jpg"><img data-k="i161" src="img/i161.jpg">
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const img=k=>{const o=document.querySelector(`#pool img[data-k="${k}"]`).cloneNode();o.removeAttribute('data-k');return o};
+document.querySelectorAll('.fan').forEach(f=>f.dataset.imgs.split(',').forEach(k=>f.appendChild(img(k))));
+
+const RESULTS=['i100','i106','i112','i118','i124','i103','i109','i115','i121'];
+const REFINED=['i106','i118','i103','i115','i124','i109'];
+const DECK=[['i106',5.9,'del'],['i118',6.4,'del'],['i103',4.8,'keep'],['i115',6.1,'del'],['i124',5.2,'del'],['i109',6.6,'del']];
+// The deck never runs dry on screen: these stay under the swiped ones.
+const REST=[['i121',5.6],['i127',6.0]];
+
+let run=0;
+const Stop={};
+const W=(ms,t)=>new Promise((res,rej)=>setTimeout(()=>t===run?res():rej(Stop),ms));
+function tapAt(x,y){const p=$('tap');p.style.left=x+'px';p.style.top=y+'px';p.classList.add('on');setTimeout(()=>p.classList.remove('on'),320)}
+function at(el){const s=$('screen').getBoundingClientRect(),r=el.getBoundingClientRect();return[r.left-s.left+r.width/2,r.top-s.top+r.height/2]}
+async function press(el,t){const[x,y]=at(el);tapAt(x,y);el.classList.add('press');await W(170,t);el.classList.remove('press')}
+function busy(on){$('sendmark').classList.toggle('busy',on)}
+function mark(size=28,busyOn=false){const s=document.createElement('span');s.className='mark'+(busyOn?' busy':'');s.style.width=s.style.height=size+'px';
+  s.innerHTML=`<svg width="${size}" height="${size}" viewBox="0 0 28 28"><circle class="ring" cx="14" cy="14" r="7" fill="none" stroke="#fff" stroke-width="3"/><circle class="arc" cx="14" cy="14" r="7" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-dasharray="12 60"/><circle class="dot" cx="14" cy="14" r="2.2" fill="#fff"/></svg>`;return s}
+function el(tag,cls,html){const e=document.createElement(tag);if(cls)e.className=cls;if(html!=null)e.innerHTML=html;return e}
+
+// Reset everything to a clean state; each scene then builds what it needs, so the scrubber can jump anywhere.
+function reset(){
+  $('home').classList.remove('hide');$('home').style.transform='';$('chat').classList.add('hide');$('end').classList.add('hide');$('end').classList.remove('on');
+  $('chatin').innerHTML='';$('chatin').style.transform='';$('composer').style.opacity=1;$('composer').style.transform='';
+  $('input').innerHTML='<span class="ph">Describe what to clear…</span>';$('live').classList.remove('on');$('strip').innerHTML='';$('liven').innerHTML='';
+  $('swipe').classList.add('hide');$('alert').classList.remove('on');$('composer').classList.remove('acting');$('actbar').classList.remove('ready');
+  $('deck').innerHTML='';$('odo').textContent='0 MB';$('queued').classList.remove('on');$('undo').classList.add('off');setConf('Learns from every swipe');
+  document.querySelectorAll('.fly').forEach(f=>f.remove());$('chat').style.transform='';
+  $('sb').style.color='';$('homebar').style.background='';busy(false);
+  document.querySelectorAll('.sug').forEach(s=>{s.style.opacity='';s.style.transform=''});
+}
+function setConf(text){$('conf').innerHTML='<i></i>'+text}
+function toChat(){ $('home').classList.add('hide');$('home').style.transform='translateY(-20px)';$('chat').classList.remove('hide') }
+
+function userTurn(text,chip){const m=el('div','me'+(chip?' chip':''),text);$('chatin').appendChild(m);return m}
+function rollTurn(){const r=el('div','roll');r.appendChild(mark(28,true));const b=el('div','body');r.appendChild(b);$('chatin').appendChild(r);return[r,b]}
+async function status(b,steps,t){const s=el('div','status');b.appendChild(s);
+  for(const st of steps){s.innerHTML=`<span class="shim">${st}</span>`;await W(620,t)} return s}
+async function stream(node,text,t,ms=55){node.innerHTML=text.split(' ').map(w=>`<span class="w">${w}</span>`).join(' ');
+  for(const w of node.querySelectorAll('.w')){w.classList.add('on');await W(ms,t)}}
+function grid(keys,why){const g=el('div','grid');keys.forEach((k,i)=>{const c=el('div','cell');c.appendChild(img(k));if(i===0&&why)c.appendChild(el('div','why',why));g.appendChild(c)});return g}
+async function reveal(g,t,step=70){for(const c of g.children){c.classList.add('in');await W(step,t)}}
+// Keep the newest content just above the composer, as a chat does.
+function fit(){const h=$('chatin').scrollHeight,avail=780-62-118;$('chatin').style.transform=`translateY(${-Math.max(0,h-avail)}px)`}
+
+function card(k,mb){const c=el('div','card');const ph=el('div','ph');ph.appendChild(img(k));c.appendChild(ph);
+  c.appendChild(el('div','ft',`<span><b>about ${mb} MB</b> · screenshot</span><span>Mar 2024</span>`));
+  c.appendChild(el('div','verdict del','<i></i>Delete'));c.appendChild(el('div','verdict keep','<i></i>Keep'));return c}
+// Top card flat, two behind it peeking from below, the rest hidden under them.
+function stack(cards,from){cards.slice(from).forEach((c,j)=>{const d=Math.min(j,2);c.style.zIndex=20-j;
+  c.style.transform=`translateY(${d*10}px) scale(${1-d*.045})`;if(j<3)c.style.opacity=1;else c.style.opacity=0})}
+// The Refine scene's last frame, drawn at once (the Swipe scene starts from it).
+function refineEnd(){userTurn('screenshots of group chats');
+  const[r,b]=rollTurn();r.querySelector('.mark').classList.remove('busy');
+  b.appendChild(el('div','status done','<span class="ok">✓</span> Compared on this iPhone in 0.09 s'));
+  b.appendChild(el('div','found','38 screenshots of chats<span>about 214 MB on this iPhone</span>'));
+  const g=grid(RESULTS);b.appendChild(g);[...g.children].forEach((c,i)=>c.classList.add(REFINED.includes(RESULTS[i])?'in':'out'));
+  userTurn('Older than a year',true);
+  const[r2,b2]=rollTurn();r2.querySelector('.mark').classList.remove('busy');
+  b2.appendChild(el('div','status done','<span class="ok">✓</span> 22 left'));
+  b2.appendChild(el('div','found','22 from before last October<span>about 131 MB · none of them favorites</span>'));
+  const g2=grid(REFINED.slice(0,3));b2.appendChild(g2);[...g2.children].forEach(c=>c.classList.add('in'));
+  const a=el('div','acts on','<span class="btn p" id="bsw2">Swipe through 22 <span style="opacity:.6">→</span></span><span class="btn s">Save pile</span>');b2.appendChild(a);
+  $('chatin').style.transition='none';fit();$('chatin').offsetHeight;$('chatin').style.transition='';return g2}
+const scenes=[
+ ['Home',async t=>{reset();await W(1800,t)}],
+ ['Type',async t=>{reset();const inp=$('input');const q='screenshots of group chats';let s='';
+   document.querySelectorAll('.sug').forEach((x,i)=>{x.style.transition=`all .5s ${i*60}ms var(--ease)`;x.style.opacity=.35;x.style.transform='scale(.98)'});
+   const counts={6:12,13:31,19:36,25:38};
+   for(let i=0;i<q.length;i++){s+=q[i];inp.innerHTML=s+'<span class="caret"></span>';
+     if(counts[i]){ $('live').classList.add('on');const n=counts[i];const strip=$('strip');
+       if(strip.children.length<5){strip.appendChild(img(RESULTS[strip.children.length]))}
+       $('liven').innerHTML=`<b>${n}</b> match so far · on this iPhone`;}
+     await W(i===12?160:62,t)}
+   await W(700,t)}],
+ ['Ask',async t=>{reset();$('input').innerHTML='screenshots of group chats<span class="caret"></span>';await W(250,t);
+   await press($('sendmark'),t);toChat();$('input').innerHTML='<span class="ph">Ask for more…</span>';$('live').classList.remove('on');
+   userTurn('screenshots of group chats');await W(350,t);
+   const[r,b]=rollTurn();busy(true);
+   const s=await status(b,['Reading your words on the Neural Engine','Comparing with 29,589 photos'],t);
+   s.className='status done';s.innerHTML='<span class="ok">✓</span> Compared on this iPhone in 0.09 s';
+   r.querySelector('.mark').classList.remove('busy');busy(false);await W(500,t)}],
+ ['Results',async t=>{reset();toChat();$('input').innerHTML='<span class="ph">Ask for more…</span>';userTurn('screenshots of group chats');
+   const[r,b]=rollTurn();r.querySelector('.mark').classList.remove('busy');
+   const s=el('div','status done','<span class="ok">✓</span> Compared on this iPhone in 0.09 s');b.appendChild(s);
+   const f=el('div','found','38 screenshots of chats<span>about 214 MB on this iPhone</span>');b.appendChild(f);b.appendChild(el('div','sticker','<i></i>Matched by what’s on screen'));
+   const g=grid(RESULTS);b.appendChild(g);fit();await reveal(g,t);
+   const more=el('div','more','+ 29 more · 6 weaker matches folded');b.appendChild(more);more.style.opacity=1;
+   const rp=el('div','reply');b.appendChild(rp);fit();
+   await stream(rp,'Most are from 2023 and early 2024. Want to swipe through them, or narrow it down first?',t);
+   const a=el('div','acts','<span class="btn p" id="bsw">Swipe through 38 <span style="opacity:.6">→</span></span><span class="btn s">Save pile</span>');b.appendChild(a);
+   const rf=el('div','refine','<span class="pill" id="pold">Older than a year</span><span class="pill">Biggest first</span><span class="pill">Only on this iPhone</span>');b.appendChild(rf);
+   await W(60,t);a.classList.add('on');rf.classList.add('on');fit();await W(1500,t)}],
+ ['Refine',async t=>{reset();toChat();$('input').innerHTML='<span class="ph">Ask for more…</span>';userTurn('screenshots of group chats');
+   const[r,b]=rollTurn();r.querySelector('.mark').classList.remove('busy');
+   b.appendChild(el('div','status done','<span class="ok">✓</span> Compared on this iPhone in 0.09 s'));
+   b.appendChild(el('div','found','38 screenshots of chats<span>about 214 MB on this iPhone</span>'));b.appendChild(el('div','sticker','<i></i>Matched by what’s on screen'));
+   const g=grid(RESULTS);b.appendChild(g);[...g.children].forEach(c=>c.classList.add('in'));
+   const rp=el('div','reply','Most are from 2023 and early 2024. Want to swipe through them, or narrow it down first?');b.appendChild(rp);
+   const rf=el('div','refine on','<span class="pill" id="pold">Older than a year</span><span class="pill">Biggest first</span><span class="pill">Only on this iPhone</span>');b.appendChild(rf);
+   $('chatin').style.transition='none';fit();await W(40,t);$('chatin').style.transition='';
+   await W(500,t);await press($('pold'),t);await W(150,t);
+   [...g.children].forEach((c,i)=>{if(!REFINED.includes(RESULTS[i]))c.classList.add('out')});
+   userTurn('Older than a year',true);fit();
+   const[r2,b2]=rollTurn();
+   const s2=await status(b2,['Keeping the ones from before October 2025'],t);
+   s2.className='status done';s2.innerHTML='<span class="ok">✓</span> 22 left';r2.querySelector('.mark').classList.remove('busy');
+   b2.appendChild(el('div','found','22 from before last October<span>about 131 MB · none of them favorites</span>'));
+   const g2=grid(REFINED.slice(0,3));b2.appendChild(g2);fit();await reveal(g2,t,90);
+   const a=el('div','acts','<span class="btn p" id="bsw2">Swipe through 22 <span style="opacity:.6">→</span></span><span class="btn s">Save pile</span>');b2.appendChild(a);await W(60,t);a.classList.add('on');fit();
+   await W(1200,t)}],
+ ['Swipe',async t=>{reset();toChat();const g2=refineEnd();await W(500,t);
+   await press($('bsw2'),t);
+   // The three photos you were looking at become the top of the deck.
+   const deck=$('deck');[...DECK,...REST].forEach(([k,mb])=>deck.appendChild(card(k,mb)));
+   const cards=[...deck.children];stack(cards,0);cards.forEach(c=>c.style.opacity=0);
+   const S=$('screen').getBoundingClientRect(),flies=[];
+   [...g2.children].forEach((cell,i)=>{const r=cell.getBoundingClientRect(),f=el('div','fly');f.appendChild(img(REFINED[i]));
+     Object.assign(f.style,{left:r.left-S.left+'px',top:r.top-S.top+'px',width:r.width+'px',height:r.height+'px'});$('screen').appendChild(f);flies.push(f)});
+   $('chat').style.transform='translateY(-24px)';$('chat').classList.add('hide');$('swipe').classList.remove('hide');$('composer').classList.add('acting');
+   await W(30,t);
+   flies.forEach((f,i)=>{const r=cards[i].querySelector('.ph').getBoundingClientRect(),c=cards[i].getBoundingClientRect();
+     Object.assign(f.style,{left:r.left-S.left+'px',top:r.top-S.top+'px',width:r.width+'px',height:r.height+'px',borderRadius:'18px',transitionDelay:i*50+'ms'})});
+   await W(700,t);cards.forEach((c,i)=>{c.style.transition='none';c.style.opacity=i<3?1:0});flies.forEach(f=>f.remove());
+   await W(30,t);cards.forEach(c=>c.style.transition='');$('queued').classList.add('on');
+   await W(600,t);
+   // A slip on card 4, then Undo: the card comes back, its MB comes off the total, and the pile forgets that swipe.
+   const STEPS=[['del',0],['del',1],['keep',2],['del',3],['undo',3],['keep',3],['del',4],['del',5]];
+   const F=131/24.1,mbOf=i=>DECK[i][1]*F;let total=0,swipes=0;
+   const count=(to)=>{const from=total;total=to;const t0=performance.now();
+     const tick=()=>{const p=Math.min(1,(performance.now()-t0)/450);$('odo').textContent=Math.round(from+(total-from)*p)+' MB';if(p<1&&t===run)requestAnimationFrame(tick)};tick()};
+   for(const[v,i]of STEPS){const c=cards[i];
+     if(v==='undo'){await press($('undo'),t);
+       c.style.transition='transform .55s var(--spring),opacity .3s';c.style.opacity=1;stack(cards,i);
+       c.querySelectorAll('.verdict').forEach(x=>x.classList.remove('on'));count(total-mbOf(i));swipes--;
+       setConf('Undone · that swipe won’t teach the pile');await W(700,t);c.style.transition='';continue}
+     const del=v==='del';await press(del?$('bx'):$('bk'),t);
+     c.querySelector('.verdict.'+(del?'del':'keep')).classList.add('on');
+     c.style.transform=`translateX(${del?-22:22}px) rotate(${del?-3:3}deg)`;await W(200,t);
+     c.style.transform=`translateX(${del?-430:430}px) translateY(20px) rotate(${del?-16:16}deg)`;c.style.opacity=0;
+     stack(cards,i+1);swipes++;$('undo').classList.remove('off');
+     if(swipes===2)setConf('Getting the idea');
+     if(swipes>=4)setConf(`${swipes-1} of the last ${swipes} on target`);
+     if(del)count(total+mbOf(i));
+     await W(i<2?520:i===3&&v==='del'?420:340,t)}
+   $('odo').textContent='131 MB';setConf('9 of the last 10 on target');await W(300,t);$('actbar').classList.add('ready');await W(1100,t)}],
+ ['Apply',async t=>{reset();toChat();$('chat').classList.add('hide');$('swipe').classList.remove('hide');$('composer').classList.add('acting');$('actbar').classList.add('ready');
+   const deck=$('deck');REST.forEach(([k,mb])=>deck.appendChild(card(k,mb)));stack([...deck.children],0);
+   $('odo').textContent='131 MB';$('queued').classList.add('on');$('undo').classList.remove('off');setConf('9 of the last 10 on target');await W(600,t);
+   await press($('apply'),t);await W(150,t);$('alert').classList.add('on');await W(1100,t);await press($('adel'),t);
+   $('alert').classList.remove('on');await W(250,t);
+   $('swipe').classList.add('hide');$('queued').classList.remove('on');$('composer').classList.remove('acting');$('chat').classList.remove('hide');
+   $('input').innerHTML='<span class="ph">Ask for more…</span>';
+   const[r,b]=rollTurn();r.querySelector('.mark').remove();
+   const big=el('div','big');
+   big.innerHTML=`<svg class="ringdone" width="64" height="64" viewBox="0 0 48 48"><circle cx="24" cy="24" r="20" fill="none" stroke="#E7E3DA" stroke-width="4"/><circle class="prog" cx="24" cy="24" r="20" fill="none" stroke="#141414" stroke-width="4" stroke-linecap="round" transform="rotate(-90 24 24)"/><circle cx="24" cy="24" r="5" fill="#141414"/></svg>`;
+   b.appendChild(big);b.appendChild(el('div','found','About 131 MB cleared<span>22 photos are in Recently Deleted for 30 days.</span>'));
+   await W(80,t);big.querySelector('.ringdone').classList.add('on');await W(900,t);
+   const nx=el('div','sug next','<div class="fan"></div><div><div class="t">Next: Blurry shots</div><div class="s">96 · about 520 MB</div></div><div class="go">›</div>');
+   ['i150','i151','i152'].forEach(k=>nx.querySelector('.fan').appendChild(img(k)));nx.style.opacity=0;b.appendChild(nx);await W(60,t);nx.style.opacity=1;
+   await W(1600,t)}],
+ ['End card',async t=>{reset();$('end').classList.remove('hide');$('sb').style.color='#fff';$('homebar').style.background='#fff';$('composer').style.opacity=0;
+   await W(50,t);$('end').classList.add('on');await W(3600,t)}],
+];
+
+const sc=$('scrub');scenes.forEach(([n],i)=>{const b=el('button','',n);b.onclick=()=>play(i);sc.appendChild(b)});
+async function play(from){const t=++run;
+  try{for(let i=from;i<scenes.length;i++){[...sc.children].forEach((b,j)=>b.classList.toggle('on',j===i));await scenes[i][1](t)}
+    if(t===run)play(0)}catch(e){if(e!==Stop)console.error(e)}}
+// ?scene=N starts there; &hold=1 stops when that scene ends (for screenshots).
+const q=new URLSearchParams(location.search),start=+(q.get('scene')||0);
+if(q.get('hold')){const t=++run;[...sc.children].forEach((b,j)=>b.classList.toggle('on',j===start));scenes[start][1](t).catch(()=>{}).then(()=>setTimeout(()=>document.getAnimations().forEach(x=>{try{x.finish()}catch(e){}}),50))}else play(start);
+</script>
+</body></html>

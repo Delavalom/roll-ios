@@ -1,0 +1,88 @@
+name: CI
+
+# Both repos (roll-ios and embeddinggemma-coreml) are private, and macOS Actions minutes on private repos are billed,
+# so for now this runs only when started by hand (Actions > CI > Run workflow).
+# When the repos go public, switch the trigger to:
+#   on:
+#     push:
+#       branches: [main]
+#     pull_request:
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-test:
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      # The app and most of RollCore need the sibling checkout. While embeddinggemma-coreml is private, reading it
+      # needs a GH_PAT secret (a fine-grained token with read access to that repo). Without it, only the RollCore
+      # modules that don't use it are tested (Package.swift drops the rest when the sibling is missing).
+      HAS_GH_PAT: ${{ secrets.GH_PAT != '' }}
+    defaults:
+      run:
+        working-directory: roll-ios
+    steps:
+      # actions/checkout only writes under the workspace, so both repos go in subfolders of it, side by side:
+      # $GITHUB_WORKSPACE/roll-ios and $GITHUB_WORKSPACE/embeddinggemma-coreml (the layout project.yml and
+      # Package.swift expect).
+      - name: Check out roll-ios
+        uses: actions/checkout@v4
+        with:
+          path: roll-ios
+
+      - name: Check out embeddinggemma-coreml (sibling)
+        if: env.HAS_GH_PAT == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: Delavalom/embeddinggemma-coreml
+          token: ${{ secrets.GH_PAT }}
+          path: embeddinggemma-coreml
+          lfs: false
+
+      - name: No sibling checkout
+        if: env.HAS_GH_PAT != 'true'
+        run: echo "::notice::GH_PAT is not set; building only the RollCore modules that don't need embeddinggemma-coreml, and skipping the app build."
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          swift --version
+
+      - name: Install XcodeGen
+        if: env.HAS_GH_PAT == 'true'
+        run: brew install xcodegen
+
+      - name: RollCore unit tests
+        working-directory: roll-ios/Packages/RollCore
+        run: swift test --parallel --xunit-output .build/test-results.xml
+
+      - name: Build the app for the iOS Simulator
+        if: env.HAS_GH_PAT == 'true'
+        run: |
+          [ -f Team.xcconfig ] || cp Team.xcconfig.example Team.xcconfig
+          xcodegen generate
+          xcodebuild build -scheme Roll -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO
+
+      - name: STATUS.md
+        if: always()
+        run: |
+          python3 scripts/gen_status.py
+          cat STATUS.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            roll-ios/Packages/RollCore/.build/test-results*.xml
+            roll-ios/STATUS.md
+          if-no-files-found: ignore

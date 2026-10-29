@@ -1,0 +1,31 @@
+{
+  "compositionGate" : 2,
+  "dimensions" : 256,
+  "foldRatios" : [
+    0.4,
+    0.5,
+    0.6
+  ],
+  "gates" : [
+    "cos>=0.2",
+    "z>=1.5",
+    "z>=2.0",
+    "z>=2.5",
+    "z>=3.0"
+  ],
+  "labels" : {
+    "animated" : 4,
+    "blurryPhoto" : 67,
+    "document" : 4055,
+    "livePhoto" : 2169,
+    "panorama" : 16,
+    "portrait" : 19,
+    "screenRecording" : 30,
+    "screenshot" : 2532,
+    "sensitive" : 0,
+    "textHeavy" : 5431,
+    "video" : 5186
+  },
+  "revision" : "file-99a7d34084f9186b-b70",
+  "vectors" : 29681
+}

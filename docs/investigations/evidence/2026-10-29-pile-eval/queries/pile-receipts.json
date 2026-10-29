@@ -1,0 +1,225 @@
+{
+  "cappedRecallAt200" : 0.71,
+  "composition" : {
+    "animated" : 1,
+    "blurryPhoto" : 42,
+    "document" : 1093,
+    "livePhoto" : 83,
+    "panorama" : 1,
+    "portrait" : 0,
+    "screenRecording" : 1,
+    "screenshot" : 177,
+    "sensitive" : 0,
+    "textHeavy" : 1160,
+    "video" : 324
+  },
+  "cosMean" : 0.6302,
+  "cosSD" : 0.0291,
+  "cosTop" : 0.8203,
+  "expect" : "matches",
+  "gates" : [
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 29681,
+          "strongPrecision" : 0.1366,
+          "strongTrue" : 4055
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.5,
+          "strong" : 29681,
+          "strongPrecision" : 0.1366,
+          "strongTrue" : 4055
+        },
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.6,
+          "strong" : 29681,
+          "strongPrecision" : 0.1366,
+          "strongTrue" : 4055
+        }
+      ],
+      "gate" : "cos>=0.2",
+      "passing" : 29681,
+      "precision" : 0.1366,
+      "recall" : 1,
+      "threshold" : 0.2,
+      "truePassing" : 4055
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 3534,
+          "foldedPrecision" : 0.3248,
+          "foldedTrue" : 1148,
+          "foldedTrueShare" : 0.7073,
+          "ratio" : 0.4,
+          "strong" : 749,
+          "strongPrecision" : 0.6342,
+          "strongTrue" : 475
+        },
+        {
+          "folded" : 4031,
+          "foldedPrecision" : 0.3572,
+          "foldedTrue" : 1440,
+          "foldedTrueShare" : 0.8872,
+          "ratio" : 0.5,
+          "strong" : 252,
+          "strongPrecision" : 0.7262,
+          "strongTrue" : 183
+        },
+        {
+          "folded" : 4178,
+          "foldedPrecision" : 0.3672,
+          "foldedTrue" : 1534,
+          "foldedTrueShare" : 0.9452,
+          "ratio" : 0.6,
+          "strong" : 105,
+          "strongPrecision" : 0.8476,
+          "strongTrue" : 89
+        }
+      ],
+      "gate" : "z>=1.5",
+      "passing" : 4283,
+      "precision" : 0.3789,
+      "recall" : 0.4002,
+      "threshold" : 1.5,
+      "truePassing" : 1623
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 1374,
+          "foldedPrecision" : 0.4498,
+          "foldedTrue" : 618,
+          "foldedTrueShare" : 0.5654,
+          "ratio" : 0.4,
+          "strong" : 749,
+          "strongPrecision" : 0.6342,
+          "strongTrue" : 475
+        },
+        {
+          "folded" : 1871,
+          "foldedPrecision" : 0.4864,
+          "foldedTrue" : 910,
+          "foldedTrueShare" : 0.8326,
+          "ratio" : 0.5,
+          "strong" : 252,
+          "strongPrecision" : 0.7262,
+          "strongTrue" : 183
+        },
+        {
+          "folded" : 2018,
+          "foldedPrecision" : 0.4975,
+          "foldedTrue" : 1004,
+          "foldedTrueShare" : 0.9186,
+          "ratio" : 0.6,
+          "strong" : 105,
+          "strongPrecision" : 0.8476,
+          "strongTrue" : 89
+        }
+      ],
+      "gate" : "z>=2.0",
+      "passing" : 2123,
+      "precision" : 0.5148,
+      "recall" : 0.2695,
+      "threshold" : 2,
+      "truePassing" : 1093
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 387,
+          "foldedPrecision" : 0.5685,
+          "foldedTrue" : 220,
+          "foldedTrueShare" : 0.3165,
+          "ratio" : 0.4,
+          "strong" : 749,
+          "strongPrecision" : 0.6342,
+          "strongTrue" : 475
+        },
+        {
+          "folded" : 884,
+          "foldedPrecision" : 0.5792,
+          "foldedTrue" : 512,
+          "foldedTrueShare" : 0.7367,
+          "ratio" : 0.5,
+          "strong" : 252,
+          "strongPrecision" : 0.7262,
+          "strongTrue" : 183
+        },
+        {
+          "folded" : 1031,
+          "foldedPrecision" : 0.5878,
+          "foldedTrue" : 606,
+          "foldedTrueShare" : 0.8719,
+          "ratio" : 0.6,
+          "strong" : 105,
+          "strongPrecision" : 0.8476,
+          "strongTrue" : 89
+        }
+      ],
+      "gate" : "z>=2.5",
+      "passing" : 1136,
+      "precision" : 0.6118,
+      "recall" : 0.1714,
+      "threshold" : 2.5,
+      "truePassing" : 695
+    },
+    {
+      "fold" : [
+        {
+          "folded" : 0,
+          "foldedTrue" : 0,
+          "foldedTrueShare" : 0,
+          "ratio" : 0.4,
+          "strong" : 593,
+          "strongPrecision" : 0.6695,
+          "strongTrue" : 397
+        },
+        {
+          "folded" : 341,
+          "foldedPrecision" : 0.6276,
+          "foldedTrue" : 214,
+          "foldedTrueShare" : 0.539,
+          "ratio" : 0.5,
+          "strong" : 252,
+          "strongPrecision" : 0.7262,
+          "strongTrue" : 183
+        },
+        {
+          "folded" : 488,
+          "foldedPrecision" : 0.6311,
+          "foldedTrue" : 308,
+          "foldedTrueShare" : 0.7758,
+          "ratio" : 0.6,
+          "strong" : 105,
+          "strongPrecision" : 0.8476,
+          "strongTrue" : 89
+        }
+      ],
+      "gate" : "z>=3.0",
+      "passing" : 593,
+      "precision" : 0.6695,
+      "recall" : 0.0979,
+      "threshold" : 3,
+      "truePassing" : 397
+    }
+  ],
+  "name" : "pile.receipts",
+  "positives" : 4055,
+  "precisionAt20" : 0.9,
+  "prompts" : 3,
+  "recallAt200" : 0.035,
+  "rule" : "document",
+  "zTop" : 7.1131
+}
