@@ -42,11 +42,11 @@ class DeviceQABase: XCTestCase {
     return condition()
   }
 
-  /// Onboarding after a reset: three value pages, the permission step (allowing full access if iOS asks), the taste
+  /// Onboarding after a reset: the intro page, the permission step (allowing full access if iOS asks), the taste
   /// scan (screenshot `<prefix>-taste-scan`), then Continue. Leaves the app on the paywall (unless skipped) or Home.
   @MainActor
   func onboard(_ app: XCUIApplication, prefix: String, tasteScanTimeout: TimeInterval = 900) {
-    for _ in 0..<4 {
+    for _ in 0..<2 {
       let next = app.buttons["Continue"]
       XCTAssertTrue(next.waitForExistence(timeout: 20), "onboarding Continue missing")
       _ = waitUntil(timeout: 10) { next.isHittable && next.isEnabled }

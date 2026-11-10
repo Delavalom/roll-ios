@@ -1,8 +1,11 @@
+import Overview
 import SwiftUI
 
 /// The Pro paywall (spec §10). Dismissible; the free tier keeps working without it.
 struct PaywallView: View {
   @State private var model: PaywallModel
+  /// The user's own number, when there is one worth leading with (`PaywallPitch`); nil keeps the generic header.
+  private let pitch: PaywallPitch?
   private let onClose: () -> Void
 
   /// Apple's Standard EULA: Roll has no custom licence in App Store Connect, so this is the Terms of Use (EULA) that
@@ -10,8 +13,9 @@ struct PaywallView: View {
   static let termsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
   static let privacyURL = URL(string: "https://roll.delavalom.com/privacy")!
 
-  init(provider: any PurchaseProvider, onClose: @escaping () -> Void) {
+  init(provider: any PurchaseProvider, pitch: PaywallPitch? = nil, onClose: @escaping () -> Void) {
     _model = State(initialValue: PaywallModel(provider: provider))
+    self.pitch = pitch
     self.onClose = onClose
   }
 
@@ -65,13 +69,29 @@ struct PaywallView: View {
         RollMark(size: Roll.Size.avatar)
         Text("Roll Pro").font(Roll.Typeface.headline).foregroundStyle(.rollInk2)
       }
-      Text("Clean up your camera roll, privately")
+      Text(Self.headline(pitch))
         .rollTitle(Roll.Typeface.display, tracking: Roll.Typeface.displayTracking)
         .fixedSize(horizontal: false, vertical: true)
         .accessibilityAddTraits(.isHeader)
+        .accessibilityIdentifier("paywall.headline")
         .padding(.top, Roll.Space.m)
+      if let subline = pitch?.subline {
+        Text(subline)
+          .font(Roll.Typeface.subhead)
+          .foregroundStyle(.rollInk2)
+          .fixedSize(horizontal: false, vertical: true)
+          .accessibilityIdentifier("paywall.subline")
+          .padding(.top, Roll.Space.xs)
+      }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
+  }
+
+  /// "Free about 3.2 GB on this iPhone" (the number the taste scan or Home showed), else the generic line. A
+  /// non-breaking space keeps "3.2 GB" together when it wraps, as on Home.
+  static func headline(_ pitch: PaywallPitch?) -> String {
+    guard let pitch else { return "Clean up your camera roll, privately" }
+    return "Free \(ByteFormat.about(pitch.bytes).replacingOccurrences(of: " ", with: "\u{00A0}")) on this iPhone"
   }
 
   private var benefits: some View {
@@ -257,6 +277,13 @@ final class MockPurchaseProvider: PurchaseProvider {
 
 #Preview("Trial") {
   PaywallView(provider: MockPurchaseProvider()) {}
+}
+
+#Preview("After the taste scan") {
+  PaywallView(provider: MockPurchaseProvider(),
+              pitch: PaywallPitch.make(onDeviceBytes: 3_240_000_000,
+                                       found: [FoundItem(kind: .duplicates, bytes: 1_900_000_000),
+                                               FoundItem(kind: .screenshots, bytes: 900_000_000)])) {}
 }
 
 #Preview("No trial, large text") {

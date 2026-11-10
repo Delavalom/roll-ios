@@ -66,6 +66,10 @@ final class HomeModel {
     summary.onDeviceHeadline(deviceTotal: storage?.total, deviceAvailable: storage?.available)
   }
 
+  /// The paywall's opening line when it's reached from the app (the free cleanups ran out, say): Home's own headline
+  /// and categories, so it never shows a number Home doesn't. nil until Home has loaded, or below the floor.
+  var paywallPitch: PaywallPitch? { PaywallPitch.make(onDeviceBytes: headlineBytes, found: summary.foundOnDevice) }
+
   /// One card per category, in Home's order.
   var cards: [HomeCard] {
     [

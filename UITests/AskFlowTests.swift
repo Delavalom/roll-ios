@@ -125,7 +125,7 @@ final class AskFlowTests: XCTestCase {
     let app = XCUIApplication()
     app.launchArguments += ["-UITestSkipPaywall", "-UITestStubEmbedder", "-UITestResetState"]
     app.launch()
-    for page in 1...4 {
+    for page in 1...2 {
       let next = app.buttons["Continue"]
       XCTAssertTrue(next.waitForExistence(timeout: 15))
       waitUntil(timeout: 10) { next.isHittable && next.isEnabled }
@@ -135,11 +135,11 @@ final class AskFlowTests: XCTestCase {
     }
     allowPhotosAccessIfAsked()
     sleep(2)
-    shot("o5-scanning")
+    shot("o3-scanning")
     let done = app.buttons["Continue"]
     waitUntil(timeout: 120) { done.exists && done.isEnabled }
     sleep(2)
-    shot("o6-found")
+    shot("o4-found")
     app.terminate()
 
     let paywall = XCUIApplication()
@@ -147,7 +147,7 @@ final class AskFlowTests: XCTestCase {
     paywall.launch()
     _ = paywall.buttons["Close"].waitForExistence(timeout: 30)
     sleep(4)
-    shot("o7-paywall")
+    shot("o5-paywall")
     let weekly = paywall.buttons.containing(NSPredicate(format: "label BEGINSWITH 'Weekly'")).firstMatch
     if weekly.exists {
       weekly.tap()
