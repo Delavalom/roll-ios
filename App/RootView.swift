@@ -28,7 +28,7 @@ struct RootView: View {
     }
     .environment(\.thumbnails, app.thumbnails)
     .fullScreenCover(isPresented: $showingPaywall) {
-      PaywallView(provider: app.entitlements) { showingPaywall = false }
+      PaywallView(provider: app.entitlements, pitch: app.home.paywallPitch) { showingPaywall = false }
     }
     .qaDebugOverlay()
     .privacyOverlay()

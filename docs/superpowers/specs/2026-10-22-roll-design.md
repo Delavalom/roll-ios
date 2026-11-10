@@ -151,10 +151,10 @@ Read-only gauges, sampled every 1 s while the screen is visible, with a 60-s Swi
 
 ## 10. Onboarding and paywall
 
-1. Three value screens: "Describe it, Roll finds it" / "Swipe to clean" / "Never leaves your phone".
+1. One intro screen: "Describe it. Roll finds it." plus the privacy promise; the swipes are taught on the card stack on first use.
 2. Photos permission (full access recommended; limited access works on the selected set). Then the model download (about 300 MB, with progress, Wi-Fi recommended; meanwhile Vision-only signals start).
 3. **Taste scan:** indexes the newest 500 assets, then shows real numbers: "about X GB in screenshots, duplicates, big videos" plus a 6-photo preview of the user's own Screenshots swipefile.
-4. **Paywall** (dismissible; free tier per §5):
+4. **Paywall** (dismissible; free tier per §5). From 100 MB it leads with the on-device number ("Free about 3.2 GB on this iPhone", `PaywallPitch`):
    - **Annual $29.99 with a 3-day free trial** (preselected, "most popular");
    - **Weekly $4.99, no trial.**
 5. **RevenueCat:** entitlement `pro`; products `roll_pro_annual` (3-day free-trial intro offer) and `roll_pro_weekly`, both in one App Store subscription group `Roll Pro`; offering `default`. The paywall is our SwiftUI screen reading `Offerings`, so there's no dashboard dependency.

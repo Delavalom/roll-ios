@@ -46,7 +46,7 @@ struct CommitSheet: View {
         model.closed()
       }
       .sheet(isPresented: $showingPaywall, onDismiss: { Task { await model.load() } }) {
-        PaywallView(provider: app.entitlements) { showingPaywall = false }
+        PaywallView(provider: app.entitlements, pitch: app.home.paywallPitch) { showingPaywall = false }
       }
     }
     .presentationCornerRadius(Roll.Radius.panel)

@@ -27,10 +27,11 @@ App/                      RollApp (registers IndexScheduler, builds AppModel), R
   EmbedderLoader.swift    GemmaLoader (ModelInstaller + GemmaActivator; in DEBUG, EGCM_MODEL_PATH or a bundled copy override it),
                           ModelIssue / StubLoader (DEBUG only: previews, -UITestStubEmbedder); RollApp's delegate hands
                           background-session events to BackgroundTransport
-  Features/Onboarding/    value pages, permission, TasteScanView (run(limit: 500)), then the paywall
+  Features/Onboarding/    one intro page, permission, TasteScanView (run(limit: 500)), then the paywall (with the scan's PaywallPitch)
   Features/Home/          HomeModel (CleanupScanner, throttled rescans on libraryRevision), cards, squish recovery banner
   Features/Swipefiles/    list, NewSwipefileView, SwipeReviewView/Model (card stack; CardImages prefetches the top 4,
-                          a card with nothing on screen can only be skipped), CommitSheet/CommitModel
+                          a card with nothing on screen can only be skipped; SwipeHint explains the swipes once on an Ask
+                          answer's stack, flag in defaults), CommitSheet/CommitModel
   Features/Duplicates/    groups → DuplicateGroupView; queues under __duplicates__ or __similar__ (per kind)
   Features/Squish/        SquishView/Model: SquishCatalog, toggles, "Not squishable yet"; queues under __squish__
   Features/Monitor/       MonitorModel over DeviceSampler (onAppear/onDisappear), gauges, Swift Charts history
@@ -65,7 +66,8 @@ Packages/RollCore/        Local SwiftPM package; one target per module
   Overview/               CleanupSummary/CleanupScanner (Home categories, duplicate groups minus keepers, freeable total:
                           deletions at full size + big videos at SquishPlanner.offer savings; journaled copies and
                           open squishes excluded; groups() reads feature prints, scan(groups:) the slim rows),
-                          DuplicateReview (queues __duplicates__ / __similar__), SystemSwipefile (hidden "__" swipefiles)
+                          DuplicateReview (queues __duplicates__ / __similar__), SystemSwipefile (hidden "__" swipefiles),
+                          PaywallPitch (the paywall's "Free about X on this iPhone" from the on-device headline, 100 MB floor)
   SquishBridge/           ReplaceFlowRunner (ReplaceFlow as Commit's SquishRunner; PreparedRegistry; reconcile),
                           SquishRefusal (UI text), SquishCatalog (skips remembered refusals), SquishQueue (__squish__)
                           CandidateChecks (after indexing drains: LocalityScanner, then SquishFormatScreen; timeouts,
@@ -80,7 +82,7 @@ Packages/RollCore/        Local SwiftPM package; one target per module
                           IndexRepository/VectorSink protocols; ThermalGate; IndexScheduler (BGProcessingTask, iOS)
 UITests/                  SmokeTests: launch, and the seeded flow (onboarding → taste scan → Screenshots → swipe 5 →
                           apply → system delete alert → count drops by 5); PaywallTests: both plans, prices, trial,
-                          links (needs RC_PUBLIC_KEY + network). DEBUG launch args -UITestStubEmbedder,
+                          links (needs RC_PUBLIC_KEY + network); OnboardingPitchTests: the paywall after the taste scan repeats its number. DEBUG launch args -UITestStubEmbedder,
                           -UITestSkipPaywall, -UITestResetState (keeps the squish journal while a squish is open),
                           -UITestOpen paywall|squish, -UITestTab. DeviceQATests: device QA (docs/qa/); -QAAlbum runs
                           use their own database under Application Support/qa
