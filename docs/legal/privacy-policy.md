@@ -56,11 +56,11 @@ your device's IP address and the request (which files are being downloaded, plus
 the app name and iOS version that iOS adds to web requests). Roll sends nothing about you or your photos in that
 request. Hugging Face's handling of this information is covered by its own privacy policy.
 
-**Subscriptions.** Roll uses RevenueCat to handle subscriptions, and Apple processes all payments. When the app
-starts, shows the paywall, or you buy or restore a subscription, Roll's purchase component sends to RevenueCat:
+**Purchases.** Roll uses RevenueCat to handle the Roll Pro purchase, and Apple processes all payments. When the app
+starts, shows the paywall, or you buy or restore Roll Pro, Roll's purchase component sends to RevenueCat:
 
 - a random, anonymous app user ID created on your device (it isn't linked to your name, email or Apple Account by us);
-- your purchase and subscription details from Apple (transactions and receipts);
+- your purchase details from Apple (transactions and receipts);
 - technical information: the identifier for vendor (an ID iOS gives each developer's apps on your device), device
   model, iOS version, app version, preferred languages, App Store country, and your IP address as part of the
   connection.
@@ -74,7 +74,7 @@ privacy policy; we never see your payment details. RevenueCat's handling is cove
 - No analytics, advertising or tracking SDKs. We don't track you across apps or websites, and we don't use the
   advertising identifier.
 - No selling or sharing of your information with third parties, other than the service providers above
-  (Hugging Face for the model download, RevenueCat and Apple for subscriptions) doing the jobs described.
+  (Hugging Face for the model download, RevenueCat and Apple for the purchase) doing the jobs described.
 
 ## Face ID
 
@@ -88,9 +88,8 @@ Roll is not directed at children under 13, and we don't knowingly collect person
 ## Your choices
 
 - You can change or remove Roll's photo access at any time in Settings > Privacy & Security > Photos.
-- You can manage or cancel a subscription in Settings > [your name] > Subscriptions.
 - You can delete everything Roll stores on your iPhone by deleting the app.
-- We don't hold your photos or an account for you. To ask about the subscription records RevenueCat keeps for
+- We don't hold your photos or an account for you. To ask about the purchase records RevenueCat keeps for
   Roll, or to have them deleted, contact us at the address below.
 
 ## Changes

@@ -1,0 +1,36 @@
+Clean up your photo library without sending a single photo anywhere. Roll's AI runs on your iPhone, so your photos, videos and the words you type never leave it.
+
+DESCRIBE IT
+Type what you want gone, like "receipts", "whiteboard photos" or "memes from group chats", and Roll gathers a pile for you with an AI model that runs on your iPhone.
+
+SWIPE IT
+Swipe through each pile: keep or let go. Roll learns from your swipes and gets better at spotting what you don't want.
+
+GONE
+Apply a pile in one go: delete, move to an album, or squish. Deleted items go to Recently Deleted, so you can change your mind.
+
+READY-MADE PILES
+• Screenshots
+• Blurry photos
+• Big videos
+• Duplicates and similar shots, grouped by moment
+
+SQUISH
+Re-save big photos and videos as smaller HEIC and HEVC copies and see about how much space you'll get back before you start. Videos stay at 1080p unless you choose to keep 4K.
+
+ASK ROLL
+Search your library in plain words and find the photo you're thinking of.
+
+MONITOR
+Live readings of your iPhone's storage, battery and more. Read-only: Roll doesn't change how your phone runs.
+
+PRIVATE BY DESIGN
+• Analysis runs on your iPhone with an on-device AI model and Apple's on-device frameworks
+• No accounts, no analytics, no tracking
+• Photos stored only in iCloud are downloaded from your own iCloud library only when you allow it
+
+ROLL PRO: PAY ONCE
+Your first 50 cleanups are free. Roll Pro is a single one-time purchase that unlocks unlimited deleting, moving and squishing. No subscription, nothing renews. Restore it anytime on your iPhone with the same Apple Account.
+
+Terms of Use: https://roll.delavalom.com/terms
+Privacy Policy: https://roll.delavalom.com/privacy
