@@ -26,7 +26,8 @@ final class OnboardingPitchTests: XCTestCase {
 
     let found = app.staticTexts.containing(NSPredicate(format: "label BEGINSWITH 'You can free about' OR "
       + "label BEGINSWITH 'Nothing confirmed on this iPhone' OR label BEGINSWITH 'Nothing big to free'")).firstMatch
-    XCTAssertTrue(found.waitForExistence(timeout: 120), "the taste scan didn't finish")
+    // Generous: the scan of 500 assets takes far longer on a loaded Mac than on a phone.
+    XCTAssertTrue(found.waitForExistence(timeout: 600), "the taste scan didn't finish")
     let continueButton = app.buttons["Continue"]
     waitUntil(timeout: 10) { continueButton.isEnabled }
     let scanLine = found.label

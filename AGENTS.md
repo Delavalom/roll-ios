@@ -30,8 +30,8 @@ App/                      RollApp (registers IndexScheduler, builds AppModel), R
   Features/Onboarding/    one intro page, permission, TasteScanView (run(limit: 500)), then the paywall (with the scan's PaywallPitch)
   Features/Home/          HomeModel (CleanupScanner, throttled rescans on libraryRevision), cards, squish recovery banner
   Features/Swipefiles/    list, NewSwipefileView, SwipeReviewView/Model (card stack; CardImages prefetches the top 4,
-                          a card with nothing on screen can only be skipped; SwipeHint explains the swipes once, flag in
-                          defaults), CommitSheet/CommitModel
+                          a card with nothing on screen can only be skipped; SwipeHint explains the swipes once on an Ask
+                          answer's stack, flag in defaults), CommitSheet/CommitModel
   Features/Duplicates/    groups → DuplicateGroupView; queues under __duplicates__ or __similar__ (per kind)
   Features/Squish/        SquishView/Model: SquishCatalog, toggles, "Not squishable yet"; queues under __squish__
   Features/Monitor/       MonitorModel over DeviceSampler (onAppear/onDisappear), gauges, Swift Charts history

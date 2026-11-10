@@ -1,9 +1,10 @@
 import Store
 import SwiftUI
 
-/// The swipes, explained once, on the card stack where they're used (onboarding no longer has a page for them). Shown
-/// until it's closed or the first card is swiped, then never again: the flag lives in the app's defaults, and
-/// `-UITestResetState` clears it with the onboarding flag.
+/// The swipes, explained once, on the card stack where they're used (onboarding no longer has a page for them). Only
+/// where the stack doesn't already spell them out: an Ask answer, whose subtitle takes the place of the pile's
+/// "Left deletes · right keeps" line. Shown until it's closed or the first card is swiped, then never again: the flag
+/// lives in the app's defaults, and `-UITestResetState` clears it with the onboarding flag.
 struct SwipeHint: View {
   static let seenKey = "swipeHintSeen"
 

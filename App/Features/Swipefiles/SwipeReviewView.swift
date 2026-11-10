@@ -42,7 +42,8 @@ private struct SwipeStack: View {
   @State private var dealt = false
   /// The Private pile on an iPhone with no passcode opened without a check: say how to lock it.
   @State private var showsNoPasscodeNote = false
-  /// The first time any pile opens: what the swipes do (`SwipeHint`).
+  /// The first time a pile opens without its own swipe line (an Ask answer's subtitle replaces it): what the swipes do
+  /// (`SwipeHint`). Piles opened from Home or Swipefiles already say it under the title.
   @State private var showsHint = false
 
   var body: some View {
@@ -91,7 +92,7 @@ private struct SwipeStack: View {
     .task { await model.watchWiFi() }
     .task {
       showsNoPasscodeNote = SwipefileListModel.isLocked(model.swipefile) && !SwipefileListModel.canLock
-      showsHint = SwipeHint.isNeeded(app.environment.defaults)
+      showsHint = subtitle != nil && SwipeHint.isNeeded(app.environment.defaults)
       await model.load()
     }
     .onChange(of: app.modelState) { _, state in
