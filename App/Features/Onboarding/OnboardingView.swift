@@ -1,3 +1,4 @@
+import Overview
 import SwiftUI
 import UIKit
 
@@ -9,106 +10,26 @@ struct OnboardingView: View {
 
   var body: some View {
     switch model.step {
-    case .value:
-      ValuePages(model: model)
+    case .intro:
+      IntroStep(model: model)
     case .permission:
       PermissionStep(model: model)
     case .tasteScan:
       TasteScanView(model: model.scan, onContinue: model.next)
     case .paywall:
-      PaywallStep(onClose: model.finish)
+      PaywallStep(pitch: model.paywallPitch, onClose: model.finish)
     }
   }
 }
 
-private struct ValuePage: Identifiable {
-  enum Hero { case mark, verdicts, privacy }
-
-  let id: Int
-  let hero: Hero
-  let title: String
-  let detail: String
-
-  static let all = [
-    ValuePage(id: 0, hero: .mark, title: "Describe it.\nRoll finds it.",
-              detail: "Type \"memes\" or \"screenshots of tweets\" and on-device AI gathers them into a pile."),
-    ValuePage(id: 1, hero: .verdicts, title: "Swipe to clean",
-              detail: "Swipe left to delete, right to keep, up to file it in an album. Every swipe teaches the pile."),
-    ValuePage(id: 2, hero: .privacy, title: "Nothing about your photos leaves your phone",
-              detail: "Roll's on-device AI looks at your photos on your iPhone. Nothing is uploaded, ever."),
-  ]
-}
-
-private struct ValuePages: View {
+/// The one page before the permission ask: the hook and the privacy promise together. The aha (the taste scan's
+/// number) comes right after the permission, so nothing else stands in front of it.
+private struct IntroStep: View {
   let model: OnboardingModel
-
-  private var current: Int { if case .value(let p) = model.step { p } else { 0 } }
-
-  private var page: Binding<Int> {
-    Binding(get: { current }, set: { model.showPage($0) })
-  }
-
-  var body: some View {
-    TabView(selection: page) {
-      ForEach(ValuePage.all) { item in
-        ValuePageView(item: item)
-          .tag(item.id)
-      }
-    }
-    .tabViewStyle(.page(indexDisplayMode: .never))
-    .safeAreaInset(edge: .bottom) {
-      VStack(spacing: Roll.Space.l) {
-        PageDots(count: ValuePage.all.count, current: current) { model.showPage($0) }
-        Button("Continue", action: model.next)
-          .buttonStyle(.roll(.primary, fullWidth: true))
-      }
-      .padding(.horizontal, Roll.Space.page)
-      .padding(.top, Roll.Space.s)
-      .padding(.bottom, Roll.Space.xs)
-    }
-    .rollPage()
-  }
-}
-
-private struct ValuePageView: View {
-  let item: ValuePage
 
   var body: some View {
     VStack(spacing: 0) {
       Spacer(minLength: Roll.Space.xl)
-      hero
-        .frame(height: 120)
-      Text(item.title)
-        .rollTitle(Roll.Typeface.display, tracking: Roll.Typeface.displayTracking)
-        .multilineTextAlignment(.center)
-        .fixedSize(horizontal: false, vertical: true)
-        .accessibilityAddTraits(.isHeader)
-        .padding(.top, Roll.Space.xxl)
-      Text(item.detail)
-        .font(Roll.Typeface.body)
-        .foregroundStyle(.rollInk2)
-        .multilineTextAlignment(.center)
-        .fixedSize(horizontal: false, vertical: true)
-        .padding(.top, Roll.Space.s)
-      Spacer(minLength: Roll.Space.xl)
-    }
-    .padding(.horizontal, Roll.Space.xxl)
-    .frame(maxWidth: .infinity)
-  }
-
-  @ViewBuilder private var hero: some View {
-    switch item.hero {
-    case .mark:
-      RollMark(size: 96)
-    case .verdicts:
-      // The three swipes, in the colors they carry on the cards.
-      VStack(spacing: Roll.Space.s) {
-        VerdictTag(title: "Delete", color: .rollEmber).rotationEffect(.degrees(-4))
-        VerdictTag(title: "Keep", color: .rollKeep).rotationEffect(.degrees(3))
-        VerdictTag(title: "Album", color: .rollAlbum).rotationEffect(.degrees(-2))
-      }
-      .accessibilityHidden(true)
-    case .privacy:
       ZStack(alignment: .bottomTrailing) {
         RollMark(size: 96)
         Image(systemName: "lock.fill")
@@ -120,36 +41,38 @@ private struct ValuePageView: View {
           .rollShadow()
           .offset(x: 6, y: 6)
       }
+      .frame(height: 120)
       .accessibilityHidden(true)
+      Text("Describe it.\nRoll finds it.")
+        .rollTitle(Roll.Typeface.display, tracking: Roll.Typeface.displayTracking)
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
+        .accessibilityAddTraits(.isHeader)
+        .padding(.top, Roll.Space.xxl)
+      Text("Type \"memes\" or \"screenshots of tweets\" and on-device AI gathers them into a pile.")
+        .font(Roll.Typeface.body)
+        .foregroundStyle(.rollInk2)
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.top, Roll.Space.s)
+      Text("Nothing about your photos leaves your phone.")
+        .font(Roll.Typeface.headline)
+        .foregroundStyle(.rollInk)
+        .multilineTextAlignment(.center)
+        .fixedSize(horizontal: false, vertical: true)
+        .padding(.top, Roll.Space.m)
+      Spacer(minLength: Roll.Space.xl)
     }
-  }
-}
-
-/// The value pages' dots: ink for the current page, ink3 for the others. One adjustable element for VoiceOver.
-private struct PageDots: View {
-  let count: Int
-  let current: Int
-  let select: (Int) -> Void
-
-  var body: some View {
-    HStack(spacing: Roll.Space.xs) {
-      ForEach(0..<count, id: \.self) { index in
-        Capsule()
-          .fill(index == current ? Roll.Palette.ink : Roll.Palette.ink3)
-          .frame(width: index == current ? 20 : 7, height: 7)
-      }
+    .padding(.horizontal, Roll.Space.xxl)
+    .frame(maxWidth: .infinity)
+    .safeAreaInset(edge: .bottom) {
+      Button("Continue", action: model.next)
+        .buttonStyle(.roll(.primary, fullWidth: true))
+        .padding(.horizontal, Roll.Space.page)
+        .padding(.top, Roll.Space.s)
+        .padding(.bottom, Roll.Space.xs)
     }
-    .animation(Roll.Motion.quick, value: current)
-    .accessibilityElement()
-    .accessibilityLabel("Page")
-    .accessibilityValue("\(current + 1) of \(count)")
-    .accessibilityAdjustableAction { direction in
-      switch direction {
-      case .increment: if current + 1 < count { select(current + 1) }
-      case .decrement: if current > 0 { select(current - 1) }
-      @unknown default: break
-      }
-    }
+    .rollPage()
   }
 }
 
@@ -213,10 +136,11 @@ private struct PermissionStep: View {
 
 private struct PaywallStep: View {
   @Environment(AppModel.self) private var app
+  let pitch: PaywallPitch?
   let onClose: () -> Void
 
   var body: some View {
-    PaywallView(provider: app.entitlements, onClose: onClose)
+    PaywallView(provider: app.entitlements, pitch: pitch, onClose: onClose)
   }
 }
 

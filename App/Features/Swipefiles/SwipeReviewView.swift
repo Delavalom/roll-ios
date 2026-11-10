@@ -42,6 +42,8 @@ private struct SwipeStack: View {
   @State private var dealt = false
   /// The Private pile on an iPhone with no passcode opened without a check: say how to lock it.
   @State private var showsNoPasscodeNote = false
+  /// The first time any pile opens: what the swipes do (`SwipeHint`).
+  @State private var showsHint = false
 
   var body: some View {
     VStack(alignment: .leading, spacing: 0) {
@@ -89,6 +91,7 @@ private struct SwipeStack: View {
     .task { await model.watchWiFi() }
     .task {
       showsNoPasscodeNote = SwipefileListModel.isLocked(model.swipefile) && !SwipefileListModel.canLock
+      showsHint = SwipeHint.isNeeded(app.environment.defaults)
       await model.load()
     }
     .onChange(of: app.modelState) { _, state in
@@ -126,6 +129,11 @@ private struct SwipeStack: View {
         Label(SwipefileListModel.noPasscodeNote, systemImage: "lock.open")
           .font(Roll.Typeface.caption)
           .foregroundStyle(.rollInk2)
+      }
+      if showsHint, model.state == .ready, !model.cards.isEmpty {
+        SwipeHint(action: model.swipefile.action, learns: model.learns, close: hintSeen)
+          .padding(.top, Roll.Space.xxs)
+          .transition(.opacity)
       }
     }
     .padding(.top, Roll.Space.xs)
@@ -294,7 +302,15 @@ private struct SwipeStack: View {
       }
   }
 
+  /// Closed, or the first card was swiped: never shown again.
+  private func hintSeen() {
+    guard showsHint else { return }
+    SwipeHint.markSeen(app.environment.defaults)
+    withAnimation(Roll.Motion.quick) { showsHint = false }
+  }
+
   private func swipe(_ verdict: Verdict, from translation: CGSize? = nil) {
+    hintSeen()
     let exit: CGSize = switch verdict {
     case .action: CGSize(width: -560, height: translation?.height ?? 40)
     case .keep: CGSize(width: 560, height: translation?.height ?? 40)
