@@ -2,6 +2,8 @@
 
 On-device AI photo cleanup for iPhone (iOS 18+, Swift 6, SwiftUI). Requires Xcode 26+ / Swift 6.2. Spec: `docs/superpowers/specs/2026-10-22-roll-design.md`. Plan: `docs/superpowers/plans/2026-10-22-roll.md`. Milestones: `docs/MILESTONES.md`.
 
+Product guardrails (what Roll does and doesn't do; check copy and growth ideas against it): `PRODUCT_GUARDRAILS.md`. Praktika learnings and what they changed here (outcome-first paywall copy, one-time "pay once" anchor): `docs/learnings/2026-11-praktika.md`.
+
 ## Start here
 
 1. `cp Team.xcconfig.example Team.xcconfig` and fill it in (team id, and `RC_PUBLIC_KEY`: the RevenueCat public SDK key; empty means free tier only). It is gitignored.
