@@ -5,19 +5,19 @@ import Overview
 import Ranking
 import Store
 
-/// Onboarding (spec §10): three value pages, Photos permission, the taste scan, then the paywall.
+/// Onboarding (spec §10): one intro page, Photos permission, the taste scan, then the paywall. The aha is the taste
+/// scan's number, so only one page stands before the permission ask; the swipes are taught where they're used
+/// (`SwipeHint`).
 @Observable @MainActor
 final class OnboardingModel {
   enum Step: Equatable {
-    case value(Int)
+    case intro
     case permission
     case tasteScan
     case paywall
   }
 
-  static let valuePages = 3
-
-  private(set) var step: Step = .value(0)
+  private(set) var step: Step = .intro
   private(set) var isRequesting = false
   let scan: TasteScanModel
 
@@ -32,14 +32,12 @@ final class OnboardingModel {
 
   func next() {
     switch step {
-    case .value(let page): step = page + 1 < Self.valuePages ? .value(page + 1) : .permission
+    case .intro: step = .permission
     case .permission: break
     case .tasteScan: app.skipsPaywall ? finish() : (step = .paywall)
     case .paywall: finish()
     }
   }
-
-  func showPage(_ page: Int) { step = .value(page) }
 
   /// Asks for Photos access; on success the model download and the taste scan start.
   func requestAccess() async {
@@ -50,6 +48,9 @@ final class OnboardingModel {
     step = .tasteScan
     scan.start()
   }
+
+  /// The paywall's opening line: the number the taste scan just showed, or nil for the generic header.
+  var paywallPitch: PaywallPitch? { scan.pitch }
 
   /// Without Photos access there is nothing to scan; Home explains how to turn it on.
   func continueWithoutAccess() { finish() }
@@ -71,6 +72,8 @@ final class TasteScanModel {
   private(set) var summary = CleanupSummary()
   /// Up to 6 ids from the Screenshots swipefile.
   private(set) var screenshotPreview: [String] = []
+  /// The device's storage, read with the results.
+  private(set) var storage: StorageSnapshot?
 
   @ObservationIgnored private let app: AppModel
   @ObservationIgnored private var task: Task<Void, Never>?
@@ -85,21 +88,16 @@ final class TasteScanModel {
 
   /// The categories shown on the results screen, with what each frees on this iPhone (big videos at their squish
   /// savings, like the header). Categories with nothing on the device are left out (never "about 0 MB").
-  var found: [(title: String, bytes: Int64)] {
-    let rows: [(String, Int64)] = [
-      ("Screenshots", summary[.screenshots].onDeviceBytes),
-      ("Duplicates and similar shots", summary[.duplicates].onDeviceBytes + summary[.similarShots].onDeviceBytes),
-      ("Squishing big videos", summary.bigVideoSavingsOnDevice),
-      ("Blurry", summary[.blurry].onDeviceBytes),
-    ]
-    return rows.filter { $0.1 > 0 }.map { (title: $0.0, bytes: $0.1) }
+  var found: [FoundItem] { summary.foundOnDevice }
+
+  /// The same total as Home's header: on this iPhone only, capped at the space in use. The storage is read once with
+  /// the results, so the paywall that follows repeats exactly this number.
+  var foundBytes: Int64 {
+    summary.onDeviceHeadline(deviceTotal: storage?.total, deviceAvailable: storage?.available)
   }
 
-  /// The same total as Home's header: on this iPhone only, capped at the space in use.
-  var foundBytes: Int64 {
-    let storage = try? StorageStats.snapshot()
-    return summary.onDeviceHeadline(deviceTotal: storage?.total, deviceAvailable: storage?.available)
-  }
+  /// The paywall's opening line, from `foundBytes` and `found` (nil below `PaywallPitch.minimumBytes`).
+  var pitch: PaywallPitch? { PaywallPitch.make(onDeviceBytes: foundBytes, found: found) }
 
   /// Originals stored in iCloud (freeing them frees iCloud space, not the iPhone's).
   var inCloudBytes: Int64 { summary.freeableInCloud }
@@ -122,6 +120,7 @@ final class TasteScanModel {
 
   private func loadResults() async throws {
     summary = try await CleanupScanner(repositories: app.repositories).scan()
+    storage = try? StorageStats.snapshot()
     screenshotPreview = try await app.previewCards(for: .screenshots, limit: 6)
   }
 }

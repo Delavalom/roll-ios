@@ -25,9 +25,9 @@ final class SmokeTests: XCTestCase {
     app.launchArguments += ["-UITestSkipPaywall", "-UITestStubEmbedder", "-UITestResetState"]
     app.launch()
 
-    // Onboarding: three value pages, then the permission step. seed_sim.sh grants Photos access, but if iOS asks
+    // Onboarding: one intro page, then the permission step. seed_sim.sh grants Photos access, but if iOS asks
     // anyway (the grant can be lost when the app is reinstalled), allow full access.
-    for _ in 0..<4 {
+    for _ in 0..<2 {
       let next = app.buttons["Continue"]
       XCTAssertTrue(next.waitForExistence(timeout: 15))
       waitUntil(timeout: 10) { next.isHittable && next.isEnabled }

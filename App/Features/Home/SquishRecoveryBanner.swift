@@ -67,7 +67,7 @@ struct SquishRecoveryBanner: View {
       .rollCard()
       .disabled(working)
       .sheet(isPresented: $showingPaywall) {
-        PaywallView(provider: app.entitlements) { showingPaywall = false }
+        PaywallView(provider: app.entitlements, pitch: app.home.paywallPitch) { showingPaywall = false }
       }
     }
   }

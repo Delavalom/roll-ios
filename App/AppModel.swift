@@ -179,6 +179,7 @@ final class AppModel {
       QARuntime.shared?.log.write("ui_test_reset", ["keptSquishJournal": .bool(true), "openSquishes": .int(open)])
     }
     defaults.removeObject(forKey: onboardingKey)
+    defaults.removeObject(forKey: SwipeHint.seenKey)
   }
   #endif
 

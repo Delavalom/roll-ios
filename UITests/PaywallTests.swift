@@ -1,7 +1,8 @@
 import XCTest
 
 /// `-UITestOpen paywall` (DEBUG only) opens the paywall on launch; `-UITestSkipPaywall` keeps onboarding from
-/// showing a second one underneath. Checks the one-time Roll Pro price, the button, the terms and the legal links.
+/// showing a second one underneath, and `-UITestResetState` keeps Home from loading a number behind it, so the header
+/// is the generic one. Checks the header, the one-time Roll Pro price, the button, the terms and the legal links.
 ///
 /// Under `xcodebuild test` the products come from the App Store sandbox, not Roll.storekit: the scheme's StoreKit
 /// configuration applies only when Xcode runs the app (Cmd-R), and an `SKTestSession` in this UI-test runner
@@ -15,8 +16,13 @@ final class PaywallTests: XCTestCase {
   @MainActor
   func testPaywallShowsOneTimePurchase() throws {
     let app = XCUIApplication()
-    app.launchArguments += ["-UITestOpen", "paywall", "-UITestSkipPaywall"]
+    app.launchArguments += ["-UITestOpen", "paywall", "-UITestSkipPaywall", "-UITestResetState"]
     app.launch()
+
+    let headline = app.staticTexts["paywall.headline"]
+    XCTAssertTrue(headline.waitForExistence(timeout: 15))
+    XCTAssertEqual(headline.label, "Clean up your camera roll, privately", "no number to lead with yet")
+    XCTAssertFalse(app.staticTexts["paywall.subline"].exists)
 
     let price = app.descendants(matching: .any)["paywall.price"].firstMatch
     if !price.waitForExistence(timeout: 45) {

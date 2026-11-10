@@ -91,8 +91,8 @@ struct TasteScanView: View {
           .padding(.top, Roll.Space.xl)
           .padding(.bottom, Roll.Space.s)
         RollGroup {
-          ForEach(model.found, id: \.title) { item in
-            RollRow(symbol: Self.symbol(for: item.title), title: item.title, trailing: ByteFormat.about(item.bytes))
+          ForEach(model.found, id: \.kind) { item in
+            RollRow(symbol: Self.symbol(for: item.kind), title: item.kind.title, trailing: ByteFormat.about(item.bytes))
           }
         }
       }
@@ -117,13 +117,12 @@ struct TasteScanView: View {
   }
 
   /// The same symbols as Home's cards.
-  private static func symbol(for title: String) -> String {
-    switch title {
-    case "Screenshots": "iphone"
-    case "Duplicates and similar shots": "square.on.square"
-    case "Squishing big videos": "film.stack"
-    case "Blurry": "camera.metering.unknown"
-    default: "photo"
+  private static func symbol(for kind: FoundKind) -> String {
+    switch kind {
+    case .screenshots: "iphone"
+    case .duplicates: "square.on.square"
+    case .bigVideos: "film.stack"
+    case .blurry: "camera.metering.unknown"
     }
   }
 }
