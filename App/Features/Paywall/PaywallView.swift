@@ -88,7 +88,7 @@ struct PaywallView: View {
   }
 
   /// "Free about 3.2 GB on this iPhone" (the number the taste scan or Home showed), else the generic line. A
-  /// non-breaking space keeps "3.2 GB" together when it wraps, as on Home.
+  /// non-breaking space keeps "about 3.2 GB" together when the headline wraps.
   static func headline(_ pitch: PaywallPitch?) -> String {
     guard let pitch else { return "Clean up your camera roll, privately" }
     return "Free \(ByteFormat.about(pitch.bytes).replacingOccurrences(of: " ", with: "\u{00A0}")) on this iPhone"
