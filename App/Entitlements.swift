@@ -51,11 +51,13 @@ final class Entitlements {
     isPro = info.entitlements[Self.entitlementID]?.isActive == true
   }
 
-  /// The annual and weekly packages of the current offering (`default`).
-  func offerings() async throws -> (annual: Package?, weekly: Package?) {
+  /// The one-time Roll Pro package of the current offering (`default`): `$rc_lifetime`, or failing that the first
+  /// non-subscription package, so a renamed package still sells.
+  func lifetimePackage() async throws -> Package? {
     guard isConfigured else { throw EntitlementsError.notConfigured }
     let current = try await Purchases.shared.offerings().current
-    return (current?.annual, current?.weekly)
+    return current?.lifetime
+      ?? current?.availablePackages.first { $0.storeProduct.productCategory == .nonSubscription }
   }
 
   /// Returns false when the user cancelled the App Store sheet.
@@ -80,7 +82,7 @@ enum EntitlementsError: LocalizedError {
   var errorDescription: String? {
     switch self {
     case .notConfigured: "Purchases aren't available in this build."
-    case .planUnavailable: "That plan isn't available right now."
+    case .planUnavailable: "Roll Pro isn't available right now."
     }
   }
 }
@@ -92,32 +94,11 @@ extension Entitlements: ProStatus {}
 // MARK: - Paywall
 
 extension Entitlements: PurchaseProvider {
-  func paywallPlans() async throws -> [PaywallPlan] {
-    let (annual, weekly) = try await offerings()
-    var plans: [PaywallPlan] = []
+  func paywallPlan() async throws -> PaywallPlan? {
     packages = [:]
-    for (package, kind) in [(annual, PaywallPlan.Kind.annual), (weekly, .weekly)] {
-      guard let package else { continue }
-      packages[package.identifier] = package
-      plans.append(PaywallPlan(id: package.identifier, kind: kind, price: package.storeProduct.localizedPriceString,
-                               trial: await trial(for: package.storeProduct)))
-    }
-    return plans
-  }
-
-  /// The free trial, only when the product has one and the user can still get it.
-  private func trial(for product: StoreProduct) async -> PaywallPlan.Trial? {
-    guard let intro = product.introductoryDiscount, intro.paymentMode == .freeTrial else { return nil }
-    let eligibility = await Purchases.shared.checkTrialOrIntroDiscountEligibility(product: product)
-    guard eligibility != .ineligible, eligibility != .noIntroOfferExists else { return nil }
-    let period = intro.subscriptionPeriod
-    let unit: PaywallPlan.Trial.Unit = switch period.unit {
-    case .day: .day
-    case .week: .week
-    case .month: .month
-    case .year: .year
-    }
-    return PaywallPlan.Trial(value: period.value, unit: unit)
+    guard let package = try await lifetimePackage() else { return nil }
+    packages[package.identifier] = package
+    return PaywallPlan(id: package.identifier, price: package.storeProduct.localizedPriceString)
   }
 
   func purchase(_ plan: PaywallPlan) async throws -> Bool {

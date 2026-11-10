@@ -148,13 +148,6 @@ final class AskFlowTests: XCTestCase {
     _ = paywall.buttons["Close"].waitForExistence(timeout: 30)
     sleep(4)
     shot("o7-paywall")
-    let weekly = paywall.buttons.containing(NSPredicate(format: "label BEGINSWITH 'Weekly'")).firstMatch
-    if weekly.exists {
-      weekly.tap()
-      sleep(2)
-      shot("o8-paywall-weekly")
-      print("PAYWALL-DEBUG", paywall.buttons.allElementsBoundByIndex.map(\.label))
-    }
   }
 
   @MainActor

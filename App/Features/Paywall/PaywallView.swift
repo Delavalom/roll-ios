@@ -6,7 +6,7 @@ struct PaywallView: View {
   private let onClose: () -> Void
 
   /// Apple's Standard EULA: Roll has no custom licence in App Store Connect, so this is the Terms of Use (EULA) that
-  /// guideline 3.1.2 asks the paywall to link. Roll's own subscription terms draft is docs/legal/terms.md.
+  /// guideline 3.1.2 asks the paywall to link. Roll's own terms draft is docs/legal/terms.md.
   static let termsURL = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
   static let privacyURL = URL(string: "https://roll.delavalom.com/privacy")!
 
@@ -19,8 +19,8 @@ struct PaywallView: View {
     ScrollView {
       VStack(alignment: .leading, spacing: 0) {
         header
-        // Plans first, so they're on screen above the button without scrolling; what Pro includes follows.
-        SectionLabel("Choose a plan")
+        // The price first, so it's on screen above the button without scrolling; what Pro includes follows.
+        SectionLabel("One-time purchase")
           .padding(.top, Roll.Space.l)
           .padding(.bottom, Roll.Space.s)
         plansSection
@@ -82,6 +82,8 @@ struct PaywallView: View {
               detail: "Delete, move to albums and squish as much as you like. The first 50 are free.")
       RollRow(symbol: "lock.shield", title: "Never leaves your phone",
               detail: "Your photos are analyzed on your iPhone. Nothing about them leaves your phone.")
+      RollRow(symbol: "checkmark.seal", title: "Pay once, keep it",
+              detail: "No subscription. Restore Roll Pro anytime with the same Apple Account.")
     }
   }
 
@@ -90,7 +92,7 @@ struct PaywallView: View {
     case .loading:
       HStack(spacing: Roll.Space.xs) {
         RollMark(size: 22, busy: true)
-        StatusLine(text: "Loading plans…")
+        StatusLine(text: "Loading Roll Pro…")
       }
       .frame(maxWidth: .infinity, minHeight: 120)
     case let .failed(text):
@@ -106,12 +108,7 @@ struct PaywallView: View {
       .frame(maxWidth: .infinity, minHeight: 120)
       .rollCard()
     case .ready:
-      VStack(spacing: Roll.Space.s) {
-        ForEach(model.plans) { plan in
-          PlanTile(plan: plan, isSelected: plan.id == model.selectedID) { model.selectedID = plan.id }
-        }
-      }
-      .animation(Roll.Motion.quick, value: model.selectedID)
+      if let plan = model.plan { PriceCard(plan: plan) }
     }
   }
 
@@ -126,10 +123,10 @@ struct PaywallView: View {
         }
       }
       .buttonStyle(.roll(.primary, fullWidth: true))
-      .disabled(model.selected == nil || model.isWorking)
+      .disabled(model.plan == nil || model.isWorking)
 
-      // The renewal terms (App Review guideline 3.1.2): price, period and renewal, readable, right under the button.
-      if let plan = model.selected {
+      // The purchase terms, readable, right under the button: one payment, nothing renews, restorable.
+      if let plan = model.plan {
         Text(plan.terms)
           .font(Roll.Typeface.subhead)
           .foregroundStyle(.rollInk2)
@@ -163,64 +160,32 @@ struct PaywallView: View {
   }
 }
 
-/// One plan as a selectable card: white with a hairline, or an ink 1.5 pt border once selected.
-private struct PlanTile: View {
+/// Roll Pro's one price: "Lifetime", the price and "once", on a white card with an ink border.
+private struct PriceCard: View {
   let plan: PaywallPlan
-  let isSelected: Bool
-  let select: () -> Void
 
   var body: some View {
-    Button(action: select) {
-      HStack(spacing: Roll.Space.s) {
-        Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
-          .font(.title2)
-          .foregroundStyle(isSelected ? .rollInk : .rollInk3)
-          .accessibilityHidden(true)
-        VStack(alignment: .leading, spacing: Roll.Space.xxs) {
-          HStack(spacing: Roll.Space.xs) {
-            Text(plan.title).font(Roll.Typeface.headline).foregroundStyle(.rollInk)
-            if let trial = plan.trial {
-              Text(trial.badge)
-                .font(Roll.Typeface.label)
-                .foregroundStyle(.rollOnInk)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 3)
-                .background(.rollInk, in: Capsule())
-            }
-          }
-          Text(plan.priceLine)
-            .font(Roll.Typeface.callout)
-            .foregroundStyle(.rollInk)
-          if plan.kind == .annual {
-            Text("Most popular")
-              .font(Roll.Typeface.caption)
-              .foregroundStyle(.rollInk2)
-          }
-        }
-        Spacer(minLength: 0)
+    HStack(alignment: .firstTextBaseline, spacing: Roll.Space.s) {
+      VStack(alignment: .leading, spacing: Roll.Space.xxs) {
+        Text("Lifetime").font(Roll.Typeface.headline).foregroundStyle(.rollInk)
+        Text("Pay once. No subscription.")
+          .font(Roll.Typeface.caption)
+          .foregroundStyle(.rollInk2)
       }
-      .padding(Roll.Space.m)
-      .frame(maxWidth: .infinity, alignment: .leading)
-      .background(.rollCard, in: RoundedRectangle(cornerRadius: Roll.Radius.card, style: .continuous))
-      .overlay {
-        RoundedRectangle(cornerRadius: Roll.Radius.card, style: .continuous)
-          .strokeBorder(isSelected ? Roll.Palette.ink : Roll.Palette.hairline,
-                        lineWidth: isSelected ? 1.5 : Roll.hairlineWidth)
-      }
-      .rollShadow()
-      .contentShape(RoundedRectangle(cornerRadius: Roll.Radius.card, style: .continuous))
+      Spacer(minLength: 0)
+      Text(plan.price).font(Roll.Typeface.title).foregroundStyle(.rollInk)
     }
-    .buttonStyle(PressScale())
-    .accessibilityLabel(accessibilityText)
-    .accessibilityAddTraits(isSelected ? .isSelected : [])
-  }
-
-  private var accessibilityText: String {
-    var parts = [plan.title]
-    if let trial = plan.trial { parts.append(trial.badge) }
-    parts.append(plan.priceLine)
-    if plan.kind == .annual { parts.append("Most popular") }
-    return parts.joined(separator: ", ")
+    .padding(Roll.Space.m)
+    .frame(maxWidth: .infinity, alignment: .leading)
+    .background(.rollCard, in: RoundedRectangle(cornerRadius: Roll.Radius.card, style: .continuous))
+    .overlay {
+      RoundedRectangle(cornerRadius: Roll.Radius.card, style: .continuous)
+        .strokeBorder(Roll.Palette.ink, lineWidth: 1.5)
+    }
+    .rollShadow()
+    .accessibilityElement(children: .combine)
+    .accessibilityLabel("Lifetime, \(plan.price), pay once, no subscription")
+    .accessibilityIdentifier("paywall.price")
   }
 }
 
@@ -230,21 +195,15 @@ private struct PlanTile: View {
 /// Offerings without the network, for previews.
 @MainActor
 final class MockPurchaseProvider: PurchaseProvider {
-  var withTrial = true
   var failsToLoad = false
 
-  init(withTrial: Bool = true, failsToLoad: Bool = false) {
-    self.withTrial = withTrial
+  init(failsToLoad: Bool = false) {
     self.failsToLoad = failsToLoad
   }
 
-  func paywallPlans() async throws -> [PaywallPlan] {
+  func paywallPlan() async throws -> PaywallPlan? {
     if failsToLoad { throw URLError(.notConnectedToInternet) }
-    return [
-      PaywallPlan(id: "$rc_annual", kind: .annual, price: "$29.99",
-                  trial: withTrial ? PaywallPlan.Trial(value: 3, unit: .day) : nil),
-      PaywallPlan(id: "$rc_weekly", kind: .weekly, price: "$4.99", trial: nil),
-    ]
+    return PaywallPlan(id: "$rc_lifetime", price: "$14.99")
   }
 
   func purchase(_ plan: PaywallPlan) async throws -> Bool {
@@ -255,12 +214,12 @@ final class MockPurchaseProvider: PurchaseProvider {
   func restorePurchases() async throws -> Bool { false }
 }
 
-#Preview("Trial") {
+#Preview("Lifetime") {
   PaywallView(provider: MockPurchaseProvider()) {}
 }
 
-#Preview("No trial, large text") {
-  PaywallView(provider: MockPurchaseProvider(withTrial: false)) {}
+#Preview("Large text") {
+  PaywallView(provider: MockPurchaseProvider()) {}
     .dynamicTypeSize(.accessibility2)
 }
 

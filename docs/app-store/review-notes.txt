@@ -1,0 +1,13 @@
+Roll cleans up the iPhone photo library entirely on the device. No account or login is needed.
+
+How to review:
+1. Launch Roll and go through onboarding. Allow Photos access (full access works best; limited access also works). The last onboarding step is the Roll Pro paywall (one-time purchase), which can be closed.
+2. Home shows screenshots, blurry photos, big videos and duplicates. These work right away.
+3. Describing a pile in words (Swipefiles tab, e.g. "receipts" or "photos of whiteboards") uses an on-device AI model. On first use Roll downloads the model (about 350 MB) from Hugging Face over Wi-Fi, then prepares it on the device ("Preparing search, first time only"). This takes a few minutes on a recent iPhone. Until it finishes, the other features keep working.
+4. Swipe left/right to review a pile, then apply it to delete, move to an album or squish (re-encode to a smaller HEIC/HEVC copy). Deletions go through the standard iOS confirmation and land in Recently Deleted.
+
+In-app purchase (Roll Pro, non-consumable, roll_pro_lifetime): the first 50 cleanups are free. Applying more opens the paywall, which offers one one-time purchase (no subscription). Restore Purchases is on the paywall. Purchases are handled by Apple through RevenueCat.
+
+Privacy: photos, videos, AI embeddings and typed descriptions are never uploaded. Network use is only the model download and RevenueCat for the purchase. The Monitor tab shows read-only device readings and does not change how the phone runs.
+
+iPhone only. Contact: hi@delavalom.com

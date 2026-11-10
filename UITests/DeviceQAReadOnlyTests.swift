@@ -167,7 +167,7 @@ final class DeviceQA3ExtrasTests: DeviceQABase {
   }
 
   /// RevenueCat Test Store (`-RCTestStore`): with the free quota used up (`-QAExhaustFreeQuota`, Roll's own counter
-  /// only), queue one screenshot, see the plan blocked, buy Weekly through the Test Store sheet, and check the plan
+  /// only), queue one screenshot, see the plan blocked, buy Roll Pro (one-time) through the Test Store sheet, and check the plan
   /// becomes appliable. Nothing is applied (and the read-only gate would refuse it). Then Restore.
   @MainActor
   func testP3TestStorePurchaseUnlocksPro() throws {
@@ -194,17 +194,14 @@ final class DeviceQA3ExtrasTests: DeviceQABase {
     shot("p3-01-plan-blocked-by-quota")
     blocked.tap()
 
-    let weekly = app.buttons.containing(NSPredicate(format: "label BEGINSWITH 'Weekly'")).firstMatch
-    guard weekly.waitForExistence(timeout: 45) else {
+    let cta = app.buttons.containing(NSPredicate(format: "label BEGINSWITH 'Unlock for'")).firstMatch
+    guard cta.waitForExistence(timeout: 45) else {
       shot("p3-02-paywall-no-plans")
-      XCTFail("the Test Store plans didn't load")
+      XCTFail("the Test Store Roll Pro product didn't load")
       return
     }
     shot("p3-02-paywall-test-store")
     attachText("p3-plan-labels", app.buttons.allElementsBoundByIndex.map(\.label).joined(separator: "\n"))
-    weekly.tap()
-    let cta = app.buttons["Continue"]
-    XCTAssertTrue(cta.waitForExistence(timeout: 5))
     cta.tap()
 
     // RevenueCat's Test Store purchase sheet: tap its success option.

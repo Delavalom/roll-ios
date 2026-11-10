@@ -138,7 +138,7 @@ def main() -> None:
 
     legal = {  # name -> (page title, description)
         "privacy": ("Privacy Policy", "How Roll handles your information: photos are analyzed on your iPhone and never uploaded. No analytics, no tracking, no accounts."),
-        "terms": ("Terms of Use", "Terms of Use for Roll and Roll Pro subscriptions, under Apple's Standard Licensed Application End User License Agreement."),
+        "terms": ("Terms of Use", "Terms of Use for Roll and the one-time Roll Pro purchase, under Apple's Standard Licensed Application End User License Agreement."),
     }
     for name, (page_title, description) in legal.items():
         md = (REPO / "docs" / "legal" / f"{'privacy-policy' if name == 'privacy' else name}.md").read_text()
