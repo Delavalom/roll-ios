@@ -82,15 +82,23 @@ struct PaywallView: View {
           .fixedSize(horizontal: false, vertical: true)
           .accessibilityIdentifier("paywall.subline")
           .padding(.top, Roll.Space.xs)
+      } else if pitch == nil {
+        // No number to lead with: the outcome headline's how and anchor (`PaywallPitch.genericSubline`).
+        Text(PaywallPitch.genericSubline)
+          .font(Roll.Typeface.subhead)
+          .foregroundStyle(.rollInk2)
+          .fixedSize(horizontal: false, vertical: true)
+          .accessibilityIdentifier("paywall.subhead")
+          .padding(.top, Roll.Space.xs)
       }
     }
     .frame(maxWidth: .infinity, alignment: .leading)
   }
 
-  /// "Free about 3.2 GB on this iPhone" (the number the taste scan or Home showed), else the generic line. A
-  /// non-breaking space keeps "about 3.2 GB" together when the headline wraps.
+  /// "Free about 3.2 GB on this iPhone" (the number the taste scan or Home showed), else the outcome line
+  /// (`PaywallPitch.genericHeadline`). A non-breaking space keeps "about 3.2 GB" together when the headline wraps.
   static func headline(_ pitch: PaywallPitch?) -> String {
-    guard let pitch else { return "Clean up your camera roll, privately" }
+    guard let pitch else { return PaywallPitch.genericHeadline }
     return "Free \(ByteFormat.about(pitch.bytes).replacingOccurrences(of: " ", with: "\u{00A0}")) on this iPhone"
   }
 

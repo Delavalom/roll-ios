@@ -21,8 +21,9 @@ final class PaywallTests: XCTestCase {
 
     let headline = app.staticTexts["paywall.headline"]
     XCTAssertTrue(headline.waitForExistence(timeout: 15))
-    XCTAssertEqual(headline.label, "Clean up your camera roll, privately", "no number to lead with yet")
+    XCTAssertEqual(headline.label, "Get your space back without uploading your photos", "no number to lead with yet")
     XCTAssertFalse(app.staticTexts["paywall.subline"].exists)
+    XCTAssertTrue(app.staticTexts["paywall.subhead"].exists, "the outcome headline's how and anchor")
 
     let price = app.descendants(matching: .any)["paywall.price"].firstMatch
     if !price.waitForExistence(timeout: 45) {

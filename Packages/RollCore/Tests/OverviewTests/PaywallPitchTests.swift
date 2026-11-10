@@ -95,4 +95,36 @@ struct PaywallPitchTests {
       == 160 * Self.mb)
     #expect(PaywallPitch.make(summary: CleanupSummary(), deviceTotal: nil, deviceAvailable: nil) == nil)
   }
+
+  // MARK: Without a number
+
+  /// Outcome first (Praktika L1), and the privacy promise stays (PRODUCT_GUARDRAILS.md).
+  @Test func theGenericHeaderLeadsWithTheOutcomeAndKeepsThePrivacyPromise() {
+    let headline = PaywallPitch.genericHeadline.lowercased()
+    #expect(headline.contains("space back"))
+    #expect(headline.contains("without uploading"))
+    #expect(PaywallPitch.genericSubline.contains("on your iPhone"))
+  }
+
+  /// ADR-0002 (no performance claims) and the guardrails' tone (never calls a library messy).
+  @Test func theGenericCopyFollowsTheCopyRules() {
+    let banned = ["boost", "free ram", "speed up", "faster", "optimiz", "clean your phone", "mess"]
+    for text in [PaywallPitch.genericHeadline, PaywallPitch.genericSubline] {
+      for word in banned { #expect(!text.lowercased().contains(word), "\(text) contains \(word)") }
+    }
+  }
+
+  /// Roll Pro is pay once, and the price card says so. The header quotes no price (ours or a storage plan's) and
+  /// names no billing period, so it can never contradict the card.
+  @Test func theGenericCopyQuotesNoPriceAndNoBillingPeriod() {
+    let banned = ["$", "icloud+", "subscri", "trial", "week", "month", "year", "annual", "renew", "cancel"]
+    for text in [PaywallPitch.genericHeadline, PaywallPitch.genericSubline] {
+      for word in banned { #expect(!text.lowercased().contains(word), "\(text) contains \(word)") }
+    }
+  }
+
+  /// Fits the paywall's display title in about two lines on the smallest supported iPhone.
+  @Test func theGenericHeadlineStaysShort() {
+    #expect(PaywallPitch.genericHeadline.count <= 56)
+  }
 }

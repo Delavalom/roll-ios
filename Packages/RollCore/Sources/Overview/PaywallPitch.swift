@@ -55,6 +55,15 @@ public struct PaywallPitch: Sendable, Equatable {
   /// is a real chunk of storage, and on most libraries the taste scan alone passes it.
   public static let minimumBytes: Int64 = 100_000_000
 
+  /// The header when there's no number to lead with (`make` returned nil): still the outcome first (Praktika L1,
+  /// docs/learnings/2026-11-praktika.md), with the privacy promise as the how.
+  public static let genericHeadline = "Get your space back without uploading your photos"
+
+  /// Under `genericHeadline`: the how, then the anchor against buying more storage. It names no price and no way of
+  /// paying, so it stays true whatever the price card below says (Roll Pro is pay once; that line lives there).
+  public static let genericSubline =
+    "Roll's AI works on your iPhone and you decide what goes. Make room before you pay for more storage."
+
   /// Exactly the on-device headline the user was shown (never recomputed here).
   public let bytes: Int64
   /// "Mostly screenshots, plus blurry photos." or "All from screenshots."; nil when no category has bytes.

@@ -52,7 +52,8 @@ final class OnboardingPitchTests: XCTestCase {
       XCTAssertEqual(Self.normalized(headline.label), "Free about \(size) on this iPhone", "scan said: \(scanLine)")
       XCTAssertTrue(app.staticTexts["paywall.subline"].exists, "the subline names what was found")
     } else {
-      XCTAssertEqual(headline.label, "Clean up your camera roll, privately", "scan said: \(scanLine)")
+      XCTAssertEqual(headline.label, "Get your space back without uploading your photos", "scan said: \(scanLine)")
+      XCTAssertTrue(app.staticTexts["paywall.subhead"].exists, "the outcome headline's how and anchor")
     }
   }
 
