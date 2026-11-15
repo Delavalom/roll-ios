@@ -31,7 +31,7 @@ targets:
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
         NSPhotoLibraryUsageDescription: Roll looks at your photos on your iPhone to find what you can delete or shrink. Nothing leaves your phone.
-        NSPhotoLibraryAddUsageDescription: Roll saves the smaller copy of photos and videos you squish.
+        NSPhotoLibraryAddUsageDescription: Roll saves the smaller copy of photos and videos you squish, and the memory videos you make.
         NSFaceIDUsageDescription: Roll uses Face ID to lock your Private swipefile.
         BGTaskSchedulerPermittedIdentifiers: [com.delavalom.roll.index]
         UIBackgroundModes: [processing]

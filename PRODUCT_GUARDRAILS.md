@@ -23,8 +23,11 @@ a feed or a backup service.
   finished or undone from Home. The confirm sheet lists what can't be carried over. [spec §8, Squish/ReplaceFlow.swift]
 - **Lock the Private pile** behind Face ID or the passcode, and hide app thumbnails in the app
   switcher. [spec §13, SwipefileListModel, PrivacyOverlay]
+- **Find photos and make albums, asking first.** Ask Roll finds a trip or an activity; "Make album" shows a grid
+  to pick from and adds only what's picked, through the same commit path as cleanup. A kept-updated ("living")
+  album only offers new matches on Home; nothing is added without a tap. [Features/Find, Commit/AlbumQueue.swift]
 - **Give the first 50 applied items for free**, counted only after a change succeeds. A declined system prompt
-  costs nothing. [ADR-0003, FreeQuota]
+  costs nothing. Album adds count too for now (`FreeQuota.countsAlbumAdds`, founder to decide). [ADR-0003, FreeQuota]
 - **Say sizes as "about X"**, for photos and videos only, and only what's on this iPhone (iCloud-only originals
   are counted separately). The paywall repeats the taste scan's or Home's own number, never a new one.
   [ADR-0002, TasteScanModel, Overview/PaywallPitch.swift]

@@ -92,6 +92,8 @@ final class AppModel {
   let squishScreen: SquishFormatScreen
   /// Locality and format checks after indexing (`startChecks`), kept for the launch.
   let checks: CandidateChecks
+  /// Living albums: the event pass, then saved searches' new photos, after indexing drains (AppModel+Text.swift).
+  let living: LivingAlbumsModel
   /// Runs the opt-in iCloud upgrade only while Wi-Fi and charging hold (live builds).
   @ObservationIgnored private var upgradeMonitor: ICloudUpgradeMonitor?
 
@@ -128,6 +130,7 @@ final class AppModel {
     entitlements = Entitlements()
     sampler = DeviceSampler()
     home = HomeModel(repositories: repositories)
+    living = LivingAlbumsModel(repositories: repositories)
     thumbnails = environment.thumbnails
     skipsPaywall = environment.skipsPaywall
     access = environment.access.current()
@@ -166,22 +169,6 @@ final class AppModel {
       thumbnails: PhotoThumbnails(), defaults: defaults, isLive: true, skipsPaywall: skipsPaywall)
     return try AppModel(environment: environment)
   }
-
-  #if DEBUG
-  /// `-UITestResetState`: a fresh install's state, without reinstalling, except that an unfinished squish survives
-  /// (`AppDatabase.resetForUITests`): its journal is kept so the recovery banner and the copy exclusions still work.
-  private static func resetStateForUITests(database url: URL, defaults: UserDefaults) throws {
-    switch try AppDatabase.resetForUITests(at: url) {
-    case .removedEverything:
-      break
-    case .keptSquishJournal(let open):
-      QARuntime.logger.notice("-UITestResetState kept the squish journal: \(open) unfinished squishes")
-      QARuntime.shared?.log.write("ui_test_reset", ["keptSquishJournal": .bool(true), "openSquishes": .int(open)])
-    }
-    defaults.removeObject(forKey: onboardingKey)
-    defaults.removeObject(forKey: SwipeHint.seenKey)
-  }
-  #endif
 
   /// Called once at launch.
   func start() {
