@@ -27,6 +27,10 @@ public struct PoolScores: Sendable {
 
   public func id(_ k: Int) -> String { snapshot[Int(source[k])].asset.id }
   public func asset(_ k: Int) -> RankingAsset { snapshot[Int(source[k])].asset }
+  /// Entry `k`'s row: date, location and moment (typed search).
+  public func row(_ k: Int) -> RankingRow { snapshot[Int(source[k])] }
+  /// Every live row the pool was built from, embedded or not.
+  public var libraryRows: [RankingRow] { snapshot }
   /// Entry `k`'s dot product with query `j`.
   public func dot(_ k: Int, query j: Int) -> Float { dots.scores[j * dots.ids.count + Int(rows[k])] }
 

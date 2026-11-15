@@ -77,6 +77,8 @@ public actor SwipefileEngine {
   private var training: Set<String> = []
   /// The live rows in memory between searches (see `CandidatePool`).
   let candidatePool: CandidatePool
+  /// The events table (`Repositories.events`) by id, for the rows generation it was read at (`find`).
+  var eventCache: (generation: UInt64, events: [String: EventRecord])? = nil
 
   private struct PromptKey: Hashable {
     var revision: String
@@ -332,7 +334,7 @@ public actor SwipefileEngine {
 
   /// The stored classifier, if it decodes at the index's width and was trained on the index's
   /// revision (weights from another model live in another vector space).
-  private func usableClassifier(_ swipefile: SwipefileRecord) -> LogisticClassifier? {
+  func usableClassifier(_ swipefile: SwipefileRecord) -> LogisticClassifier? {
     guard let blob = swipefile.classifier, swipefile.classifierRevision == vectors.revision else { return nil }
     return LogisticClassifier(blob: blob, dimensions: vectors.dimensions)
   }
