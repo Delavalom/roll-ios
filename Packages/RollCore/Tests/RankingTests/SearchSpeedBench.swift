@@ -66,6 +66,54 @@ struct SearchSpeedBench {
     }
   }
 
+  /// Typed search (Ask Roll's `SwipefileEngine.search`) over the same world: a first call, then the median of 10 warm
+  /// calls per query (stub query embedding, so this is the store read, `dotAll`, gating and ranking).
+  @Test func typedSearch() async throws {
+    let world = try await SearchBenchWorld.make()
+    defer { world.cleanUp() }
+    let queries = ["receipts and invoices", "screenshots of chats", "a dog on the beach", "zxqv blorp"]
+    let clock = ContinuousClock()
+    for query in queries {
+      let firstStart = clock.now
+      _ = try await world.engine.search(query)
+      let first = SearchTimings.ms(clock.now - firstStart)
+      var warm: [Double] = []
+      var count = 0
+      for _ in 0..<10 {
+        let start = clock.now
+        let result = try await world.engine.search(query)
+        warm.append(SearchTimings.ms(clock.now - start))
+        count = result.matches.count + result.weaker.count
+      }
+      warm.sort()
+      print("bench search \"\(query)\" results=\(count) first=\(String(format: "%.2f", first))"
+            + " warmMedian=\(String(format: "%.2f", warm[warm.count / 2])) warmMin=\(String(format: "%.2f", warm[0]))")
+    }
+    // Find variants over the same library (V2 parses the query; V3 groups by event, with no events stored here; "all"
+    // adds seeds, tags, a relative cut and a nothing-found test).
+    let seeds = try await world.engine.search("a dog on the beach").matches.prefix(3).map(\.id)
+    var all = FindConfig.v3
+    all.understanding = true
+    all.tags = true
+    all.relativeCut = 0.6
+    all.nothingFound = NothingFoundTest(minTopGap: 1)
+    let variants: [(String, FindConfig)] = [("v0", .v0), ("v1", .v1), ("v2", .v2), ("v3", .v3), ("all", all)]
+    for (name, config) in variants {
+      let query = "a dog on the beach"
+      let picked = name == "all" ? Array(seeds) : []
+      _ = try await world.engine.find(query, config: config, seeds: picked)
+      var warm: [Double] = []
+      for _ in 0..<10 {
+        let start = clock.now
+        _ = try await world.engine.find(query, config: config, seeds: picked)
+        warm.append(SearchTimings.ms(clock.now - start))
+      }
+      warm.sort()
+      print("bench find \(name) warmMedian=\(String(format: "%.2f", warm[warm.count / 2]))"
+            + " warmMin=\(String(format: "%.2f", warm[0]))")
+    }
+  }
+
   static func dict(_ t: SearchTimings) -> [String: Double] {
     Dictionary(uniqueKeysWithValues: t.milliseconds.map { ($0.step, ($0.ms * 1000).rounded() / 1000) })
   }

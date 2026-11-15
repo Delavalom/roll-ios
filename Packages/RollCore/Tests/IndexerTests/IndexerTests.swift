@@ -306,6 +306,32 @@ struct IndexerTests {
     }
   }
 
+  /// Rows stored before v11 (`locationChecked = 0`) get the library's location from the next sync; their signals and
+  /// embedded flag stay, so nothing is re-embedded. Synthetic coordinates.
+  @Test func syncBackfillsLocationWithoutReembedding() async throws {
+    let a = AssetSnapshot(id: "a", mediaType: MediaKind.image, created: 3, pixelW: 4000, pixelH: 3000, lat: 10.25,
+                          lon: -20.5)
+    let b = AssetSnapshot(id: "b", mediaType: MediaKind.image, created: 2, pixelW: 4000, pixelH: 3000)
+    let bad = AssetSnapshot(id: "z", mediaType: MediaKind.image, created: 1, lat: 0, lon: 0)
+    #expect(bad.lat == nil && bad.lon == nil, "(0, 0) means unknown")
+    let library = FakeLibrary(assets: [a, b, bad])
+    try await Harness.with(library: library) { h in
+      try await h.repo.upsertAssets([AssetRecord(id: "a", mediaType: MediaKind.image, subtypes: 0, created: 3),
+                                     AssetRecord(id: "b", mediaType: MediaKind.image, subtypes: 0, created: 2)])
+      try await h.repo.commitSignals([SignalFields(id: "a", signalsDone: true, blur: 7),
+                                      SignalFields(id: "b", signalsDone: true)])
+      try await h.repo.markEmbedded(ids: ["a", "b"])
+      #expect(try await h.repo.locationUncheckedCount() == 2)
+      _ = try await h.indexer().sync()
+      let storedA = try #require(try await h.repo.asset(id: "a"))
+      #expect(storedA.lat == 10.25 && storedA.lon == -20.5 && storedA.locationChecked)
+      #expect(storedA.embedded && storedA.signalsDone && storedA.blur == 7)
+      let storedB = try #require(try await h.repo.asset(id: "b"))
+      #expect(storedB.lat == nil && storedB.locationChecked && storedB.embedded)
+      #expect(try await h.repo.locationUncheckedCount() == 0)
+    }
+  }
+
   @Test func requiresResyncRunsAFullSync() async throws {
     try await Harness.with(count: 5) { h in
       let indexer = try h.indexer()

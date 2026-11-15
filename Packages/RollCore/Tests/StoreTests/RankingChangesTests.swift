@@ -59,7 +59,7 @@ struct RankingChangesTests {
     ])
     let rows = try await repo.rankingRows()
     #expect(Set(rows.map(\.asset.id)) == ["s", "plain"])
-    #expect(rows.first { $0.asset.id == "s" } == RankingRow(asset: RankingAsset(s), embedded: true))
+    #expect(rows.first { $0.asset.id == "s" } == RankingRow(asset: RankingAsset(s), embedded: true, created: s.created))
     #expect(rows.first { $0.asset.id == "plain" }?.embedded == false)
   }
 
