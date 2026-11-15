@@ -140,133 +140,12 @@ struct AnswerTitle: View {
   }
 }
 
-/// One answer: what Roll did (counted and measured), what it found, why, the grid, a reply built from the dates,
-/// and, on the actionable answer (the last one that came back), what to do next.
-struct AnswerView: View {
-  let answer: AskModel.Answer
-  let isActionable: Bool
-  let model: AskModel
-  let swipe: (AskModel.Answer) -> Void
-  let open: (String) -> Void
-
-  @State private var saving = false
-
-  var body: some View {
-    RollTurn(busy: answer.result == nil && answer.failure == nil) {
-      if let failure = answer.failure {
-        AnswerTitle(title: "That search didn't run", subtitle: failure)
-      } else if let result = answer.result {
-        StatusLine(text: AskModel.elapsed(result), done: true)
-        if result.matches.isEmpty {
-          nothing(result)
-        } else {
-          found(result)
-        }
-      } else {
-        StatusLine(text: "Comparing with your library on this iPhone")
-      }
-    }
-  }
-
-  @ViewBuilder private func nothing(_ result: PhotoSearch.Result) -> some View {
-    // No photo has been read by the on-device AI yet (the first scan, or the switch to a new model).
-    if result.compared == 0 {
-      AnswerTitle(title: "Nothing to compare yet",
-                  subtitle: "Roll is still reading your library on this iPhone. Ask again once it's done.")
-    } else {
-      nothingStoodOut(result)
-    }
-  }
-
-  @ViewBuilder private func nothingStoodOut(_ result: PhotoSearch.Result) -> some View {
-    AnswerTitle(title: "Nothing stood out",
-                subtitle: answer.isRefinement ? "None of the matches fit that. Change the filters below."
-                  : "Try what's in the photo, like “receipts” or “screenshots of maps”.")
-    if !result.weaker.isEmpty {
-      Text("\(result.weaker.count.formatted()) weaker \(result.weaker.count == 1 ? "match" : "matches") folded")
-        .font(Roll.Typeface.subhead)
-        .foregroundStyle(.rollInk3)
-    }
-    // A refinement that empties the answer can always be undone from here.
-    if isActionable, answer.isRefinement { RefineChips(refinement: answer.refinement, model: model) }
-  }
-
-  @ViewBuilder private func found(_ result: PhotoSearch.Result) -> some View {
-    AnswerTitle(title: AskModel.title(answer), subtitle: AskModel.subtitle(answer))
-    RollSticker(text: "Matched by what’s in the photo")
-    let shown = answer.expanded ? result.matches : Array(result.matches.prefix(AskModel.previewCount))
-    ResultGrid(ids: shown.map(\.id), open: open)
-    if let more = AskModel.more(result, showing: shown.count) {
-      Button(more) { withAnimation(Roll.Motion.ease) { model.expand(answer.id) } }
-        .font(Roll.Typeface.subhead)
-        .foregroundStyle(.rollInk2)
-        .disabled(answer.expanded)
-    }
-    StreamedText(text: AskModel.reply(answer))
-    if isActionable {
-      // Side by side when both fit whole, stacked otherwise (a long count, "In Swipefiles", large text).
-      ViewThatFits(in: .horizontal) {
-        HStack(spacing: Roll.Space.xs) { actions(answer) }
-        VStack(alignment: .leading, spacing: Roll.Space.xs) { actions(answer) }
-      }
-      .transition(.opacity.combined(with: .offset(y: 8)))
-      RefineChips(refinement: answer.refinement, model: model)
-    }
-  }
-
-  @ViewBuilder private func actions(_ answer: AskModel.Answer) -> some View {
-    Button { swipe(answer) } label: {
-      HStack(spacing: 6) {
-        Text(answer.toSwipe == 0 ? "Review the pile" : "Swipe through \(answer.toSwipe.formatted())")
-        Image(systemName: "arrow.right").font(.footnote.weight(.bold)).opacity(0.6)
-      }
-    }
-    .buttonStyle(.rollPrimary)
-    if model.savedQueries.contains(answer.query) {
-      Label("In Swipefiles", systemImage: "checkmark")
-        .font(Roll.Typeface.label)
-        .foregroundStyle(.rollInk2)
-        .padding(.horizontal, Roll.Space.s)
-    } else {
-      Button(saving ? "Saving…" : "Save pile") {
-        saving = true
-        Task {
-          await model.save(answer)
-          saving = false
-        }
-      }
-      .buttonStyle(.rollSecondary)
-      .disabled(saving)
-    }
-  }
-}
-
-/// "Older than a year", "Biggest first", "Only on this iPhone": each toggles a new turn.
-private struct RefineChips: View {
-  let refinement: PhotoSearch.Refinement
-  let model: AskModel
-
-  var body: some View {
-    // Wraps onto a second line rather than hiding a chip off the edge.
-    RollWrap {
-      RollChip(title: "Older than a year", isOn: refinement.olderThanAYear) {
-        model.refine { $0.olderThanAYear.toggle() }
-      }
-      RollChip(title: "Biggest first", isOn: refinement.biggestFirst) {
-        model.refine { $0.biggestFirst.toggle() }
-      }
-      RollChip(title: "Only on this iPhone", isOn: refinement.onlyOnThisIPhone) {
-        model.refine { $0.onlyOnThisIPhone.toggle() }
-      }
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
-  }
-}
-
-/// Three columns of square thumbnails that sharpen in one after another.
+/// Three columns of square thumbnails that sharpen in one after another. With `isPicked`, a tap picks (a check in
+/// the corner) instead of opening.
 struct ResultGrid: View {
   let ids: [String]
   let open: (String) -> Void
+  var isPicked: ((String) -> Bool)?
 
   private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
 
@@ -274,10 +153,13 @@ struct ResultGrid: View {
     LazyVGrid(columns: columns, spacing: 4) {
       ForEach(Array(ids.enumerated()), id: \.element) { index, id in
         RevealCell(id: id, delay: Double(min(index, 12)) * 0.035)
+          .overlay(alignment: .topTrailing) {
+            if let isPicked { PickMark(on: isPicked(id)).padding(6) }
+          }
           .onTapGesture { open(id) }
           .accessibilityElement()
           .accessibilityLabel("Photo \(index + 1)")
-          .accessibilityAddTraits(.isButton)
+          .accessibilityAddTraits(isPicked?(id) == true ? [.isButton, .isSelected] : .isButton)
           .accessibilityAction { open(id) }
       }
     }

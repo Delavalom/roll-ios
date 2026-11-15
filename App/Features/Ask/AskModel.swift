@@ -13,8 +13,15 @@ final class AskModel {
     let id: Int
     let query: String
     let refinement: PhotoSearch.Refinement
-    /// Nil while searching.
+    /// "More like these": photos picked from an earlier answer, searched as seeds (V5).
+    var seeds: [String] = []
+    /// Nil while searching. What swiping deals: the strong matches, or the closest results when nothing clearly
+    /// matched.
     var result: PhotoSearch.Result?
+    /// What the answer shows: event sections, folded weaker matches, the closest results, notes.
+    var find: FindAnswer?
+    /// The weaker matches are unfolded.
+    var showsWeaker = false
     /// Why the search didn't run.
     var failure: String?
     /// A refinement of the answer before it (titled by what changed).
@@ -59,7 +66,13 @@ final class AskModel {
   /// Queries that already have a pile (Save pile then says so).
   private(set) var savedQueries: Set<String> = []
 
-  @ObservationIgnored private let app: AppModel
+  /// "More like these" picking on one answer (by id), and what's picked so far.
+  var picking: Int?
+  var pick = SeedPick()
+  /// "Make album" grids opened from answers or sections, by draft id (`HomeRoute.album`).
+  var albumDrafts: [Int: AlbumDraft] = [:]
+
+  @ObservationIgnored let app: AppModel
   @ObservationIgnored private var liveTask: Task<Void, Never>?
   @ObservationIgnored private var askTask: Task<Void, Never>?
   @ObservationIgnored private var nextId = 0
@@ -100,7 +113,15 @@ final class AskModel {
     guard let base = actionableAnswer, !searching else { return }
     var refinement = base.refinement
     change(&refinement)
-    ask(base.query, refinement: refinement, isRefinement: true)
+    ask(base.query, refinement: refinement, seeds: base.seeds, isRefinement: true)
+  }
+
+  /// Re-asks the actionable answer's query with `seeds` ("more like these"; empty takes them off), as a new turn.
+  func reask(seeds: [String]) {
+    guard let base = actionableAnswer, !searching else { return }
+    picking = nil
+    pick = SeedPick()
+    ask(base.query, refinement: base.refinement, seeds: seeds, isRefinement: true)
   }
 
   func expand(_ id: Int) {
@@ -116,25 +137,33 @@ final class AskModel {
     turns = []
     draft = ""
     live = nil
+    picking = nil
+    pick = SeedPick()
   }
 
   /// Appends the answer turn at once (so it always follows its question), then searches.
-  private func ask(_ query: String, refinement: PhotoSearch.Refinement, isRefinement: Bool) {
+  private func ask(_ query: String, refinement: PhotoSearch.Refinement, seeds: [String] = [], isRefinement: Bool) {
     let id = makeId()
-    turns.append(.answer(Answer(id: id, query: query, refinement: refinement, isRefinement: isRefinement)))
+    turns.append(.answer(Answer(id: id, query: query, refinement: refinement, seeds: seeds,
+                                isRefinement: isRefinement)))
     guard let engine = app.engine else {
       update(id) { $0.failure = "The on-device AI isn't ready yet. Try again once it is." }
       return
     }
     searching = true
     askTask = Task { [weak self] in
-      let outcome: Result<PhotoSearch.Result, any Error>
-      do { outcome = .success(try await engine.search(query, refinement: refinement)) } catch { outcome = .failure(error) }
+      let outcome: Result<FindOutcome, any Error>
+      do {
+        outcome = .success(try await Self.find(query, seeds: seeds, refinement: refinement, engine: engine))
+      } catch { outcome = .failure(error) }
       guard let self, !Task.isCancelled else { return }
       self.searching = false
       switch outcome {
-      case .success(let result):
-        self.update(id) { $0.result = result }
+      case .success(let found):
+        self.update(id) {
+          $0.result = found.swipe
+          $0.find = found.answer
+        }
         await self.refreshRemaining(id)
       case .failure(let error):
         self.update(id) { $0.failure = Self.failureText(error) }
@@ -161,9 +190,9 @@ final class AskModel {
     liveTask = Task { [weak self] in
       try? await Task.sleep(for: Self.liveDelay)
       guard !Task.isCancelled else { return }
-      let result = try? await engine.search(query)
+      let result = try? await engine.find(query, config: .shipping)
       guard !Task.isCancelled else { return }
-      self?.live = result.map { ($0.matches.count, $0.matches.prefix(5).map(\.id)) }
+      self?.live = result.flatMap { $0.nothingFound ? nil : ($0.matches.count, $0.matches.prefix(5).map(\.id)) }
     }
   }
 
@@ -229,81 +258,14 @@ final class AskModel {
     await refreshRemaining()
   }
 
-  // MARK: Copy
-
-  /// "Screenshots of group chats".
-  static func name(_ query: String) -> String {
-    query.prefix(1).uppercased() + query.dropFirst()
-  }
-
-  /// An answer's title: the query for the first, what changed for a refinement ("22 older than a year").
-  static func title(_ answer: Answer) -> String {
-    guard answer.isRefinement, let result = answer.result else { return name(answer.query) }
-    let filters = [answer.refinement.olderThanAYear ? "older than a year" : nil,
-                   answer.refinement.onlyOnThisIPhone ? "on this iPhone" : nil].compactMap { $0 }
-    // "22 older than a year, biggest first"; without a filter the count takes a noun: "8 matches, biggest first".
-    var title = "\(result.matches.count.formatted())"
-    title += filters.isEmpty ? " \(result.matches.count == 1 ? "match" : "matches")" : " " + filters.joined(separator: " and ")
-    if answer.refinement.biggestFirst { title += ", biggest first" }
-    return title
-  }
-
-  /// "38 photos · about 214 MB", or for a refinement "about 131 MB · none of them favorites".
-  static func subtitle(_ answer: Answer) -> String {
-    guard let result = answer.result else { return "" }
-    let size = ByteFormat.about(result.totalBytes)
-    if answer.isRefinement {
-      return "\(size) · \(SearchSummary.favorites(result.favorites, of: result.matches.count))"
-    }
-    return "\(photos(result.matches.count)) · \(size)"
-  }
-
-  /// "+ 29 more · 6 weaker matches folded".
-  static func more(_ result: PhotoSearch.Result, showing: Int) -> String? {
-    let hidden = max(0, result.matches.count - showing)
-    let weaker = result.weaker.count
-    var parts: [String] = []
-    if hidden > 0 { parts.append("+ \(hidden.formatted()) more") }
-    if weaker > 0 { parts.append("\(weaker.formatted()) weaker \(weaker == 1 ? "match" : "matches") folded") }
-    return parts.isEmpty ? nil : parts.joined(separator: " · ")
-  }
-
-  /// "Most are from 2023 and early 2024. Want to swipe through them, or narrow it down first?"
-  static func reply(_ answer: Answer) -> String {
-    guard let result = answer.result, !result.matches.isEmpty else { return "" }
-    let when = SearchSummary.when(result.matches.map(\.created)).map { $0 + " " } ?? ""
-    let ask = result.matches.count == 1 ? "Want to look at it?" : answer.isRefinement
-      ? "Swipe through these?" : "Want to swipe through them, or narrow it down first?"
-    return when + ask
-  }
-
-  /// "Compared 29,589 items on this iPhone in 0.09 s" (counted and measured by the engine).
-  static func elapsed(_ result: PhotoSearch.Result) -> String {
-    let seconds = Double(result.elapsed.components.seconds) + Double(result.elapsed.components.attoseconds) / 1e18
-    let time = seconds < 0.01 ? "under 0.01 s" : "\(seconds.formatted(.number.precision(.fractionLength(2)))) s"
-    let items = "\(result.compared.formatted()) \(result.compared == 1 ? "item" : "items")"
-    return "Compared \(items) on this iPhone in \(time)"
-  }
-
-  static func photos(_ count: Int) -> String { "\(count.formatted()) \(count == 1 ? "photo" : "photos")" }
-
-  /// Under the swipe step's title: "older than a year · 22 photos" (what's left to swipe).
-  static func swipeSubtitle(_ answer: Answer) -> String {
-    let count = answer.remaining == 0 ? "all swiped" : photos(answer.toSwipe)
-    let filters = [answer.refinement.olderThanAYear ? "older than a year" : nil,
-                   answer.refinement.onlyOnThisIPhone ? "on this iPhone" : nil,
-                   answer.refinement.biggestFirst ? "biggest first" : nil].compactMap { $0 }
-    return (filters + [count]).joined(separator: " · ")
-  }
-
   // MARK: -
 
-  private func makeId() -> Int {
+  func makeId() -> Int {
     nextId += 1
     return nextId
   }
 
-  private func update(_ id: Int, _ change: (inout Answer) -> Void) {
+  func update(_ id: Int, _ change: (inout Answer) -> Void) {
     guard let index = turns.firstIndex(where: { $0.id == id }), case .answer(var answer) = turns[index] else { return }
     change(&answer)
     turns[index] = .answer(answer)

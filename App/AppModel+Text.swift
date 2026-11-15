@@ -15,6 +15,8 @@ extension AppModel {
     let text = textIndexer, engine = engine, generation = textGeneration
     Task(priority: .utility) { [weak self] in
       if let engine { try? await engine.preparePools(for: Preset.allCases) }
+      // Events, then living albums' new photos (offered on Home, never added silently).
+      await self?.living.refresh(engine: engine)
       // Indexing restarted or the app went to the background meanwhile: their cancel came before this run existed.
       guard let self, self.textGeneration == generation else { return }
       #if DEBUG

@@ -10,6 +10,8 @@ enum HomeRoute: Hashable {
   case squish
   /// Swiping through an Ask answer (by answer id).
   case ask(Int)
+  /// "Make album" from an answer or a section (by draft id, `AskModel.albumDrafts`).
+  case album(Int)
 }
 
 /// Home is Ask Roll (spec §1): a greeting, what's worth clearing (one card per cleanup category), and a composer to
@@ -37,6 +39,8 @@ private struct AskHome: View {
   @State private var fullScreen: String?
   /// A swipe step is being opened (its pile is being made): further taps wait.
   @State private var opening = false
+  /// "Make a video" from an event section.
+  @State private var video: VideoRequest?
   @FocusState private var composerFocused: Bool
 
   /// DEBUG: `-UITestOpen squish` opens Squish on launch (screenshots).
@@ -86,6 +90,7 @@ private struct AskHome: View {
         // Back from swiping: "Swipe through N" counts what's left.
         if path.isEmpty { Task { await model.refreshRemaining() } }
       }
+      .sheet(item: $video) { MemoryVideoView(request: $0) }
       .fullScreenCover(item: Binding(get: { fullScreen.map(AskPhotoID.init) }, set: { fullScreen = $0?.id })) {
         FullScreenPhoto(id: $0.id)
       }
@@ -122,6 +127,9 @@ private struct AskHome: View {
     VStack(spacing: Roll.Space.s) {
       ModelStatusView()
       SquishRecoveryBanner()
+      LivingAlbumCards { saved in
+        if let draft = app.living.draft(for: saved) { path.append(.album(model.store(draft))) }
+      }
     }
     .padding(.top, Roll.Space.l)
 
@@ -234,7 +242,8 @@ private struct AskHome: View {
           UserBubble(text: text)
         case .answer(let answer):
           AnswerView(answer: answer, isActionable: answer.id == model.actionableAnswer?.id, model: model,
-                     swipe: swipe, open: { fullScreen = $0 })
+                     swipe: swipe, open: { fullScreen = $0 }, makeAlbum: { path.append(.album($0)) },
+                     makeVideo: { video = $0 })
         case .saved(_, let name):
           RollTurn {
             AnswerTitle(title: "Saved as a pile", subtitle: "“\(name)” is in Swipefiles, ready to swipe any time.")
@@ -336,6 +345,12 @@ private struct AskHome: View {
     case .duplicates(let kind): DuplicatesView(kind: kind)
     case .swipefile(let preset): SwipeReviewView(swipefile: preset.swipefile(created: 0))
     case .squish: SquishView()
+    case .album(let id):
+      if let draft = model.albumDrafts[id] {
+        AlbumMakerView(model: AlbumMakerModel(app: app, draft: draft), done: { path.removeAll() })
+      } else {
+        RollEmptyState(title: "This answer is gone", message: "Go back and ask again.").rollPage()
+      }
     case .ask(let id):
       if let answer = model.answer(id: id), let pile = piles[id] {
         let matches = answer.result?.matches ?? []
@@ -372,57 +387,3 @@ private struct AskPhotoID: Identifiable {
   PreviewHost(modelReady: false) { HomeView() }
 }
 #endif
-
-/// "You can free about X on this iPhone", and what's in iCloud on its own line (freeing it frees iCloud space).
-struct HomeHeadline: View {
-  let onDevice: Int64
-  let inCloud: Int64
-
-  var body: some View {
-    VStack(alignment: .leading, spacing: Roll.Space.xs) {
-      if onDevice > 0 {
-        // A non-breaking space keeps "49.6 MB" together when the headline wraps.
-        Text("You can free about \(ByteFormat.short(onDevice).replacingOccurrences(of: " ", with: "\u{00A0}")) on this iPhone")
-          .rollTitle(Roll.Typeface.display, tracking: Roll.Typeface.displayTracking)
-          .fixedSize(horizontal: false, vertical: true)
-          .accessibilityAddTraits(.isHeader)
-      } else {
-        Text(inCloud > 0 ? "Nothing confirmed on this iPhone yet" : "Nothing big to free yet")
-          .rollTitle(Roll.Typeface.display, tracking: Roll.Typeface.displayTracking)
-          .fixedSize(horizontal: false, vertical: true)
-          .accessibilityAddTraits(.isHeader)
-      }
-      if inCloud > 0 {
-        Text("Plus \(ByteFormat.about(inCloud)) in iCloud or not checked yet")
-          .font(Roll.Typeface.subhead)
-          .foregroundStyle(.rollInk2)
-      }
-    }
-    .frame(maxWidth: .infinity, alignment: .leading)
-  }
-}
-
-/// Assets analysed from small previews (their originals are in iCloud), and the opt-in to use full images instead.
-private struct ICloudOption: View {
-  @Environment(AppModel.self) private var app
-
-  var body: some View {
-    @Bindable var app = app
-    if app.previewCount > 0 || app.improveWithICloud {
-      VStack(alignment: .leading, spacing: Roll.Space.xs) {
-        RollGroup {
-          Toggle(isOn: $app.improveWithICloud) {
-            Text("Improve with iCloud originals").font(Roll.Typeface.headline).foregroundStyle(.rollInk)
-          }
-          .tint(.rollInk)
-          .padding(.horizontal, Roll.Space.m)
-          .frame(minHeight: 56)
-        }
-        Text("\(app.previewCount.formatted()) \(app.previewCount == 1 ? "item was" : "items were") checked from a small preview because \(app.previewCount == 1 ? "its original is" : "their originals are") in iCloud. When this is on, Roll downloads them to check again, only on Wi-Fi while your iPhone is charging.")
-          .font(Roll.Typeface.caption)
-          .foregroundStyle(.rollInk3)
-          .padding(.horizontal, Roll.Space.xxs)
-      }
-    }
-  }
-}
