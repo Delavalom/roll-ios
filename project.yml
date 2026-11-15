@@ -78,7 +78,7 @@ targets:
           fi
     dependencies:
       - package: RollCore
-        products: [Embedding, ModelInstall, Store, Library, Signals, Indexer, Ranking, Dedupe, Squish, Monitor, Entitlements, Commit, Overview, SquishBridge]
+        products: [Embedding, ModelInstall, Store, Library, Signals, Indexer, Ranking, Dedupe, Squish, Monitor, Entitlements, Commit, Overview, SquishBridge, Memories]
       - package: EmbeddingGemma
         products: [EmbeddingGemma]
       - package: RevenueCat
