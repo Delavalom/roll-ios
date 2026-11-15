@@ -75,17 +75,20 @@ extension SwipefileEngine {
     var topCosine: Float? = nil
     var read: [String: FindSearch.Candidate] = [:]
     var unread: [FindSearch.Candidate] = []
+    let dots = (0..<queries.count).map { pool.dots(query: $0) }  // per query, one per entry
+    let wantZs = !config.nothingFound.isOff
+    zs.reserveCapacity(wantZs ? pool.count : 0)
     for k in 0..<pool.count {
-      let cosines = (0..<scales.count).map { pool.dot(k, query: $0) }
-      if let c = cosines.first { topCosine = max(topCosine ?? c, c) }
-      let seedCosine = seedVector == nil ? nil : pool.dot(k, query: texts.count)
-      let z = FindSearch.meaningZ(cosines: cosines, seedCosine: seedCosine, scales: scales, seedScale: seedScale,
-                                  config: config)
-      if let z { zs.append(z) }
+      if !scales.isEmpty { topCosine = max(topCosine ?? dots[0][k], dots[0][k]) }
+      let seedCosine = seedVector == nil ? nil : dots[texts.count][k]
+      let z = FindSearch.meaningZ(count: scales.count, cosine: { dots[$0][k] }, seedCosine: seedCosine,
+                                  scales: scales, seedScale: seedScale, config: config)
+      if wantZs, let z { zs.append(z) }
       let id = pool.id(k)
       let tagCoverage = config.tags ? TagFusion.coverage(queryTerms: terms, labels: tags?[id] ?? []) : 0
       guard FindSearch.mayQualify(z: z, coverage: coverage[id] ?? 0, tagCoverage: tagCoverage, filtered: filtered,
                                   filterOnly: filterOnly, config: config) else { continue }
+      let cosines = (0..<scales.count).map { dots[$0][k] }
       let row = pool.row(k)
       let candidate = FindSearch.Candidate(
         asset: SearchAsset(id: id, mediaType: row.asset.mediaType, estBytes: row.asset.estBytes, created: row.created,

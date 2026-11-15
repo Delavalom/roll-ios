@@ -139,12 +139,19 @@ extension FindSearch {
   /// (`FindConfig.seedAlpha`). Nil without query texts or seeds.
   public static func meaningZ(cosines: [Float], seedCosine: Float?, scales: [QueryScale], seedScale: QueryScale?,
                               config: FindConfig) -> Float? {
+    meaningZ(count: min(cosines.count, scales.count), cosine: { cosines[$0] }, seedCosine: seedCosine, scales: scales,
+             seedScale: seedScale, config: config)
+  }
+
+  /// `meaningZ` without an array per photo (the engine's loop over the library).
+  @inline(__always)
+  static func meaningZ(count n: Int, cosine: (Int) -> Float, seedCosine: Float?, scales: [QueryScale],
+                       seedScale: QueryScale?, config: FindConfig) -> Float? {
     var z: Float? = nil
-    let n = min(cosines.count, scales.count)
     if n > 0 {
       var best = -Float.infinity, sum: Float = 0
       for j in 0..<n {
-        let v = scales[j].z(cosines[j])
+        let v = scales[j].z(cosine(j))
         best = max(best, v)
         sum += v
       }

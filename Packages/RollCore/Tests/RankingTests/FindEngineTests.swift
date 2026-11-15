@@ -124,6 +124,25 @@ struct FindEngineTests {
     #expect(ids(seeded.matches + seeded.weaker).subtracting(m).count < 5)
   }
 
+  @Test func savedSearchesOfferWhatIsNewSinceTheirWatermark() async throws {
+    let world = try await FindWorld.make()
+    defer { world.cleanUp() }
+    let rowids = try await world.repo.assetRowids(ids: ["m19", "r269"])
+    let pile = SwipefileRecord(id: "sf", name: "Chats", kind: .custom, prompts: ["screenshots of chats"],
+                               examples: [], action: .album, created: 0)
+    try await world.repo.save(pile)
+    try await world.engine.record(swipefileId: "sf", assetId: "m25", verdict: .keep)
+    try await world.repo.save(SavedSearchRecord(id: "s", query: "screenshots of chats", albumName: "Chats",
+                                                swipefileId: "sf", createdAt: 0, lastSeenRowid: rowids["m19"]!))
+    try await world.repo.upsertAssets([AssetRecord(id: "late", mediaType: Preset.imageMediaType, subtypes: 0)])
+    let offer = try #require(try await world.engine.newMatches(for: "s"))
+    #expect(Set(offer.ids) == Set((20..<30).map { "m\($0)" }).subtracting(["m25"]))
+    #expect(offer.watermark == rowids["r269"]!)  // "late" has no vector yet: it waits for the next run
+    try await world.repo.markSavedSearchRun(id: "s", lastSeenRowid: offer.watermark, at: 1)
+    #expect(try await world.engine.newMatches(for: "s")?.ids == [])
+    #expect(try await world.engine.newMatches(for: "missing") == nil)
+  }
+
   @Test func nothingFoundRefusesAFlatQuery() async throws {
     let world = try await FindWorld.make()
     defer { world.cleanUp() }
