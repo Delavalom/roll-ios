@@ -114,7 +114,9 @@ struct SearchSpeedBench {
     }
   }
 
-  /// Tags (V4) over the same world: every photo gets 3–10 scene labels in the store (the tag pass keeps >= 0.1, top 10),
+  /// Tags (V4) over the same world: every photo gets 3–10 scene labels in the store (the tag pass keeps >= 0.1, top 10;
+  /// one label in seven from 29 everyday ones, the rest from 600 others, so "dog" is on ~3 % of photos, as Vision's
+  /// ~1,300 identifiers spread),
   /// then `find` with tags off, with tags on, and with `FindConfig.shipping`: a first call (reads and folds the labels
   /// into a `TagIndex`), the median of 10 warm calls, and `TagIndex.coverage` alone. Tags should add < 5 ms warm.
   @Test func typedSearchWithTags() async throws {
@@ -127,7 +129,9 @@ struct SearchSpeedBench {
     var items: [TagFields] = []
     for id in world.ids {
       let labels = (0..<Int.random(in: 3...10, using: &g)).map { _ in
-        TagLabel(label: vocabulary.randomElement(using: &g)!, confidence: Double.random(in: 0.1...0.95, using: &g))
+        TagLabel(label: Int.random(in: 0..<7, using: &g) == 0 ? vocabulary.randomElement(using: &g)!
+                   : "label_\(Int.random(in: 0..<600, using: &g))",
+                 confidence: Double.random(in: 0.1...0.95, using: &g))
       }
       items.append(TagFields(id: id, labels: labels, revision: "bench", side: 360))
     }

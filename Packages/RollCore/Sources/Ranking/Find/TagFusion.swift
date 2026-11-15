@@ -70,10 +70,10 @@ public enum TagFusion {
 /// engine, once per tag write; the eval, once per library), so a query costs one lookup per query word and synonym
 /// instead of folding every photo's labels again (`TagFusion.coverage` per photo took ~1.4 s a query over 30k photos).
 public struct TagIndex: Sendable, Equatable {
-  /// Folded label → ids of the photos carrying it.
-  private var postings: [String: [String]] = [:]
-  /// Photos with at least one tag.
-  public private(set) var photoCount = 0
+  /// Photo ids, by position.
+  private var ids: [String] = []
+  /// Folded label → positions in `ids` of the photos carrying it (each once).
+  private var postings: [String: [Int32]] = [:]
 
   public static let empty = TagIndex()
 
@@ -81,32 +81,44 @@ public struct TagIndex: Sendable, Equatable {
 
   /// `labels`: photo id → its labels, as `TagFusion.coverage` takes them.
   public init(labels: [String: [String]]) {
+    ids.reserveCapacity(labels.count)
     for (id, list) in labels {
       var seen = Set<String>()
+      let at = Int32(ids.count)
       for label in list {
         let folded = TagFusion.fold(label)
         guard !folded.isEmpty, seen.insert(folded).inserted else { continue }
-        postings[folded, default: []].append(id)
+        postings[folded, default: []].append(at)
       }
-      if !seen.isEmpty { photoCount += 1 }
+      if !seen.isEmpty { ids.append(id) }
     }
   }
 
-  public var isEmpty: Bool { photoCount == 0 }
+  /// Photos with at least one tag.
+  public var photoCount: Int { ids.count }
+  public var isEmpty: Bool { ids.isEmpty }
 
   /// Photo id → `TagFusion.coverage(queryTerms:labels:synonyms:)`, for the photos whose coverage is above 0.
   public func coverage(queryTerms: [String], synonyms: [String: Set<String>] = TagFusion.defaultSynonyms)
     -> [String: Double] {
     guard !queryTerms.isEmpty, !postings.isEmpty else { return [:] }
-    var hits: [String: Int] = [:]
-    for term in queryTerms {
-      var ids = Set<String>()
+    var hits = [UInt16](repeating: 0, count: ids.count)
+    var lastTerm = [Int32](repeating: -1, count: ids.count)  // a photo counts once per term
+    var touched: [Int32] = []
+    for (t, term) in queryTerms.enumerated() {
       for label in (synonyms[term] ?? []).union([term]) {
-        if let list = postings[label] { ids.formUnion(list) }
+        guard let list = postings[label] else { continue }
+        for p in list where lastTerm[Int(p)] != Int32(t) {
+          lastTerm[Int(p)] = Int32(t)
+          if hits[Int(p)] == 0 { touched.append(p) }
+          hits[Int(p)] &+= 1
+        }
       }
-      for id in ids { hits[id, default: 0] += 1 }
     }
     let n = Double(queryTerms.count)
-    return hits.mapValues { Double($0) / n }
+    var out: [String: Double] = [:]
+    out.reserveCapacity(touched.count)
+    for p in touched { out[ids[Int(p)]] = Double(hits[Int(p)]) / n }
+    return out
   }
 }
