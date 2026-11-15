@@ -63,7 +63,7 @@ let package = Package(
     .target(name: "Monitor"),
     .target(name: "Entitlements", dependencies: ["Store"]),
     .target(name: "Commit", dependencies: ["Store", "Library", "Entitlements"]),
-    .target(name: "Overview", dependencies: ["Store", "Ranking", "Dedupe", "Signals", "Squish", "Library"]),
+    .target(name: "Overview", dependencies: ["Store", "Ranking", "Dedupe", "Signals", "Squish", "Library", "Memories"]),
     // Conforms Squish's ReplaceFlow to Commit's SquishRunner, so neither target depends on the other.
     .target(name: "SquishBridge", dependencies: ["Commit", "Squish", "Store", "Library", "Overview"]),
     // Memory reel planning: pure, no dependencies.
@@ -83,7 +83,7 @@ let package = Package(
     .testTarget(name: "PlacesTests", dependencies: ["Places"]),
     .testTarget(name: "CommitTests", dependencies: ["Commit", "Store", "Entitlements"]),
     .testTarget(name: "MemoriesTests", dependencies: ["Memories"]),
-    .testTarget(name: "OverviewTests", dependencies: ["Overview", "Store", "Ranking", "Signals", "Squish"]),
+    .testTarget(name: "OverviewTests", dependencies: ["Overview", "Store", "Ranking", "Signals", "Squish", "Memories"]),
   ]
 )
 

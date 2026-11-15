@@ -99,13 +99,17 @@ public final class PhotoKitCommitter: Sendable {
   let quota: FreeQuota
   let pro: any ProStatus
   let squish: (any SquishRunner)?
+  /// `FreeQuota.countsAlbumAdds`; injectable for tests.
+  let albumAddsCount: Bool
 
-  init(library: any CommitLibrary, database: AppDatabase, pro: any ProStatus, squish: (any SquishRunner)?) {
+  init(library: any CommitLibrary, database: AppDatabase, pro: any ProStatus, squish: (any SquishRunner)?,
+       albumAddsCount: Bool = FreeQuota.countsAlbumAdds) {
     self.library = library
     self.repositories = Repositories(database)
     self.quota = FreeQuota(database)
     self.pro = pro
     self.squish = squish
+    self.albumAddsCount = albumAddsCount
   }
 
   public func apply(_ plan: CommitPlan, progress: (@Sendable (CommitProgress) -> Void)? = nil) async throws -> CommitOutcome {
@@ -230,7 +234,8 @@ public final class PhotoKitCommitter: Sendable {
     let keys = extra + ops.flatMap { run.plan.settles[$0] ?? [] }
     do {
       try await repositories.recordApplied(keys, deletedAssetIds: deleted)
-      let fresh = Set(ops.map(\.assetId)).subtracting(run.charged)
+      let chargeable = albumAddsCount ? ops : ops.filter { if case .album = $0 { false } else { true } }
+      let fresh = Set(chargeable.map(\.assetId)).subtracting(run.charged)
       run.charged.formUnion(fresh)
       if !run.isPro, !fresh.isEmpty { run.report.quotaSpent += try await quota.consumeUpTo(fresh.count) }
     } catch {

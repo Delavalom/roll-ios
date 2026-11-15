@@ -1,3 +1,4 @@
+import Entitlements
 import Foundation
 import Store
 
@@ -66,9 +67,12 @@ public enum CommitPlanner {
   /// - `protecting` lists groups of shots of which at least one must survive (duplicate groups, keeper first). If
   ///   every live member of a group would be deleted, the first one's delete is dropped (`keptLastCopies`); its other
   ///   decisions (album, squish) still apply.
+  /// - `albumAddsCount` (`FreeQuota.countsAlbumAdds`): when false, an asset whose only operations are album moves is
+  ///   never blocked and doesn't use up `quotaRemaining`.
   public static func plan(queued: [DecisionRecord], records: [String: AssetRecord],
                           swipefiles: [String: SwipefileRecord], isPro: Bool, quotaRemaining: Int,
-                          protecting groups: [[String]] = []) -> CommitPlan {
+                          protecting groups: [[String]] = [],
+                          albumAddsCount: Bool = FreeQuota.countsAlbumAdds) -> CommitPlan {
     let ordered = queued
       .filter { !$0.applied && $0.verdict != .keep }
       .sorted { ($0.decidedAt, $0.swipefileId, $0.assetId) < ($1.decidedAt, $1.swipefileId, $1.assetId) }
@@ -100,10 +104,25 @@ public enum CommitPlanner {
       plan.keptLastCopies.append(survivor)
     }
 
-    let allowed = isPro ? assetOrder.count : min(assetOrder.count, max(0, quotaRemaining))
-    plan.blockedByQuota = assetOrder.count - allowed
+    // Quota: assets in order of their first decision, each costing one item unless it's free (album-only, when
+    // album adds don't count).
+    var allowedAssets: [String] = []
+    var charged = 0
+    for id in assetOrder {
+      let free = !albumAddsCount && (wanted[id] ?? []).allSatisfy {
+        if case .album = $0.op { true } else { false }
+      }
+      if isPro || free {
+        allowedAssets.append(id)
+      } else if charged < max(0, quotaRemaining) {
+        charged += 1
+        allowedAssets.append(id)
+      } else {
+        plan.blockedByQuota += 1
+      }
+    }
 
-    for id in assetOrder.prefix(allowed) {
+    for id in allowedAssets {
       let entries = wanted[id] ?? []
       if entries.contains(where: { $0.op == .delete(id) }) {
         plan.deletes.append(id)
