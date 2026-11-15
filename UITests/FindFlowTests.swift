@@ -28,7 +28,7 @@ final class FindFlowTests: XCTestCase {
   @MainActor
   func testFindTour() throws {
     let app = launch(extra: ["-UITestNoRefusal"])
-    ask(app, "photos")
+    ask(app, "screenshots")
     shot("t1-sections")
     let section = app.buttons["section.makeAlbum"].firstMatch
     let make = section.waitForExistence(timeout: 5) ? section : app.buttons["ask.makeAlbum"]
@@ -36,6 +36,13 @@ final class FindFlowTests: XCTestCase {
     reveal(make, in: app)
     make.tap()
     createAlbum(app, shots: ("t2-make-album", "t3-created"))
+    let keep = app.buttons["album.keepUpdated"]
+    if keep.exists {
+      keep.tap()
+      let kept = app.staticTexts.containing(NSPredicate(format: "label BEGINSWITH 'Kept up to date'")).firstMatch
+      XCTAssertTrue(kept.waitForExistence(timeout: 10), "the living album wasn't saved")
+      shot("t3b-kept-updated")
+    }
     let video = app.buttons["Make a video"]
     if video.waitForExistence(timeout: 3) {
       video.tap()
