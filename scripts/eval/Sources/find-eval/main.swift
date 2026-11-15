@@ -28,7 +28,7 @@ import Foundation
 let usage = """
   usage: find-eval embed --queries SPEC... --model DIR --store DIR --out QVECS
          find-eval pool --db DB --index EGIX --qvecs QVECS --queries SPEC... [--export JSONL] [--vision JSONL]
-                        [--labels DIR] --variants V0[,V1...] [--k 50] --out DIR
+                        [--labels DIR] --variants V0[,V1...] [--k 50] [--keep-all] --out DIR
          find-eval sheets --pool DIR/pool --thumbs DIR --labels DIR --out DIR [--queries SPEC... --export JSONL]
          find-eval apply-judgments --sheets DIR [--judgments FILE] --labels DIR
                         [--queries SPEC... --export JSONL [--pool-root DIR]]
@@ -85,6 +85,7 @@ do {
       db: url(opts.need("db")), index: url(opts.need("index")), qvecs: url(opts.need("qvecs")),
       specs: opts.urls("queries"), export: opts.one("export").map(url), vision: opts.one("vision").map(url),
       labels: opts.one("labels").map(url), variants: names, k: Int(opts.one("k") ?? "50") ?? 50,
+      keepAll: CommandLine.arguments.contains("--keep-all"),
       out: url(opts.need("out"))))
   case "sheets":
     try sheetsCommand(pool: url(opts.need("pool")), thumbs: url(opts.need("thumbs")), labels: url(opts.need("labels")),

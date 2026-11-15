@@ -32,15 +32,18 @@ struct VariantAnswer {
   var weaker: [String]
   /// Identifier-free numbers worth keeping (top z, gate used, ...).
   var notes: [String: Double] = [:]
+  /// The ranking score of each id in `ranked` (same order), when the variant has one; for offline cut-off studies.
+  var scores: [Float]? = nil
 
   var ranked: [String] { strong + weaker }
 
-  init(strong: [String], weaker: [String], notes: [String: Double] = [:]) {
-    self.strong = strong; self.weaker = weaker; self.notes = notes
+  init(strong: [String], weaker: [String], notes: [String: Double] = [:], scores: [Float]? = nil) {
+    self.strong = strong; self.weaker = weaker; self.notes = notes; self.scores = scores
   }
 
   init(_ result: PhotoSearch.Result, notes: [String: Double] = [:]) {
-    self.init(strong: result.matches.map(\.id), weaker: result.weaker.map(\.id), notes: notes)
+    self.init(strong: result.matches.map(\.id), weaker: result.weaker.map(\.id), notes: notes,
+              scores: (result.matches + result.weaker).map(\.score))
   }
 }
 

@@ -11,6 +11,8 @@ struct PoolOptions {
   var labels: URL?
   var variants: [String]
   var k: Int
+  /// Keep every ranked id in `top` (strong then weaker), for sampling precision deep in the answer.
+  var keepAll: Bool = false
   var out: URL
 }
 
@@ -31,7 +33,7 @@ func poolCommand(_ o: PoolOptions) async throws {
   print("library: \(library.ids.count) vectors, \(library.poolCount) in the search pool, \(textRows) rows of words, "
         + "export \(library.export.count), vision \(library.vision.count); loaded in \(clock.now - mark)")
 
-  let keep = max(o.k, VariantRun.keepAtLeast)
+  let keep = o.keepAll ? Int.max : max(o.k, VariantRun.keepAtLeast)
   var privateNumber = 0
   for q in queries {
     let label: String
@@ -43,7 +45,8 @@ func poolCommand(_ o: PoolOptions) async throws {
       let elapsed = clock.now - mark
       let ms = Double(elapsed.components.seconds) * 1000 + Double(elapsed.components.attoseconds) / 1e15
       let run = VariantRun(variant: v.name, slug: q.slug, query: q.text, k: o.k, top: Array(answer.ranked.prefix(keep)),
-                           strong: answer.strong.count, weaker: answer.weaker.count, elapsedMs: ms, notes: answer.notes)
+                           strong: answer.strong.count, weaker: answer.weaker.count, elapsedMs: ms, notes: answer.notes,
+                           scores: answer.scores.map { Array($0.prefix(keep)) })
       try JSONOut.write(run, to: o.out.appending(path: v.name).appending(path: "\(q.slug).json"))
       line += String(format: " %@ %d strong + %d weaker (%.0f ms)", v.name, run.strong, run.weaker, ms)
     }

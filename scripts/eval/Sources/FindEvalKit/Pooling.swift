@@ -16,14 +16,16 @@ public struct VariantRun: Codable, Sendable, Equatable {
   public var elapsedMs: Double
   /// Variant-specific numbers (e.g. the best z), never ids.
   public var notes: [String: Double]?
+  /// Ranking score per id of `top` (same order), when the variant reports one.
+  public var scores: [Float]?
 
   /// Recall is measured at 100, so a run keeps at least that many.
   public static let keepAtLeast = 100
 
   public init(variant: String, slug: String, query: String, k: Int, top: [String], strong: Int, weaker: Int,
-              elapsedMs: Double, notes: [String: Double]? = nil) {
+              elapsedMs: Double, notes: [String: Double]? = nil, scores: [Float]? = nil) {
     self.variant = variant; self.slug = slug; self.query = query; self.k = k; self.top = top; self.strong = strong
-    self.weaker = weaker; self.elapsedMs = elapsedMs; self.notes = notes
+    self.weaker = weaker; self.elapsedMs = elapsedMs; self.notes = notes; self.scores = scores
   }
 
   public var answer: Int { strong + weaker }
