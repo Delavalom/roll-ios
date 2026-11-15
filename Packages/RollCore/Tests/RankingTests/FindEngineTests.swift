@@ -20,7 +20,8 @@ private struct FindWorld {
     return c.date(from: DateComponents(year: year, month: 6, day: 15, hour: 14, minute: minute))!.timeIntervalSince1970
   }
 
-  static func make(keywordCoverage: LibrarySearch.KeywordCoverage? = nil) async throws -> FindWorld {
+  static func make(keywordCoverage: LibrarySearch.KeywordCoverage? = nil,
+                   locations: [String: (Double, Double)] = [:]) async throws -> FindWorld {
     let dir = FileManager.default.temporaryDirectory.appendingPathComponent("roll-find-\(UUID().uuidString)")
     try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
     let db = try AppDatabase.inMemory()
@@ -45,6 +46,12 @@ private struct FindWorld {
       records.append(AssetRecord(id: "r\(i)", mediaType: Preset.imageMediaType, subtypes: 0, created: created,
                                  estBytes: 1))
       embedded.append(("r\(i)", randomUnit(query.count, using: &g)))
+    }
+    for i in records.indices {
+      guard let at = locations[records[i].id] else { continue }
+      records[i].lat = at.0
+      records[i].lon = at.1
+      records[i].locationChecked = true
     }
     try await repo.upsertAssets(records)
     try await vectors.upsert(embedded)
@@ -141,6 +148,46 @@ struct FindEngineTests {
     try await world.repo.markSavedSearchRun(id: "s", lastSeenRowid: offer.watermark, at: 1)
     #expect(try await world.engine.newMatches(for: "s")?.ids == [])
     #expect(try await world.engine.newMatches(for: "missing") == nil)
+  }
+
+  @Test func tagsComeFromTheStoreAndFollowItsWrites() async throws {
+    let world = try await FindWorld.make()
+    defer { world.cleanUp() }
+    func found(_ r: FindSearch.Result) -> Set<String> { ids(r.matches + r.weaker) }
+    #expect(!found(try await world.engine.find("soccer", config: .v4)).contains("r100"))
+    func tag(_ id: String, _ labels: [(String, Double)]) -> TagFields {
+      TagFields(id: id, labels: labels.map { TagLabel(label: $0.0, confidence: $0.1) }, revision: "t", side: 360)
+    }
+    try await world.repo.commitTags([tag("r100", [("sport", 0.8), ("ball", 0.5)]), tag("r101", [("sport", 0.2)])])
+    let after = try await world.engine.find("soccer", config: .v4)
+    #expect(found(after).contains("r100"), "read again after the tag write")
+    #expect(!found(after).contains("r101"), "under tagMinConfidence 0.3")
+    #expect((after.matches + after.weaker).first { $0.id == "r100" }?.tagCoverage == 1)
+    // Tags off: the store isn't read; a given index replaces the store's.
+    #expect(!found(try await world.engine.find("soccer", config: .v0)).contains("r100"))
+    let given = try await world.engine.find("soccer", config: .v4, tags: TagIndex(labels: ["r102": ["Soccer"]]))
+    #expect(found(given).contains("r102") && !found(given).contains("r100"))
+  }
+
+  @Test func softPlacesKeepUnlocatedPhotosAndDropThoseElsewhere() async throws {
+    // m0…m4 in Madrid, m5…m9 in Lisbon, the rest unlocated; r200 in Madrid.
+    let madrid = (40.4165, -3.7026), lisbon = (38.7167, -9.1333)
+    var at: [String: (Double, Double)] = ["r200": madrid]
+    for i in 0..<5 { at["m\(i)"] = madrid }
+    for i in 5..<10 { at["m\(i)"] = lisbon }
+    let world = try await FindWorld.make(locations: at)
+    defer { world.cleanUp() }
+    let soft = try await world.engine.find("screenshots of chats in Madrid", config: .v2)
+    #expect(soft.understanding?.semanticText == "screenshots of chats in Madrid" && soft.missingLocation == 0)
+    let found = ids(soft.matches + soft.weaker)
+    #expect(Set((0..<5).map { "m\($0)" } + (10..<30).map { "m\($0)" }).isSubset(of: found))
+    #expect(found.isDisjoint(with: (5..<10).map { "m\($0)" }))
+    var hardConfig = FindConfig.v2
+    hardConfig.placeMode = .hard
+    let hard = try await world.engine.find("screenshots of chats in Madrid", config: hardConfig)
+    #expect(hard.understanding?.semanticText == "screenshots of chats")
+    #expect(ids(hard.matches + hard.weaker).isSubset(of: Set((0..<5).map { "m\($0)" } + ["r200"])))
+    #expect(hard.missingLocation >= 20)
   }
 
   @Test func nothingFoundRefusesAFlatQuery() async throws {

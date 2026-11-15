@@ -13,9 +13,11 @@ struct SchemaTests {
         """)
       #expect(Set(tables) == ["asset", "swipefile", "decision", "quota", "squishJournal", "squishRefusal", "videoProbe",
                               "assetText", "assetTextFts",  // v10
-                              "event", "savedSearch"])  // v11
+                              "event", "savedSearch",  // v11
+                              "assetTagRead", "assetTag"])  // v12
       let indexes = try String.fetchAll(db, sql: "SELECT name FROM sqlite_master WHERE type='index' AND name LIKE 'asset_%'")
-      #expect(Set(indexes) == ["asset_created", "asset_phash", "asset_pending", "asset_textGated", "asset_event"])
+      #expect(Set(indexes) == ["asset_created", "asset_phash", "asset_pending", "asset_textGated", "asset_event",
+                              "asset_tagOrder"])
       let columns = try db.columns(in: "asset").map(\.name)
       #expect(columns == ["id", "mediaType", "subtypes", "created", "pixelW", "pixelH", "duration", "isFavorite", "burstId",
                           "uti", "estBytes", "cloudOnly", "embedded", "signalsDone", "blur", "aesthetic", "isUtility",
@@ -33,7 +35,7 @@ struct SchemaTests {
     let db = try AppDatabase.inMemory()
     try Schema.migrator.migrate(db.writer)
     let applied = try db.writer.read { db in try Schema.migrator.appliedIdentifiers(db) }
-    #expect(applied == ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11"])
+    #expect(applied == ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12"])
   }
 
   @Test func v11KeepsEarlierRowsAndMarksTheirLocationUnread() async throws {

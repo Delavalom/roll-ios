@@ -9,14 +9,16 @@ extension SwipefileEngine {
   /// today's Ask Roll answer (`search` returns it as a `PhotoSearch.Result`).
   ///
   /// - `seeds`: photo ids for "more like these" (V5); their mean vector is one more query in the same `dotAll`.
-  /// - `tags`: asset id → labels (V4, with `config.tags`), matched to the query's words by `TagFusion`.
+  /// - `tags` (V4, with `config.tags`): the photos' scene labels folded, matched to the query's words by `TagFusion`.
+  ///   Nil: the store's (`Repositories.tagLabels` at `config.tagMinConfidence`), loaded once per tag write and kept in
+  ///   memory with the candidate rows.
   ///
   /// Uses the piles' fast path (`poolScores`): in-memory rows with date, location and moment, one matrix product. Only
   /// photos that may qualify (`FindSearch.mayQualify`) and pass the query's filters are read from the database; those
   /// failing a filter for lack of a date or location go to the ranker as is, to be counted. `elapsed` covers
   /// understanding, embedding, scoring and ranking.
   public func find(_ text: String, config: FindConfig = .default, seeds: [String] = [],
-                   tags: [String: [String]]? = nil, refinement: PhotoSearch.Refinement = .init()) async throws
+                   tags: TagIndex? = nil, refinement: PhotoSearch.Refinement = .init()) async throws
     -> FindSearch.Result {
     let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !text.isEmpty else { return FindSearch.Result() }
@@ -35,7 +37,7 @@ extension SwipefileEngine {
     if config.understanding {
       let gazetteer = try? Gazetteer.load()
       var u = QueryUnderstanding.parse(text, now: Date(timeIntervalSince1970: nowValue), calendar: calendar,
-                                       gazetteer: gazetteer, options: config.understandingOptions)
+                                       gazetteer: gazetteer, options: config.parseOptions)
       if u.hasPlaceFilter, let gazetteer {
         let place = PlaceLocator(gazetteer: gazetteer)
         let rows = try await candidatePool.snapshot().snapshot.rows
@@ -51,6 +53,7 @@ extension SwipefileEngine {
     let filtered = understanding?.hasFilter == true
     let semantic = understanding?.semanticText ?? text
     let filterOnly = filtered && understanding!.isFilterOnly
+    let soft = FindSearch.softPlaces(understanding, filterOnly: filterOnly, config: config)
     let texts = filterOnly ? [] : FindQuery.texts(for: semantic.isEmpty ? text : semantic, config: config)
 
     // Queries: the texts, then the seed centroid.
@@ -63,6 +66,12 @@ extension SwipefileEngine {
 
     let terms = SearchTerms.queryTerms(filterOnly ? "" : (semantic.isEmpty ? text : semantic))
     let coverage = terms.isEmpty ? [:] : (try await keywordCoverage?(terms) ?? [:])
+    var tagCoverage: [String: Double] = [:]
+    if config.tags, !terms.isEmpty {
+      var index = tags
+      if index == nil { index = try await candidatePool.tagIndex(minConfidence: config.tagMinConfidence) }
+      tagCoverage = index?.coverage(queryTerms: terms) ?? [:]
+    }
     let pool = try await poolScores(queries: queries, preset: nil, filter: .none, decidedIn: nil, excluding: [])
     let scales = placeholder ? [] : (0..<texts.count).map { QueryScale(pool.dots, query: $0) }
     let seedScale = seedVector == nil ? nil : QueryScale(pool.dots, query: texts.count)
@@ -85,28 +94,27 @@ extension SwipefileEngine {
                                   scales: scales, seedScale: seedScale, config: config)
       if wantZs, let z { zs.append(z) }
       let id = pool.id(k)
-      let tagCoverage = config.tags ? TagFusion.coverage(queryTerms: terms, labels: tags?[id] ?? []) : 0
-      guard FindSearch.mayQualify(z: z, coverage: coverage[id] ?? 0, tagCoverage: tagCoverage, filtered: filtered,
-                                  filterOnly: filterOnly, config: config) else { continue }
-      let cosines = (0..<scales.count).map { dots[$0][k] }
       let row = pool.row(k)
+      let v = filtered ? FindSearch.verdict(understanding, soft: soft, created: row.created, latitude: row.lat,
+                                            longitude: row.lon, locator: locator, calendar: calendar, config: config)
+        : FindSearch.Verdict()
+      let tags = tagCoverage[id] ?? 0
+      guard FindSearch.mayQualify(z: z, coverage: coverage[id] ?? 0, tagCoverage: tags, filtered: v.confined,
+                                  filterOnly: filterOnly, placeBonus: v.placeBonus, config: config) else { continue }
+      if !v.passes {
+        if !v.dateOK {
+          guard row.created == nil else { continue }  // dated outside the window
+        } else if soft || (row.lat != nil && row.lon != nil) {
+          continue  // located elsewhere
+        }
+      }
       let candidate = FindSearch.Candidate(
         asset: SearchAsset(id: id, mediaType: row.asset.mediaType, estBytes: row.asset.estBytes, created: row.created,
                            isFavorite: false, originalLocal: nil),
-        cosines: cosines, seedCosine: seedCosine, coverage: coverage[id] ?? 0, tagCoverage: tagCoverage,
-        latitude: row.lat, longitude: row.lon, eventId: row.eventId,
+        cosines: (0..<scales.count).map { dots[$0][k] }, seedCosine: seedCosine, coverage: coverage[id] ?? 0,
+        tagCoverage: tags, latitude: row.lat, longitude: row.lon, eventId: row.eventId,
         tripId: row.eventId.flatMap { events[$0]?.tripId })
-      if let u = understanding, filtered {
-        let dateOK = u.matchesDate(row.created, calendar: calendar)
-        guard dateOK || row.created == nil else { continue }
-        let placeOK = dateOK && u.matchesPlace(latitude: row.lat, longitude: row.lon, locator: locator)
-        if !(dateOK && placeOK) {
-          if dateOK, row.lat != nil, row.lon != nil { continue }  // located elsewhere
-          unread.append(candidate)  // no date or no location: only counted
-          continue
-        }
-      }
-      read[id] = candidate
+      if v.passes { read[id] = candidate } else { unread.append(candidate) }  // no date or location: only counted
     }
     var candidates = unread
     for asset in try await repositories.searchAssets(ids: Array(read.keys)) {

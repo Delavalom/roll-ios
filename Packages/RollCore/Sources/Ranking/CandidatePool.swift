@@ -39,6 +39,7 @@ actor CandidatePool {
   private var cached: Snapshot?
   private var rowByID: (layout: UInt64, count: Int, map: [String: Int32])?
   private var aligned: [AlignedEntry] = []
+  private var tags: (generation: UInt64, minConfidence: Double, index: TagIndex)?
 
   init(repositories: Repositories) {
     self.repositories = repositories
@@ -80,6 +81,17 @@ actor CandidatePool {
     aligned.append(AlignedEntry(preset: preset, filter: filter, generation: snapshot.generation, layout: dots.layout,
                                 pool: pool))
     return pool
+  }
+
+  /// Every photo's scene labels with confidence >= `minConfidence`, folded (`TagIndex`), read again only after the tag
+  /// tables changed (`RankingChanges.tagGeneration`): typed search with tags pays the SQL read once per tag write, not
+  /// per query.
+  func tagIndex(minConfidence: Double) async throws -> TagIndex {
+    let generation = try await observer().tagGeneration
+    if let tags, tags.generation == generation, tags.minConfidence == minConfidence { return tags.index }
+    let index = TagIndex(labels: try await repositories.tagLabels(minConfidence: minConfidence))
+    if (tags?.generation ?? 0) <= generation { tags = (generation, minConfidence, index) }
+    return index
   }
 
   /// `dots`' row of each of `ids` that has a vector (call after `aligned` for the same `dots`).

@@ -175,6 +175,33 @@ public enum Schema {
         """)
     }
 
+    // v12 (Find tags): Vision scene labels per photo (`Repositories+Tags`), written by the tag pass (`TagIndexer`)
+    // after indexing drains. `assetTagRead` has one row per photo the pass looked at (the classifier's revision, the
+    // long side of the image read, NULL when no local image could be loaded); `assetTag` its labels (confidence
+    // >= 0.1, best 10). Both go with their asset: deleted, marked deleted, or edited (`signalsDone` back to 0, read
+    // again once analysed). `asset_tagOrder` makes the pass's "analysed, not read yet, newest first" query cheap.
+    // Rowid tables on purpose: SQLite reports no changes of WITHOUT ROWID tables to observers (`RankingChanges`).
+    migrator.registerMigration("v12") { db in
+      try db.execute(sql: """
+        CREATE TABLE assetTagRead (
+          assetId TEXT PRIMARY KEY REFERENCES asset(id) ON DELETE CASCADE, revision TEXT NOT NULL, side INTEGER,
+          readAt REAL NOT NULL);
+        CREATE TABLE assetTag (
+          id INTEGER PRIMARY KEY, assetId TEXT NOT NULL REFERENCES asset(id) ON DELETE CASCADE, label TEXT NOT NULL,
+          confidence REAL NOT NULL, UNIQUE (assetId, label));
+        CREATE TRIGGER asset_tagGone AFTER UPDATE OF deleted ON asset WHEN new.deleted = 1 AND old.deleted = 0 BEGIN
+          DELETE FROM assetTag WHERE assetId = new.id;
+          DELETE FROM assetTagRead WHERE assetId = new.id;
+        END;
+        CREATE TRIGGER asset_tagStale AFTER UPDATE OF signalsDone ON asset
+          WHEN new.signalsDone = 0 AND old.signalsDone = 1 BEGIN
+          DELETE FROM assetTag WHERE assetId = new.id;
+          DELETE FROM assetTagRead WHERE assetId = new.id;
+        END;
+        CREATE INDEX asset_tagOrder ON asset(created DESC, id) WHERE deleted = 0 AND signalsDone = 1;
+        """)
+    }
+
     return migrator
   }
 
