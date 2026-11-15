@@ -66,6 +66,31 @@ struct SearchSpeedBench {
     }
   }
 
+  /// Typed search (Ask Roll's `SwipefileEngine.search`) over the same world: a first call, then the median of 10 warm
+  /// calls per query (stub query embedding, so this is the store read, `dotAll`, gating and ranking).
+  @Test func typedSearch() async throws {
+    let world = try await SearchBenchWorld.make()
+    defer { world.cleanUp() }
+    let queries = ["receipts and invoices", "screenshots of chats", "a dog on the beach", "zxqv blorp"]
+    let clock = ContinuousClock()
+    for query in queries {
+      let firstStart = clock.now
+      _ = try await world.engine.search(query)
+      let first = SearchTimings.ms(clock.now - firstStart)
+      var warm: [Double] = []
+      var count = 0
+      for _ in 0..<10 {
+        let start = clock.now
+        let result = try await world.engine.search(query)
+        warm.append(SearchTimings.ms(clock.now - start))
+        count = result.matches.count + result.weaker.count
+      }
+      warm.sort()
+      print("bench search \"\(query)\" results=\(count) first=\(String(format: "%.2f", first))"
+            + " warmMedian=\(String(format: "%.2f", warm[warm.count / 2])) warmMin=\(String(format: "%.2f", warm[0]))")
+    }
+  }
+
   static func dict(_ t: SearchTimings) -> [String: Double] {
     Dictionary(uniqueKeysWithValues: t.milliseconds.map { ($0.step, ($0.ms * 1000).rounded() / 1000) })
   }

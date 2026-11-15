@@ -82,6 +82,13 @@ public struct AssetRecord: Codable, Sendable, Equatable, Identifiable, Fetchable
   public var previewSide: Int?
   /// Whether the original resource is on the device (v8): nil until checked.
   public var originalLocal: Bool?
+  /// Where the photo was taken (v11, `PHAsset.location`, degrees): library-owned, nil when it has no location.
+  public var lat: Double?
+  public var lon: Double?
+  /// The library's location was read for this row (v11): false only for rows stored before v11 and not synced since.
+  public var locationChecked: Bool
+  /// The moment this photo belongs to (v11, `EventRecord`), written by the event pass only.
+  public var eventId: String?
 
   /// From the original-resource check only (`originalLocal`). `cloudOnly` is about thumbnails, not this.
   public var locality: AssetLocality {
@@ -98,7 +105,8 @@ public struct AssetRecord: Codable, Sendable, Equatable, Identifiable, Fetchable
               blur: Double? = nil, aesthetic: Double? = nil, isUtility: Bool? = nil, sensitive: Bool? = nil,
               phash: UInt64? = nil, featurePrint: Data? = nil, deleted: Bool = false, deletedAt: Double? = nil,
               attempts: Int = 0, modified: Double? = nil, source: AnalysisSource? = nil, previewSide: Int? = nil,
-              originalLocal: Bool? = nil) {
+              originalLocal: Bool? = nil, lat: Double? = nil, lon: Double? = nil, locationChecked: Bool = false,
+              eventId: String? = nil) {
     self.id = id; self.mediaType = mediaType; self.subtypes = subtypes; self.created = created
     self.pixelW = pixelW; self.pixelH = pixelH; self.duration = duration; self.isFavorite = isFavorite
     self.burstId = burstId; self.uti = uti; self.estBytes = estBytes; self.cloudOnly = cloudOnly
@@ -107,12 +115,13 @@ public struct AssetRecord: Codable, Sendable, Equatable, Identifiable, Fetchable
     self.featurePrint = featurePrint; self.deleted = deleted; self.deletedAt = deletedAt; self.attempts = attempts
     self.modified = modified; self.source = source; self.previewSide = previewSide
     self.originalLocal = originalLocal
+    self.lat = lat; self.lon = lon; self.locationChecked = locationChecked; self.eventId = eventId
   }
 
   private enum CodingKeys: String, CodingKey {
     case id, mediaType, subtypes, created, pixelW, pixelH, duration, isFavorite, burstId, uti, estBytes, cloudOnly
     case embedded, signalsDone, blur, aesthetic, isUtility, sensitive, featurePrint, deleted, deletedAt, attempts, modified
-    case source, previewSide, originalLocal
+    case source, previewSide, originalLocal, lat, lon, locationChecked, eventId
     case phashBits = "phash"
   }
 }

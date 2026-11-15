@@ -12,9 +12,10 @@ struct SchemaTests {
           AND name NOT LIKE 'assetTextFts_%'
         """)
       #expect(Set(tables) == ["asset", "swipefile", "decision", "quota", "squishJournal", "squishRefusal", "videoProbe",
-                              "assetText", "assetTextFts"])  // v10
+                              "assetText", "assetTextFts",  // v10
+                              "event", "savedSearch"])  // v11
       let indexes = try String.fetchAll(db, sql: "SELECT name FROM sqlite_master WHERE type='index' AND name LIKE 'asset_%'")
-      #expect(Set(indexes) == ["asset_created", "asset_phash", "asset_pending", "asset_textGated"])
+      #expect(Set(indexes) == ["asset_created", "asset_phash", "asset_pending", "asset_textGated", "asset_event"])
       let columns = try db.columns(in: "asset").map(\.name)
       #expect(columns == ["id", "mediaType", "subtypes", "created", "pixelW", "pixelH", "duration", "isFavorite", "burstId",
                           "uti", "estBytes", "cloudOnly", "embedded", "signalsDone", "blur", "aesthetic", "isUtility",
@@ -22,7 +23,8 @@ struct SchemaTests {
                           "modified",  // v5
                           "source",  // v6
                           "previewSide",  // v7
-                          "originalLocal"])  // v8
+                          "originalLocal",  // v8
+                          "lat", "lon", "locationChecked", "eventId"])  // v11
       #expect(try db.columns(in: "swipefile").map(\.name).contains("classifierRevision"))  // v2
     }
   }
@@ -31,7 +33,26 @@ struct SchemaTests {
     let db = try AppDatabase.inMemory()
     try Schema.migrator.migrate(db.writer)
     let applied = try db.writer.read { db in try Schema.migrator.appliedIdentifiers(db) }
-    #expect(applied == ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10"])
+    #expect(applied == ["v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11"])
+  }
+
+  @Test func v11KeepsEarlierRowsAndMarksTheirLocationUnread() async throws {
+    let queue = try DatabaseQueue()
+    try Schema.migrator.migrate(queue, upTo: "v10")
+    try await queue.write { db in
+      try db.execute(sql: "INSERT INTO asset (id, mediaType, subtypes, estBytes, embedded) VALUES ('a', 1, 0, 7, 1)")
+    }
+    let repo = Repositories(try AppDatabase(queue))
+    let a = try #require(try await repo.asset(id: "a"))
+    #expect(a.embedded && a.lat == nil && a.lon == nil && !a.locationChecked && a.eventId == nil)
+    #expect(try await repo.locationUncheckedCount() == 1)
+    // The next sync's upsert brings the location; signals and the embedded flag stay.
+    var synced = AssetRecord(id: "a", mediaType: 1, subtypes: 0, estBytes: 7, lat: 18.5, lon: -66.1, locationChecked: true)
+    synced.embedded = false
+    try await repo.upsertAssets([synced])
+    let b = try #require(try await repo.asset(id: "a"))
+    #expect(b.embedded && b.lat == 18.5 && b.lon == -66.1 && b.locationChecked)
+    #expect(try await repo.locationUncheckedCount() == 0)
   }
 
   @Test func v5KeepsEarlierRowsAndAddsSquishRefusals() async throws {

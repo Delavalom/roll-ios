@@ -37,6 +37,7 @@ let package = Package(
     .library(name: "Commit", targets: ["Commit"]),
     .library(name: "Overview", targets: ["Overview"]),
     .library(name: "SquishBridge", targets: ["SquishBridge"]),
+    .library(name: "Places", targets: ["Places"]),
   ],
   dependencies: [
     gemma,
@@ -53,7 +54,9 @@ let package = Package(
     .target(name: "Library"),
     .target(name: "Signals"),
     .target(name: "Indexer", dependencies: ["Library", "Signals", "Store", "Embedding"]),
-    .target(name: "Ranking", dependencies: ["Store", "Embedding"]),
+    .target(name: "Ranking", dependencies: ["Store", "Embedding", "Places"]),
+    // The offline gazetteer (GeoNames, CC-BY 4.0: Resources/NOTICE; built by scripts/make_places.py). No dependencies.
+    .target(name: "Places", resources: [.copy("Resources/places.z"), .copy("Resources/NOTICE")]),
     .target(name: "Dedupe", dependencies: ["Store"]),
     .target(name: "Squish", dependencies: ["Store", "Library"]),
     .target(name: "Monitor"),
@@ -73,15 +76,16 @@ let package = Package(
     .testTarget(name: "SignalsTests", dependencies: ["Signals"], resources: [.copy("Resources")]),
     .testTarget(name: "LibraryTests", dependencies: ["Library"]),
     .testTarget(name: "IndexerTests", dependencies: ["Indexer", "Library", "Signals", "Store", "Embedding"]),
-    .testTarget(name: "RankingTests", dependencies: ["Ranking", "Store", "Embedding"]),
+    .testTarget(name: "RankingTests", dependencies: ["Ranking", "Store", "Embedding", "Places"]),
+    .testTarget(name: "PlacesTests", dependencies: ["Places"]),
     .testTarget(name: "CommitTests", dependencies: ["Commit", "Store", "Entitlements"]),
     .testTarget(name: "OverviewTests", dependencies: ["Overview", "Store", "Ranking", "Signals", "Squish"]),
   ]
 )
 
 if !hasGemma {
-  let standalone: Set<String> = ["Library", "Signals", "Monitor", "ModelInstall", "LibraryTests", "SignalsTests",
-                                 "MonitorTests", "ModelInstallTests"]
+  let standalone: Set<String> = ["Library", "Signals", "Monitor", "ModelInstall", "Places", "LibraryTests",
+                                 "SignalsTests", "MonitorTests", "ModelInstallTests", "PlacesTests"]
   package.dependencies = []
   package.targets = package.targets.filter { standalone.contains($0.name) }
   package.products = package.products.filter { standalone.contains($0.name) }
