@@ -102,11 +102,13 @@ struct FindAnswerTests {
     #expect(range(at(2024, 6, 7), at(2024, 6, 3)) == "Jun 3–7, 2024", "order doesn't matter")
   }
 
-  @Test func shippingIsV0WithTheCutRefusalEventsAndUnderstanding() {
+  @Test func shippingIsV0WithTheCutRefusalSoftUnderstandingTagsAndEventSections() {
     let s = FindConfig.shipping
     #expect(s.relativeCut == 0.6)
     #expect(s.nothingFound == NothingFoundTest(minTopCosine: 0.735))
-    #expect(s.understanding && s.events && s.groupByEvent && s.expandRest)
+    #expect(s.understanding && s.understandingOptions.keepHolidayWords && s.placeMode == .soft)
+    #expect(s.tags && s.tagWeight == 1 && s.tagGate == 0.5 && s.tagMinConfidence == 0.3)
+    #expect(!s.events && s.supportWeight == 0 && s.groupByEvent && s.expandRest, "events group, never rank")
     #expect(s.zGate == FindConfig.v0.zGate && s.foldRatio == FindConfig.v0.foldRatio && s.templates.isEmpty)
     #expect(FindConfig.default == FindConfig.v0, "the engine's default is unchanged")
     #expect(s.withoutNothingFound.nothingFound.isOff)

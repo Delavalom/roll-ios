@@ -63,7 +63,9 @@ Packages/RollCore/        Local SwiftPM package; one target per module
                           the activator gets model/ and the marker's ModelIdentity, and only the marker stays; old
                           revision in use until the new one is staged, then deleted), BackgroundTransport (background URLSessions, resumable; its bookkeeping
                           is TransportBook, tested without a network)
-  Store/                  GRDB schema (v1-v10; v10: assetText + FTS5 keyword index, Repositories.keywordCoverage), records, Repositories, VectorStore (actor over EmbeddingIndex),
+  Store/                  GRDB schema (v1-v12; v10: assetText + FTS5 keyword index, Repositories.keywordCoverage; v11: location,
+                          events, saved searches; v12: assetTag + assetTagRead scene labels, Repositories+Tags; RankingChanges
+                          counts tag writes apart as tagGeneration), records, Repositories, VectorStore (actor over EmbeddingIndex),
                           squishJournal, squishRefusal (remembered run-time refusals; hold while asset.modified is unchanged)
   Entitlements/           FreeQuota (policy only; the counter is Repositories.consumeCounter; `countsAlbumAdds` is THE
                           switch for whether album adds spend free items, true today), ProStatus protocol
@@ -75,7 +77,9 @@ Packages/RollCore/        Local SwiftPM package; one target per module
   Squish/                 SquishCandidates + SquishPlanner (spec §8 rules, 30% savings floor; depends on Store only), SquishEligibility (typed refusals incl. formats), VideoSquisher (HEVC export), PhotoSquisher (HEIC 0.8, keeps gain map + metadata), ReplaceFlow (needs full access; prepare copies, journaled in Store, then one commitDeletes that re-verifies inside the change block; PhotoKit behind an internal seam, iOS only)
   Ranking/                Preset (filters, boosts, prompts), Scorer, LogisticClassifier (vDSP), SwipefileEngine (actor: in-memory candidate rows (CandidatePool, refreshed after ranking-relevant writes) + one VectorStore.dotAll matrix product, aligned as integers (PoolScores); untrained piles on each query's own scale (QueryScale, z >= 2) with weaker matches folded (Fold, 0.4); rank-based once trained, class-balanced retraining, isLikelyExhausted); SwipeDeck protocol + SignalDeck (Screenshots/Blurry/Big videos without the model); LibrarySearch (typed queries: z + keyword coverage, DigUp-style), SearchTerms; Find/ (FindSearch V0-V5,
                           FindConfig: `FindConfig.shipping` is THE config the app ships (Ask, more like these, living
-                          albums), tuned from the find eval; FindAnswer, AlbumSelection, SeedPick, LivingAlbumInbox)
+                          albums), tuned from the find eval (ADR-0006: V0 + cut 0.6 + nothing-found, understanding with
+                          holiday words kept and soft places, tags, events for sections only); TagIndex (labels folded
+                          once, loaded by CandidatePool per tag write); FindAnswer, AlbumSelection, SeedPick, LivingAlbumInbox)
   Overview/               CleanupSummary/CleanupScanner (Home categories, duplicate groups minus keepers, freeable total:
                           deletions at full size + big videos at SquishPlanner.offer savings; journaled copies and
                           open squishes excluded; groups() reads feature prints, scan(groups:) the slim rows),
@@ -90,8 +94,10 @@ Packages/RollCore/        Local SwiftPM package; one target per module
                           CardImage (ImageRequestSpec, CardImageLoader: best local image, else a download on Wi-Fi only,
                           else "unavailable", 8 s lookup timeout; CardGate; CardPrefetch), SwipeVerdict (gate → record, skip
                           or ignore: only a card on screen records), SharedWiFiCheck + NetworkPath (Low Data Mode allowed)
-  Signals/                Vision signals: blur, aesthetics, feature print (FP01 raw floats), dHash, sensitive content; AssetSignals; TextRecognizer (.accurate at 960 px, no language correction)
-  Indexer/                TextIndexer (words of gated images: screenshots + isUtility, after indexing drains, pauses from thermal .fair); Indexer actor (sync/apply, run(limit:allowNetwork:), flush, cancel, setEmbedder(_:openVectors:), AsyncStream progress) over LibrarySource/SignalSource/
+  Signals/                Vision signals: blur, aesthetics, feature print (FP01 raw floats), dHash, sensitive content; AssetSignals; TextRecognizer (.accurate at 960 px, no language correction); SceneClassifier (VNClassifyImageRequest, Find tags)
+  Indexer/                TextIndexer (words of gated images: screenshots + isUtility, after indexing drains, pauses from thermal .fair);
+                          TagIndexer (Vision scene labels of every analysed photo at 360 px, >= 0.1 top 10, after the text pass,
+                          same throttling, unread when no local image); Indexer actor (sync/apply, run(limit:allowNetwork:), flush, cancel, setEmbedder(_:openVectors:), AsyncStream progress) over LibrarySource/SignalSource/
                           IndexRepository/VectorSink protocols; ThermalGate; IndexScheduler (BGProcessingTask, iOS)
 UITests/                  SmokeTests: launch, and the seeded flow (onboarding → taste scan → Screenshots → swipe 5 →
                           apply → system delete alert → count drops by 5); PaywallTests: both plans, prices, trial,

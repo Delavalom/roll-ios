@@ -3,16 +3,17 @@ import Indexer
 import Ranking
 import Store
 
-// MARK: - After indexing drains: words in images, warm piles
+// MARK: - After indexing drains: words in images, scene tags, warm piles
 
 extension AppModel {
   /// Once the photo pass has drained: reads the words of gated images (screenshots and documents, `TextGate`) that
-  /// have none yet, then warms the preset piles' in-memory rows so the first pile opened skips its database read. Both
-  /// are cheap to call again: the text pass shares a run already in flight, and `TextIndexer` pauses from thermal
-  /// `.fair`. A new indexing loop (`startIndexing`) or a taste scan cancels the text pass; it resumes on the next drain.
+  /// have none yet, then labels photos for Find's tags (`TagIndexer`, when `FindConfig.shipping.tags`), and warms the
+  /// preset piles' in-memory rows so the first pile opened skips its database read. All are cheap to call again: the
+  /// passes share a run already in flight and pause from thermal `.fair`. A new indexing loop (`startIndexing`) or a
+  /// taste scan cancels both passes; they resume on the next drain (each photo is read once per revision).
   func afterIndexDrained() {
     guard environment.isLive, access.canRead else { return }
-    let text = textIndexer, engine = engine, generation = textGeneration
+    let text = textIndexer, tags = tagIndexer, engine = engine, generation = textGeneration
     Task(priority: .utility) { [weak self] in
       if let engine { try? await engine.preparePools(for: Preset.allCases) }
       // Events, then living albums' new photos (offered on Home, never added silently).
@@ -36,6 +37,31 @@ extension AppModel {
       }
       #endif
       if report != nil { self.bumpLibrary() }
+      // Scene tags last: search reads them again after each commit (`RankingChanges.tagGeneration`), no bump needed.
+      guard FindConfig.shipping.tags, report != nil, self.textGeneration == generation else { return }
+      #if DEBUG
+      QARuntime.shared?.log.write("tag_pass", ["state": .string("started")])
+      let tagStart = ContinuousClock.now
+      #endif
+      let tagged = try? await tags.run()
+      #if DEBUG
+      let tagMs = SearchTimings.ms(ContinuousClock.now - tagStart)
+      if let tagged {
+        QARuntime.shared?.log.write("tag_pass", [
+          "state": .string("finished"), "ms": .double(tagMs), "read": .int(tagged.read),
+          "tagged": .int(tagged.tagged), "unread": .int(tagged.unread), "failed": .int(tagged.failed),
+        ])
+      } else {
+        QARuntime.shared?.log.write("tag_pass", ["state": .string("stopped"), "ms": .double(tagMs)])
+      }
+      #endif
+      _ = tagged
     }
+  }
+
+  /// Stops the text and tag passes (each commits what it read); the photo pass or a taste scan goes first.
+  func cancelAfterIndexPasses() async {
+    await textIndexer.cancel()
+    await tagIndexer.cancel()
   }
 }
