@@ -21,13 +21,10 @@ extension QueryUnderstanding {
     var holidayTokens = Set<Int>()
     for (range, expr) in found {
       for i in range { tokens[i].role = .date }
-      if case .periodic(.holiday, _) = expr { holidayTokens.formUnion(range) }
+      if case .periodic(.holiday, _) = expr { holidayTokens.formUnion(holidayWords(folded, in: range)) }
       markConnectors(&tokens, before: range.lowerBound, from: dateConnectors, owner: nil)
     }
     let filters = dateFilters(found.map(\.1), now: now, calendar: calendar, options: options)
-    if options.keepHolidayWords {
-      for i in holidayTokens { tokens[i].role = .semantic }
-    }
 
     // Places, in runs of words still semantic.
     var spans: [PlaceSpan] = []
@@ -50,10 +47,26 @@ extension QueryUnderstanding {
       }
       assignClauses(&spans, tokens: &tokens)
     }
+    // After places, so a holiday word is never read as one ("Christmas" Island).
+    if options.keepHolidayWords {
+      for i in holidayTokens { tokens[i].role = .semantic }
+    }
 
     return Understanding(text: text, tokens: tokens, semanticText: "", dateRanges: filters.ranges.map(closed),
                          anyYearWindows: filters.windows, placeSpans: spans, removedWords: [],
-                         generalWords: defaultGeneralWords).refreshed()
+                         generalWords: defaultGeneralWords, keepsPlaceWords: options.keepPlaceWords).refreshed()
+  }
+
+  /// The holiday's own words inside a date expression's `range`: "christmas" of "last christmas", "navidad" of "la
+  /// navidad pasada", not the qualifier, article or year around them.
+  static func holidayWords(_ folded: [String], in range: Range<Int>) -> Range<Int> {
+    for i in range {
+      for (words, _) in holidays where i + words.count <= range.upperBound
+        && Array(folded[i..<(i + words.count)]) == words {
+        return i..<(i + words.count)
+      }
+    }
+    return range.lowerBound..<range.lowerBound
   }
 
   static func closed(_ r: Range<Double>) -> ClosedRange<Double> { r.lowerBound...(r.upperBound - 0.001) }
@@ -112,9 +125,18 @@ extension QueryUnderstanding.Understanding {
   /// Recomputes `semanticText` and `removedWords` from the tokens' roles.
   func refreshed() -> Self {
     var copy = self
-    copy.semanticText = tokens.filter { $0.role == .semantic }.map(\.text).joined(separator: " ")
-    copy.removedWords = tokens.filter { $0.role != .semantic }.map(\.folded)
+    copy.semanticText = tokens.filter(embeds).map(\.text).joined(separator: " ")
+    copy.removedWords = tokens.filter { !embeds($0) }.map(\.folded)
     return copy
+  }
+
+  /// Whether `token` is embedded: semantic words, and place words with their connectors when `keepsPlaceWords`.
+  func embeds(_ token: QueryUnderstanding.Token) -> Bool {
+    switch token.role {
+    case .semantic: true
+    case .place, .connector(.some): keepsPlaceWords
+    case .date, .connector(.none): false
+    }
   }
 
   /// Keeps only the place matches that hold at least `minimumPhotos` of `locations` (the library's located photos);

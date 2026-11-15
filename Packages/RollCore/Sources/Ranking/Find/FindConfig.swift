@@ -24,6 +24,16 @@ public struct FindConfig: Sendable, Equatable, Codable {
     case zMass
   }
 
+  /// What a place in the query does to photos (V2).
+  public enum PlaceMode: String, Sendable, Codable {
+    /// Only photos located in the place pass; photos without a location are dropped (counted in `missingLocation`).
+    /// Place words are removed from the embedded text.
+    case hard
+    /// Photos located elsewhere are dropped; photos located in the place get `placeBonus`; photos without a location
+    /// stay and compete on meaning alone, at the plain `zGate`. Place words stay in the embedded text.
+    case soft
+  }
+
   public enum SupportLevel: String, Sendable, Codable {
     /// Moments (one outing).
     case moment
@@ -67,6 +77,19 @@ public struct FindConfig: Sendable, Equatable, Codable {
   public var filteredZGate: Float = 1
   /// A place filters only if at least this many located photos fall in it (`Understanding.resolvingPlaces`).
   public var minimumPhotosPerPlace = 1
+  /// Soft by default: only 18.6 % of the founder's library is located (WhatsApp saves never are), and the hard filter
+  /// dropped album trip queries ("Lisbon trip") from P@20 .80 (meaning alone) to .48 (find eval, 2026-11-15).
+  public var placeMode: PlaceMode = .soft
+  /// Soft places: z bonus for a photo located in the query's place (added before the gate, like the event bonus).
+  /// 1: being there counts like standing out one deviation more; a first guess, measured as V2s in round 3.
+  public var placeBonus: Float = 1
+
+  /// The parser's options for this config: `understandingOptions` with place words kept in soft mode.
+  public var parseOptions: QueryUnderstanding.Options {
+    var o = understandingOptions
+    o.keepPlaceWords = placeMode == .soft
+    return o
+  }
 
   // MARK: V3 events
 
@@ -94,6 +117,9 @@ public struct FindConfig: Sendable, Equatable, Codable {
   public var tagWeight: Float = 1
   /// Tags alone qualify a photo from this coverage (nil: tags only reorder).
   public var tagGate: Double? = 0.5
+  /// Labels count as tags from this Vision confidence (the store keeps every label >= `TagPassConfig` 0.1, top 10;
+  /// the eval's V4 used 0.3).
+  public var tagMinConfidence: Double = 0.3
 
   // MARK: V5 more like these
 

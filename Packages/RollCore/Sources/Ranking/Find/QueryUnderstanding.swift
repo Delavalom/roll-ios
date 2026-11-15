@@ -17,7 +17,9 @@ import Places
 ///   ("Spain and Portugal"). Whether a place filters at all is decided against the library
 ///   (`Understanding.resolvingPlaces`): a name nobody photographed ("wedding" was a Berlin district) stays a word.
 /// - **What stays.** Everything else, in order, is `semanticText`. "trip", "vacation" stay; a query whose words are
-///   only those (or "photos") plus a date or place is `isFilterOnly`: everything in that window, by time.
+///   only those (or "photos") plus a date or place is `isFilterOnly`: everything in that window, by time. Holiday words
+///   filter *and* stay (`Options.keepHolidayWords`: "Christmas" describes the pictures too), and so do place words
+///   with `Options.keepPlaceWords` (soft places, `FindConfig.PlaceMode`).
 ///
 /// Ambiguous words need a hint before they count as dates: "may", "march", "mayo" need a year, "in"/"en"/"last"/"this";
 /// a bare season ("summer", "spring") stays a word unless `Options.bareSeasonIsDate` (it describes a scene as often as
@@ -29,9 +31,14 @@ public enum QueryUnderstanding {
     public var maxYearsAhead = 1
     /// "summer" alone filters to June–August of any year (off: it stays a word, like "beach").
     public var bareSeasonIsDate = false
-    /// A holiday filters to its days *and* stays in the embedded text (off: it only filters, so "Christmas" is every
-    /// photo taken 24–26 December, by time).
-    public var keepHolidayWords = false
+    /// A holiday filters to its days *and* stays in the embedded text (on by default). Off, it only filters, so
+    /// "Christmas 2023" is every photo taken 24–26 December 2023, by time: the find eval (2026-11-15) measured P@20 0.2
+    /// for that query although all 34 relevant photos were in its 98 results; the word ranks them. Only the holiday's
+    /// own words stay ("last", "2023", "pasada" still go).
+    public var keepHolidayWords = true
+    /// Place words filter *and* stay in the embedded text (`FindConfig.PlaceMode.soft` sets it). Off, they only filter.
+    /// A query whose only other words are general ones ("Lisbon trip") is then not `isFilterOnly`: it is embedded.
+    public var keepPlaceWords = false
     /// Seasons of the southern hemisphere (summer = December–February).
     public var southernHemisphere = false
 
@@ -115,6 +122,8 @@ public enum QueryUnderstanding {
     public var removedWords: [String]
     /// The semantic words that make a query "only a date or place" (`isFilterOnly`).
     public var generalWords: Set<String>
+    /// Place words (and their connectors) stay in `semanticText` while they filter (`Options.keepPlaceWords`).
+    public var keepsPlaceWords = false
 
     /// Every place match, span by span.
     public var places: [PlaceMatch] { placeSpans.flatMap(\.matches) }

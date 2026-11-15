@@ -151,13 +151,56 @@ struct FindSearchVariantTests {
                  cand("nowhere", z: nil, created: day(2024, 3, 1))]
     var ctx = FindSearch.Context(scales: [], understanding: u, locator: locator, calendar: utc, now: now)
     ctx.locationUnchecked = 7
-    let r = FindSearch.rank(cands, context: ctx, config: .v2)
+    var hard = FindConfig.v2
+    hard.placeMode = .hard
+    let r = FindSearch.rank(cands, context: ctx, config: hard)
+    // A place-only answer keeps its place hard even in soft mode: with nothing to rank by, the unlocated can't compete.
+    #expect(ids(FindSearch.rank(cands, context: ctx, config: .v2)) == ids(r))
     #expect(r.filterOnly && ids(r) == ["early", "early2", "late"] && r.weaker.isEmpty)
     #expect(r.sections.map(\.eventId) == ["m:early", "m:late"])
     #expect(r.missingLocation == 1 && r.locationUnchecked == 7)
     var result = r
     FindSearch.fillRest(&result, members: ["m:early": ["early", "x1", "early2", "x2"], "m:late": ["late"]])
     #expect(result.sections.map(\.rest) == [["x1", "x2"], []])
+  }
+
+  @Test func softPlacesDropOnlyWhatIsLocatedElsewhere() throws {
+    let g = try Gazetteer.load()
+    let madrid = (40.4165, -3.7026), lisbon = (38.7167, -9.1333)  // public city centres
+    let locator = PlaceLocator(gazetteer: g)
+    func understood(_ mode: FindConfig.PlaceMode) -> QueryUnderstanding.Understanding {
+      var config = FindConfig.v2
+      config.placeMode = mode
+      return QueryUnderstanding.parse("Madrid trip", now: Date(timeIntervalSince1970: now), calendar: utc, gazetteer: g,
+                                      options: config.parseOptions)
+        .resolvingPlaces(locations: [(madrid.0, madrid.1)], locator: locator, minimumPhotos: 1)
+    }
+    let soft = understood(.soft)
+    #expect(soft.semanticText == "Madrid trip" && soft.hasPlaceFilter && !soft.isFilterOnly)
+    #expect(understood(.hard).semanticText == "trip" && understood(.hard).isFilterOnly)
+    let cands = [cand("there", z: 0.5, at: madrid), cand("thereWeak", z: -0.6, at: madrid),
+                 cand("lisbon", z: 5, at: lisbon), cand("album", z: 2.5), cand("albumWeak", z: 1.5)]
+    var ctx = context(soft, locator: locator)
+    ctx.locationUnchecked = 3
+    let r = FindSearch.rank(cands, context: ctx, config: .v2)
+    // Located elsewhere: out however well it scores. Located there: filtered gate (1) after the bonus (1).
+    // Unlocated: competes on meaning alone at the plain gate (2).
+    #expect(Set(ids(r) + r.weaker.map(\.id)) == ["album", "there"])
+    #expect(r.matches.first { $0.id == "there" }?.bonus == 1)
+    #expect(r.missingLocation == 0 && r.locationUnchecked == 0 && !r.filterOnly)
+    var hard = FindConfig.v2
+    hard.placeMode = .hard
+    let h = FindSearch.rank(cands, context: ctx, config: hard)
+    #expect((ids(h) + h.weaker.map(\.id)).isEmpty && !h.filterOnly)  // z 0.5 < 1, no bonus; unlocated dropped
+    #expect(h.missingLocation == 2 && h.locationUnchecked == 3)
+    var bigger = FindConfig.v2
+    bigger.placeBonus = 2
+    #expect(Set(ids(FindSearch.rank(cands, context: ctx, config: bigger))).isSuperset(of: ["there", "thereWeak"]))
+    // The engine's prefilter agrees: a located-there photo may qualify from its bonus, an unlocated one only at zGate.
+    #expect(FindSearch.mayQualify(z: 0.1, coverage: 0, tagCoverage: 0, filtered: true, filterOnly: false,
+                                  placeBonus: 1, config: .v2))
+    #expect(!FindSearch.mayQualify(z: 1.5, coverage: 0, tagCoverage: 0, filtered: false, filterOnly: false,
+                                   config: .v2))
   }
 
   @Test func eventSupportLiftsOrderAndSurvival() {
@@ -192,6 +235,25 @@ struct FindSearchVariantTests {
     #expect(TagFusion.coverage(queryTerms: ["wedding"], labels: ["Wedding Dress"]) == 1)
     #expect(TagFusion.coverage(queryTerms: ["dog"], labels: ["cat"]) == 0)
     #expect(TagFusion.coverage(queryTerms: [], labels: ["dog"]) == 0)
+  }
+
+  @Test func theTagIndexAgreesWithPerPhotoCoverage() {
+    var rng = SeededRNG(seed: 11)
+    let vocabulary = ["sport", "ball", "Grass", "beach", "sand", "Wedding Dress", "dog", "pet", "cake", "outdoor",
+                      "sky", "food", "dessert", "snow", "stage"]
+    var labels: [String: [String]] = [:]
+    for i in 0..<400 where i % 7 != 0 {
+      labels["p\(i)"] = (0..<Int.random(in: 1...6, using: &rng)).map { _ in vocabulary.randomElement(using: &rng)! }
+    }
+    let index = TagIndex(labels: labels)
+    #expect(index.photoCount == labels.count && !index.isEmpty && TagIndex.empty.isEmpty)
+    for terms in [["soccer"], ["soccer", "night"], ["wedding"], ["dog", "beach"], ["birthday", "food"], ["zebra"], []] {
+      let fast = index.coverage(queryTerms: terms)
+      for (id, list) in labels {
+        let slow = TagFusion.coverage(queryTerms: terms, labels: list)
+        #expect((fast[id] ?? 0) == slow, "\(terms) \(id)")
+      }
+    }
   }
 
   @Test func seedsBlendIntoMeaning() {

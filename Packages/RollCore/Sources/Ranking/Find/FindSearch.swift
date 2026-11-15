@@ -10,8 +10,10 @@ import Store
 /// Per candidate photo:
 /// 1. **Meaning** `z`: each query text's cosine on that text's scale over the library (`QueryScale`), combined by max or
 ///    mean (V1); blended with the seed centroid's z when seeds are given (V5, `FindConfig.seedAlpha`).
-/// 2. **Filters** (V2): the query's dates and places (`QueryUnderstanding`). A photo without a date or location can't
-///    pass them and is counted (`Result.missingDate`, `missingLocation`) instead of silently dropped.
+/// 2. **Filters** (V2): the query's dates and places (`QueryUnderstanding`). A photo without a date can't pass a date
+///    and is counted (`Result.missingDate`) instead of silently dropped. Places are soft by default
+///    (`FindConfig.PlaceMode`): located elsewhere fails, located there gets a bonus, unlocated competes on meaning; hard
+///    places drop unlocated photos too and count them (`missingLocation`). See `verdict`.
 /// 3. **Qualifies** when z >= the gate (`zGate`, or `filteredZGate` under a filter), or its words or tags cover enough
 ///    of the query, or (date- or place-only query) when it passes the filters at all.
 /// 4. **Event bonus** (V3): photos that qualify on their own support the others in their event; the bonus is added to z
@@ -95,7 +97,7 @@ public enum FindSearch {
     public var z: Float?
     public var coverage: Double
     public var tagCoverage: Double
-    /// The event bonus in z units (V3).
+    /// The event bonus (V3) plus the soft place bonus (V2, `FindConfig.placeBonus`), in z units.
     public var bonus: Float
     /// The section this photo is grouped under: its moment, or its trip at `SupportLevel.trip`.
     public var eventId: String?
@@ -131,11 +133,11 @@ public enum FindSearch {
     public var understanding: QueryUnderstanding.Understanding?
     /// Only a date or place: everything in the window, by time.
     public var filterOnly = false
-    /// Photos that would have qualified but have no location to test against the query's place.
+    /// Photos that would have qualified but have no location to test against the query's place (hard places only).
     public var missingLocation = 0
     /// Photos that would have qualified but have no date to test against the query's dates.
     public var missingDate = 0
-    /// `Context.locationUnchecked`, when the query has a place filter.
+    /// `Context.locationUnchecked`, when the query has a hard place filter (soft places keep those photos).
     public var locationUnchecked = 0
     /// The query was refused (`FindConfig.nothingFound`).
     public var nothingFound = false

@@ -1,4 +1,5 @@
 import Foundation
+import Places
 import Store
 
 extension FindSearch {
@@ -11,8 +12,8 @@ extension FindSearch {
     let filtered = u?.hasFilter == true
     let filterOnly = filtered && (u!.isFilterOnly || context.scales.isEmpty)
     result.filterOnly = filterOnly
-    if u?.hasPlaceFilter == true { result.locationUnchecked = context.locationUnchecked }
-    let gate = filtered ? config.filteredZGate : config.zGate
+    let soft = softPlaces(u, filterOnly: filterOnly, config: config)
+    if u?.hasPlaceFilter == true, !soft { result.locationUnchecked = context.locationUnchecked }
 
     // 1-3: meaning, filters, own qualification.
     struct Entry {
@@ -21,6 +22,8 @@ extension FindSearch {
       var passes: Bool
       var own: Bool
       var words: Bool
+      var gate: Float
+      /// Event bonus plus the soft place bonus.
       var bonus: Float = 0
     }
     var entries: [Entry] = []
@@ -32,20 +35,20 @@ extension FindSearch {
       if let z { meaning.append(z) }
       let words = c.coverage >= config.coverageGate
         || (config.tags && config.tagGate.map { c.tagCoverage >= $0 } == true)
-      let own = filterOnly || words || (z.map { $0 >= gate } ?? false)
-      var passes = true
-      if let u, filtered {
-        let dateOK = u.matchesDate(c.asset.created, calendar: context.calendar)
-        let placeOK = dateOK && u.matchesPlace(latitude: c.latitude, longitude: c.longitude, locator: context.locator)
-        passes = dateOK && placeOK
-        // Counted when it could have qualified: on its own, or with the most an event could add.
-        let could = own || (config.events && (z.map { $0 + config.supportWeight >= gate } ?? false))
-        if could, !dateOK, u.hasDateFilter, c.asset.created == nil { result.missingDate += 1 }
-        if could, dateOK, !placeOK, u.hasPlaceFilter, c.latitude == nil || c.longitude == nil {
+      let v = verdict(u, soft: soft, created: c.asset.created, latitude: c.latitude, longitude: c.longitude,
+                      locator: context.locator, calendar: context.calendar, config: config)
+      let gate = v.confined ? config.filteredZGate : config.zGate
+      let own = filterOnly || words || (z.map { $0 + v.placeBonus >= gate } ?? false)
+      // Counted when it could have qualified: on its own, or with the most an event could add. Soft places keep
+      // photos without a location, so none is missing one.
+      let eventMost = config.events ? config.supportWeight : 0
+      if let u, filtered, own || (z.map { $0 + v.placeBonus + eventMost >= gate } ?? false) {
+        if !v.dateOK, u.hasDateFilter, c.asset.created == nil { result.missingDate += 1 }
+        if !soft, v.dateOK, !v.passes, u.hasPlaceFilter, c.latitude == nil || c.longitude == nil {
           result.missingLocation += 1
         }
       }
-      entries.append(Entry(index: i, z: z, passes: passes, own: own, words: words))
+      entries.append(Entry(index: i, z: z, passes: v.passes, own: own, words: words, gate: gate, bonus: v.placeBonus))
     }
 
     // The whole query refused?
@@ -74,7 +77,7 @@ extension FindSearch {
       for i in entries.indices where entries[i].passes {
         guard let k = key(candidates[entries[i].index]), var s = support[k] else { continue }
         if entries[i].own { s -= weight(entries[i]) }
-        entries[i].bonus = config.supportWeight * min(max(s, 0) / config.supportSaturation, 1)
+        entries[i].bonus += config.supportWeight * min(max(s, 0) / config.supportSaturation, 1)
       }
     }
 
@@ -86,7 +89,7 @@ extension FindSearch {
     var scored: [Scored] = []
     for e in entries where e.passes {
       let lifted = e.z.map { $0 + e.bonus }
-      guard e.own || (lifted.map { $0 >= gate } ?? false) else { continue }
+      guard e.own || (lifted.map { $0 >= e.gate } ?? false) else { continue }
       let c = candidates[e.index]
       var s = LibrarySearch.fusedScore(z: lifted, coverage: c.coverage, lookup: context.lookup)
       if config.tags { s += config.tagWeight * Float(pow(min(max(c.tagCoverage, 0), 1), 1.5)) }
@@ -135,6 +138,45 @@ extension FindSearch {
     return result
   }
 
+  /// Where one photo stands against the query's filters (V2): `rank` and the engine's prefilter share it.
+  public struct Verdict: Sendable, Equatable {
+    /// It stays a candidate.
+    public var passes = true
+    public var dateOK = true
+    /// Inside a filter (its date window, or located in the place), so `filteredZGate` applies; else `zGate`.
+    public var confined = false
+    /// Soft places: `FindConfig.placeBonus` when located in the place.
+    public var placeBonus: Float = 0
+  }
+
+  /// Whether the query's places are soft (`FindConfig.PlaceMode.soft`) for this answer. A date- or place-only answer
+  /// (everything there, by time) keeps them hard: with nothing to rank by, an unlocated photo can't compete.
+  public static func softPlaces(_ u: QueryUnderstanding.Understanding?, filterOnly: Bool, config: FindConfig) -> Bool {
+    config.placeMode == .soft && u?.hasPlaceFilter == true && !filterOnly
+  }
+
+  /// `u`'s filters for one photo (nil `u`: no filter). Hard: it passes when it is in every filter, and then it is
+  /// confined. Soft places: a photo located elsewhere fails; one located in the place passes, confined, with the bonus;
+  /// one without a location passes, confined only by a date filter.
+  public static func verdict(_ u: QueryUnderstanding.Understanding?, soft: Bool, created: Double?, latitude: Double?,
+                             longitude: Double?, locator: PlaceLocator?, calendar: Calendar,
+                             config: FindConfig) -> Verdict {
+    guard let u, u.hasFilter else { return Verdict() }
+    var v = Verdict()
+    v.dateOK = u.matchesDate(created, calendar: calendar)
+    if soft {
+      let located = latitude != nil && longitude != nil
+      let inside = located && u.matchesPlace(latitude: latitude, longitude: longitude, locator: locator)
+      v.passes = v.dateOK && (inside || !located)
+      v.confined = u.hasDateFilter || inside
+      v.placeBonus = inside ? config.placeBonus : 0
+    } else {
+      v.passes = v.dateOK && u.matchesPlace(latitude: latitude, longitude: longitude, locator: locator)
+      v.confined = true
+    }
+    return v
+  }
+
   /// A photo's meaning z: each text's z combined (`FindConfig.combine`), blended with the seed's
   /// (`FindConfig.seedAlpha`). Nil without query texts or seeds.
   public static func meaningZ(cosines: [Float], seedCosine: Float?, scales: [QueryScale], seedScale: QueryScale?,
@@ -169,14 +211,16 @@ extension FindSearch {
 
   /// Whether a photo can reach the answer before filters and events are looked at: the engine's prefilter, so only
   /// those are read from the database. Errs on the side of yes (the event bonus at its most).
+  /// `filtered`: the photo is confined by a filter (`Verdict.confined`), so the lower gate applies; `placeBonus`: its
+  /// soft place bonus.
   public static func mayQualify(z: Float?, coverage: Double, tagCoverage: Double, filtered: Bool, filterOnly: Bool,
-                                config: FindConfig) -> Bool {
+                                placeBonus: Float = 0, config: FindConfig) -> Bool {
     if filterOnly || coverage >= config.coverageGate { return true }
     if config.tags, let gate = config.tagGate, tagCoverage >= gate { return true }
     guard let z else { return false }
     let gate = (filtered && config.understanding ? config.filteredZGate : config.zGate)
       - (config.events ? max(config.supportWeight, 0) : 0)
-    return z >= gate
+    return z + placeBonus >= gate
   }
 
   /// Groups `matches` by `Match.eventId`: best section first (by time for a date- or place-only answer), photos in no
