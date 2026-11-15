@@ -235,6 +235,7 @@ struct SheetTests {
     #expect(t.url(for: "c") != nil)  // not in the index, found by its default name
     #expect(t.url(for: "d") == nil)
     #expect(ThumbIndex.defaultName("c").count == 20)
+    #expect(t.done == ["a", "b"])  // listed, with or without a thumbnail
   }
 }
 

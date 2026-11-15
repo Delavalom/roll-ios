@@ -2,18 +2,35 @@ import Embedding
 import EmbeddingGemma
 import FindEvalKit
 import Foundation
+import Places
+import Ranking
 
 /// Embeds every query text and its template variants (`ResolvedQuery.texts`) the way the app embeds a typed query, and
 /// the way `pile-eval embed` does: `GemmaEmbedder.load(.file(model), budget: .tokens70)` so the revision matches the
 /// phone's index, `embed(query:)` (query prefix), then normalized as `SwipefileEngine.search` does. Only text functions
 /// load (on first use; peak about 1.6 GB on the first run while the package compiles them, then about 0.65 GB).
 ///
+/// With `export` (the phone export's `assets.jsonl`), each query's V2 semantic text is embedded too: what
+/// `QueryUnderstanding` leaves after removing date and place words ("beach" from "beach last summer"), with the clock at
+/// the export's newest date and places resolved against its located photos (`Understood`), as `pool` will look it up.
+///
 /// `out` is merged: texts already in it for the same revision are kept and not embedded again, so a private spec can
 /// be added later. `store` is a scratch model store (a copy of the model and its compiled form): keep it private.
-func embedCommand(specs: [URL], model: URL, store: URL, out: URL) async throws {
+func embedCommand(specs: [URL], model: URL, store: URL, out: URL, export: URL?) async throws {
   let queries = try FindSpec.load(specs)
   var texts: [String] = []
   for q in queries { for t in q.texts where !texts.contains(t) { texts.append(t) } }
+  if let export {
+    let (now, located) = exportClock(try JSONLines.decode(ExportAsset.self, from: export), indexed: nil)
+    let gazetteer = try Gazetteer.load()
+    var added = 0
+    for q in queries {
+      let u = Understood.of(q.text.trimmingCharacters(in: .whitespacesAndNewlines),
+                            now: now ?? Date().timeIntervalSince1970, gazetteer: gazetteer, located: located, config: .v2)
+      if let s = u.semanticText, !texts.contains(s) { texts.append(s); added += 1 }
+    }
+    print("V2 understanding: \(added) semantic texts besides the queries' own")
+  }
 
   let clock = ContinuousClock()
   let start = clock.now

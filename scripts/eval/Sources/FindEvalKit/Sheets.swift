@@ -61,21 +61,26 @@ public enum SheetLayout {
 public struct ThumbIndex: Sendable {
   public let folder: URL
   private let files: [String: String]
+  /// Every id the index lists, with or without a thumbnail (the phone doesn't try those again).
+  public let done: Set<String>
 
   public init(folder: URL) throws {
     self.folder = folder
     var files: [String: String] = [:]
+    var done = Set<String>()
     let url = folder.appending(path: "index.jsonl")
     if FileManager.default.fileExists(atPath: url.path) {
       let text = try String(contentsOf: url, encoding: .utf8)
       for line in text.split(whereSeparator: \.isNewline) {
         guard let o = try? JSONSerialization.jsonObject(with: Data(line.utf8)) as? [String: Any],
               let id = o["id"] as? String else { continue }
+        done.insert(id)
         if (o["ok"] as? Bool) == false { files[id] = nil; continue }
         if let file = (o["file"] ?? o["path"]) as? String { files[id] = file }
       }
     }
     self.files = files
+    self.done = done
   }
 
   /// The thumbnail file for `id`: the index's entry, else `<16 hex of SHA-1(id)>.jpg` if it exists; nil when missing.

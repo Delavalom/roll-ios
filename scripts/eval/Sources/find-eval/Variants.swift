@@ -17,12 +17,14 @@ import Store
 /// - `export[id]`: created, lat/lon, media type, albums (phone export; empty without `--export`); `vision[id]`: Vision
 ///   labels (V4); `index.vector(for: id)`: image vectors (V5's photo-to-photo seeds); `labels(slug)`: labels so far
 ///   (V5's picked relevant results); `now`: the export's newest date (for "last summer").
-/// A variant that needs text the spec didn't embed should add a template to the spec, not embed here: `pool` stays
-/// model-free.
+/// A variant that needs text the spec didn't embed should add a template to the spec (or, like V2's semantic text, be
+/// embedded by `embed`), not embed here: `pool` stays model-free. RollCore's `FindSearch` variants are
+/// `FindSearchVariant` (`FindVariants.swift`): one `FindConfig` each.
 protocol FindVariant: Sendable {
   var name: String { get }
   var about: String { get }
-  func answer(_ query: ResolvedQuery, in library: FindLibrary) async throws -> VariantAnswer
+  /// Nil: the variant doesn't apply to this query (e.g. V5 without 3 picked relevant results); nothing is written.
+  func answer(_ query: ResolvedQuery, in library: FindLibrary) async throws -> VariantAnswer?
 }
 
 struct VariantAnswer {
@@ -59,7 +61,7 @@ enum Variants {
                        texts: { [ResolvedQuery.apply("a photo of {text}", to: $0.text)] }),
     PhotoSearchVariant(name: "V1x", about: "provisional: best z over the bare text and every template of the spec",
                        texts: { $0.texts }),
-  ]
+  ] + FindVariants.all
 
   static func named(_ names: [String]) throws -> [any FindVariant] {
     try names.map { name in
@@ -87,7 +89,7 @@ struct PhotoSearchVariant: FindVariant {
   let about: String
   let texts: @Sendable (ResolvedQuery) -> [String]
 
-  func answer(_ query: ResolvedQuery, in library: FindLibrary) async throws -> VariantAnswer {
+  func answer(_ query: ResolvedQuery, in library: FindLibrary) async throws -> VariantAnswer? {
     let bare = query.text.trimmingCharacters(in: .whitespacesAndNewlines)
     guard !bare.isEmpty else { return VariantAnswer(strong: [], weaker: []) }
     let texts = self.texts(query)

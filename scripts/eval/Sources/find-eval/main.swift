@@ -9,10 +9,14 @@ import Foundation
 ///     P=~/egcm-evidence-raw/2026-11-15/find      (private root: ids, thumbnails, labels)
 ///
 ///     $B embed --queries ../../evals/find.json $P/find-private.json --model <folder with b70/files.json> \
-///        --store $P/model-store --out $P/qvecs.json
+///        --store $P/model-store --export $P/export/assets.jsonl --out $P/qvecs.json
+///     (--export adds each query's V2 semantic text, e.g. "beach" for "beach last summer")
 ///     $B pool --db $P/db/roll.sqlite --index $P/index/vectors.egix --qvecs $P/qvecs.json \
 ///        --queries ../../evals/find.json $P/find-private.json [--export $P/export/assets.jsonl] \
-///        [--vision $P/export/vision.jsonl] [--labels $P/labels] --variants V0,V1 --k 50 --out $P/pools
+///        [--vision $P/export/vision.jsonl] [--labels $P/labels] [--thumbs $P/thumbs] [--keep-all] \
+///        --variants V0,F0,C60,C70,V2,V3,V4,V5,V23,V234,NF --k 50 --out $P/pools
+///     (`find-eval variants` lists them; F0 is checked against V0 on every query; V5 needs --labels;
+///      with --thumbs, thumb-request.txt lists only ids without a thumbnail yet)
 ///     (copy $P/pools/thumb-request.txt to the phone, pull thumbs/ back)
 ///     $B sheets --pool $P/pools/pool --thumbs $P/thumbs --labels $P/labels --out $P/sheets \
 ///        [--queries ... --export $P/export/assets.jsonl]
@@ -26,9 +30,9 @@ import Foundation
 /// A flag may take several values (`--queries a.json b.json`) or repeat. Everything but `score --out` is private and
 /// stays outside the repo; `score` writes counts only, and private queries (album-derived) lose their names there.
 let usage = """
-  usage: find-eval embed --queries SPEC... --model DIR --store DIR --out QVECS
+  usage: find-eval embed --queries SPEC... --model DIR --store DIR [--export JSONL] --out QVECS
          find-eval pool --db DB --index EGIX --qvecs QVECS --queries SPEC... [--export JSONL] [--vision JSONL]
-                        [--labels DIR] --variants V0[,V1...] [--k 50] [--keep-all] --out DIR
+                        [--labels DIR] --variants V0[,V1...] [--k 50] [--keep-all] [--thumbs DIR] --out DIR
          find-eval sheets --pool DIR/pool --thumbs DIR --labels DIR --out DIR [--queries SPEC... --export JSONL]
          find-eval apply-judgments --sheets DIR [--judgments FILE] --labels DIR
                         [--queries SPEC... --export JSONL [--pool-root DIR]]
@@ -78,14 +82,14 @@ do {
   switch args[1] {
   case "embed":
     try await embedCommand(specs: opts.urls("queries"), model: url(opts.need("model")), store: url(opts.need("store")),
-                           out: url(opts.need("out")))
+                           out: url(opts.need("out")), export: opts.one("export").map(url))
   case "pool":
     let names = (opts.one("variants") ?? "V0").split(separator: ",").map { String($0).trimmingCharacters(in: .whitespaces) }
     try await poolCommand(PoolOptions(
       db: url(opts.need("db")), index: url(opts.need("index")), qvecs: url(opts.need("qvecs")),
       specs: opts.urls("queries"), export: opts.one("export").map(url), vision: opts.one("vision").map(url),
       labels: opts.one("labels").map(url), variants: names, k: Int(opts.one("k") ?? "50") ?? 50,
-      keepAll: CommandLine.arguments.contains("--keep-all"),
+      keepAll: CommandLine.arguments.contains("--keep-all"), thumbs: opts.one("thumbs").map(url),
       out: url(opts.need("out"))))
   case "sheets":
     try sheetsCommand(pool: url(opts.need("pool")), thumbs: url(opts.need("thumbs")), labels: url(opts.need("labels")),

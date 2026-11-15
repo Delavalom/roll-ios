@@ -47,6 +47,7 @@ let package = Package(
       .product(name: "Embedding", package: "RollCore"),
       .product(name: "Ranking", package: "RollCore"),
       .product(name: "Store", package: "RollCore"),
+      .product(name: "Places", package: "RollCore"),
       .product(name: "EmbeddingIndex", package: "swift"),
       .product(name: "EmbeddingGemma", package: "swift"),
       .product(name: "GRDB", package: "GRDB.swift"),

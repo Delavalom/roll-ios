@@ -2,6 +2,7 @@ import EmbeddingIndex
 import FindEvalKit
 import Foundation
 import GRDB
+import Places
 import Store
 
 /// Everything a variant can read about the library, loaded once per `pool` run. Private: ids, dates, places.
@@ -32,6 +33,14 @@ final class FindLibrary {
   let now: Double
   private var cache: [String: [Float]] = [:]
   private let clone: URL
+
+  // Lazily built for the FindSearch variants (`Library+Find.swift`).
+  var eventsCache: (assignment: [String: String], tripOf: [String: String], moments: Int, trips: Int)?
+  var tagsCache: [String: [String]]?
+  var gazetteerCache: Gazetteer??
+  var locatedCache: [(latitude: Double, longitude: Double)]?
+  /// (variant name, slug) → answer, so a variant can build on another's (V5 on V0) without running it twice.
+  var answers: [String: VariantAnswer] = [:]
 
   init(db: URL, index indexURL: URL, qvecs qvecsURL: URL, export exportURL: URL?, vision visionURL: URL?,
        labels: URL?) async throws {
