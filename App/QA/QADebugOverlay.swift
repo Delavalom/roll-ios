@@ -85,6 +85,10 @@ final class QAController {
         runtime.log.write("thumb_probe_done", [:])
       }
     }
+    if let title = QAMemoryReel.title(in: arguments) {
+      let seconds = arguments.firstIndex(of: "-QAMemoryReelSeconds").flatMap { Double(($0 + 1 < arguments.count ? arguments[$0 + 1] : "")) } ?? 30
+      Task { await QAMemoryReel.run(title: title, seconds: seconds, log: runtime.log) }
+    }
     guard let title = runtime.albumTitle else { return }
     Task {
       if runtime.restocks {
