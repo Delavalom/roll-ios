@@ -37,6 +37,7 @@ let package = Package(
     .library(name: "Commit", targets: ["Commit"]),
     .library(name: "Overview", targets: ["Overview"]),
     .library(name: "SquishBridge", targets: ["SquishBridge"]),
+    .library(name: "Memories", targets: ["Memories"]),
   ],
   dependencies: [
     gemma,
@@ -62,6 +63,8 @@ let package = Package(
     .target(name: "Overview", dependencies: ["Store", "Ranking", "Dedupe", "Signals", "Squish", "Library"]),
     // Conforms Squish's ReplaceFlow to Commit's SquishRunner, so neither target depends on the other.
     .target(name: "SquishBridge", dependencies: ["Commit", "Squish", "Store", "Library", "Overview"]),
+    // Memory reel planning: pure, no dependencies.
+    .target(name: "Memories"),
 
     .testTarget(name: "EmbeddingTests", dependencies: ["Embedding", "ModelInstall"]),
     .testTarget(name: "ModelInstallTests", dependencies: ["ModelInstall"]),
@@ -75,13 +78,14 @@ let package = Package(
     .testTarget(name: "IndexerTests", dependencies: ["Indexer", "Library", "Signals", "Store", "Embedding"]),
     .testTarget(name: "RankingTests", dependencies: ["Ranking", "Store", "Embedding"]),
     .testTarget(name: "CommitTests", dependencies: ["Commit", "Store", "Entitlements"]),
+    .testTarget(name: "MemoriesTests", dependencies: ["Memories"]),
     .testTarget(name: "OverviewTests", dependencies: ["Overview", "Store", "Ranking", "Signals", "Squish"]),
   ]
 )
 
 if !hasGemma {
   let standalone: Set<String> = ["Library", "Signals", "Monitor", "ModelInstall", "LibraryTests", "SignalsTests",
-                                 "MonitorTests", "ModelInstallTests"]
+                                 "MonitorTests", "ModelInstallTests", "Memories", "MemoriesTests"]
   package.dependencies = []
   package.targets = package.targets.filter { standalone.contains($0.name) }
   package.products = package.products.filter { standalone.contains($0.name) }
