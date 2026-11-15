@@ -92,7 +92,7 @@ final class AppModel {
   let squishScreen: SquishFormatScreen
   /// Locality and format checks after indexing (`startChecks`), kept for the launch.
   let checks: CandidateChecks
-  /// Living albums: the event pass, then saved searches' new photos, after indexing drains (AppModel+Find.swift).
+  /// Living albums: the event pass, then saved searches' new photos, after indexing drains (AppModel+Text.swift).
   let living: LivingAlbumsModel
   /// Runs the opt-in iCloud upgrade only while Wi-Fi and charging hold (live builds).
   @ObservationIgnored private var upgradeMonitor: ICloudUpgradeMonitor?

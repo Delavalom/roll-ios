@@ -35,8 +35,11 @@ final class SmokeTests: XCTestCase {
     }
     allowPhotosAccessIfAsked()
 
-    // Taste scan: wait for the numbers, then continue (the paywall is skipped).
-    let found = app.staticTexts.containing(NSPredicate(format: "label BEGINSWITH 'You can free about'")).firstMatch
+    // Taste scan: wait for the numbers, then continue (the paywall is skipped). On a freshly seeded simulator the
+    // originals aren't confirmed on the device yet, so the headline can be "Nothing confirmed on this iPhone yet"
+    // (as in OnboardingPitchTests); the Screenshots pile is shown either way.
+    let found = app.staticTexts.containing(NSPredicate(format: "label BEGINSWITH 'You can free about' OR "
+      + "label BEGINSWITH 'Nothing confirmed on this iPhone' OR label BEGINSWITH 'Nothing big to free'")).firstMatch
     XCTAssertTrue(found.waitForExistence(timeout: 120), "the taste scan didn't finish")
     let continueButton = app.buttons["Continue"]
     waitUntil(timeout: 10) { continueButton.isEnabled }
