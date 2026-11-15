@@ -35,6 +35,7 @@ import os
 ///   the HEVC presets and record what the output keeps. Never writes to the library.
 /// - `-QARestock`: with `-QAAlbum`, import the files in `Documents/qa-restock/` (`scripts/qa_restock.sh`) into the
 ///   album, after taking out as few iCloud-only items as needed to stay within 40 (`QARestock`). Ignored otherwise.
+/// - `-QAFindExport`: handled in `RollApp` before this (see `QAFindExport`); no AppModel, database or model.
 final class QARuntime: Sendable {
   static let shared: QARuntime? = QARuntime(arguments: ProcessInfo.processInfo.arguments)
 

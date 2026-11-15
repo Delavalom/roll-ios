@@ -41,16 +41,16 @@ done
 needles=(
   # Types and helpers (App/QA, RollCore's #if DEBUG files).
   "QARuntime" "QAEventLog" "QAMetrics" "QAPause" "QACounters" "QALibrary" "QASquishAudit" "QAInventory"
-  "QAThumbProbe" "QAKeepAwake" "QAController" "QADebugOverlay" "QAScopeGate" "QAReadOnlyGate" "QAAlbumGate"
+  "QAThumbProbe" "QAFindExport" "QAFindExporter" "QAKeepAwake" "QAController" "QADebugOverlay" "QAScopeGate" "QAReadOnlyGate" "QAAlbumGate"
   "QAScopeViolation" "QASquishHooks" "QAStoreStats" "QAMediaProbe" "QADolbyVisionExperiment" "qaScoped"
   "resetForUITests" "UITestResetOutcome" "PhotoKitFingerprint" "QARestock" "QARestockRoom" "removeFromQAAlbum"
   # Launch arguments.
-  "-QAAlbum" "-QAMetrics" "-QAPauseBeforeSquishDelete" "-QAFakeAvailableBytes" "-QAThumbProbe" "-QAExhaustFreeQuota"
+  "-QAAlbum" "-QAMetrics" "-QAPauseBeforeSquishDelete" "-QAFakeAvailableBytes" "-QAThumbProbe" "-QAFindExport" "-QAExhaustFreeQuota"
   "-QADolbyVisionExperiment" "-QARestock" "-QASquishStartEmpty" "-RCTestStore" "-UITestStubEmbedder" "-UITestSkipPaywall" "-UITestResetState"
   "-UITestOpen" "-UITestTab"
   # Fixed QA text, files and accessibility identifiers. (Not a bare "RCTestStore": RevenueCat itself has
   # @objc(RCTestStore). The Test Store key is checked in Info.plist below.)
-  "QA scope" "metrics.jsonl" "qa.continueDelete" "com.delavalom.roll.qa" "qa-restock" "qa.restock" "QA restock"
+  "QA scope" "metrics.jsonl" "thumb-request.txt" "Find export (QA)" "qa.continueDelete" "com.delavalom.roll.qa" "qa-restock" "qa.restock" "QA restock"
   "remove from the QA album"
   # Metrics event names (QAEventLog.write).
   "qa_gate" "qa_config_error" "qa_fake_space" "qa_exhaust_quota" "ui_test_reset" "locality_scan" "types_resolved"
