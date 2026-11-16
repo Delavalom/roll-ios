@@ -57,12 +57,11 @@ real queries:
 |---|---|---|---|---|---|
 | V0 | .865 | .823 | .770 | 676 | 0 / 12 |
 | V4 | .884 | .841 | .788 | 657 | 0 / 12 |
-| SHIP | .860 | .812 | .812 | 69 | 9 / 12 |
+| SHIP | .860 | .815 | .815 | 69 | 9 / 12 |
 
 "Dates enforced" scores "christmas 2023" and "beach last summer" only on photos from those dates. V0 and V4 ignore
-the dates (P@20 0 on both). SHIP scores .85, and .10 on "beach last summer", where .10 is the maximum because only 2 such
-photos exist. 17 tiles in round 4 are unjudged (.04 of the top 20 for the date variants) and are counted as wrong. SHIP
-loses .03 P@20 to V4 on undated queries and .08 recall@100 to V0 because of the cut. In exchange its answers are ten times
+the dates (P@20 0 on both). SHIP scores .95 on "christmas 2023", and .10 on "beach last summer", where .10 is the maximum because only 2 such
+photos exist. Every pooled tile is judged. SHIP loses .03 P@20 to V4 on undated queries and .08 recall@100 to V0 because of the cut. In exchange its answers are ten times
 smaller and it refuses nonsense.
 
 ## Consequences
