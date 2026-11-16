@@ -26,8 +26,8 @@ Find segment.
 |---|---|---|
 | 0–2 s | Camera roll scrolling fast, endless grid | "Send me the pics from Lisbon" |
 | 2–5 s | Roll: type "Lisbon 2024", letter by letter | "Type the trip." |
-| 5–9 s | Answer grouped by day: Fri 10 May, Sat 11 May, Sun 12 May | "Roll finds it, day by day." |
-| 9–12 s | Make album → grid → Create → "Added 48 photos" | "Make the album." |
+| 5–9 s | Answer grouped by day: "Lisbon · 10 May, 2024", "Buraca · 11 May, 2024", "Lisbon · 12 May, 2024" (29 photos in the demo library) | "Roll finds it, day by day." |
+| 9–12 s | Make album → grid → Create → "Added 29 photos to “Lisbon 2024”" | "Make the album." |
 | 12–15 s | End card: app icon, "Clear space. Find your photos." | "Albums are free. On your iPhone. Nothing uploaded." |
 
 6 s cut: 2–5 s + 9–12 s + end card. Don't say how long it took unless the clip shows the status line's real time.
@@ -54,7 +54,7 @@ Audience: storage full. Format: SR, 15 s. Number = what the recorded library's s
 |---|---|
 | "iPhone Storage Almost Full" banner | "Before you pay for more storage" |
 | Roll's scan → "Free about {X} on this iPhone" | "See what you don't need." |
-| Screenshots pile, swipe left, left, keep | "Swipe. Keep or let go." |
+| A pile (Blurry in the demo library, which has no screenshots), swipe left, keep, left | "Swipe. Keep or let go." |
 | Review & apply → iOS confirmation | "You decide. Deleted items wait 30 days in Recently Deleted." |
 | End card | "Get your space back without uploading your photos." |
 
