@@ -129,6 +129,9 @@ public enum FindSearch {
     public var totalBytes: Int64 = 0
     public var favorites = 0
     public var elapsed: Duration = .zero
+    /// Milliseconds per step of `SwipefileEngine.find` (understand, embed, words, pool, events, filter, read, rank,
+    /// rest), for the QA bench. Empty from `rank` alone.
+    public var steps: [String: Double] = [:]
     public var compared = 0
     public var understanding: QueryUnderstanding.Understanding?
     /// Only a date or place: everything in the window, by time.

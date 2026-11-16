@@ -29,6 +29,13 @@ extension SwipefileEngine {
     let clock = ContinuousClock()
     let start = clock.now
     let nowValue = now()
+    var steps: [String: Double] = [:]
+    var mark = start
+    func lap(_ step: String) {
+      let t = clock.now
+      steps[step, default: 0] += SearchTimings.ms(t - mark)
+      mark = t
+    }
     let calendar = Calendar.current
 
     // Understanding (V2): dates and places filter, the rest is embedded.
@@ -50,6 +57,7 @@ extension SwipefileEngine {
       }
       understanding = u
     }
+    lap("understand")
     let filtered = understanding?.hasFilter == true
     let semantic = understanding?.semanticText ?? text
     let filterOnly = filtered && understanding!.isFilterOnly
@@ -63,6 +71,7 @@ extension SwipefileEngine {
     if let seedVector { queries.append(seedVector) }
     let placeholder = queries.isEmpty
     if placeholder { queries.append([Float](repeating: 0, count: vectors.dimensions)) }
+    lap("embed")
 
     let terms = SearchTerms.queryTerms(filterOnly ? "" : (semantic.isEmpty ? text : semantic))
     let coverage = terms.isEmpty ? [:] : (try await keywordCoverage?(terms) ?? [:])
@@ -72,35 +81,45 @@ extension SwipefileEngine {
       if index == nil { index = try await candidatePool.tagIndex(minConfidence: config.tagMinConfidence) }
       tagCoverage = index?.coverage(queryTerms: terms) ?? [:]
     }
+    lap("words")
     let pool = try await poolScores(queries: queries, preset: nil, filter: .none, decidedIn: nil, excluding: [])
     let scales = placeholder ? [] : (0..<texts.count).map { QueryScale(pool.dots, query: $0) }
     let seedScale = seedVector == nil ? nil : QueryScale(pool.dots, query: texts.count)
     let needEvents = config.events || config.groupByEvent || config.expandRest || filterOnly
       || config.supportLevel == .trip
+    lap("pool")
     let events = needEvents ? try await eventsById() : [:]
+    lap("events")
 
     // Per entry: meaning z, prefilter, filters.
-    var zs: [Float] = []
     var topCosine: Float? = nil
     var read: [String: FindSearch.Candidate] = [:]
     var unread: [FindSearch.Candidate] = []
     let dots = (0..<queries.count).map { pool.dots(query: $0) }  // per query, one per entry
     let wantZs = !config.nothingFound.isOff
-    zs.reserveCapacity(wantZs ? pool.count : 0)
+    var topZs = TopFloats(count: max(config.nothingFound.gapRank, 1))
+    let lenientConfined = filtered && config.filteredZGate < config.zGate
+    let maxPlaceBonus = soft ? max(config.placeBonus, 0) : 0
     for k in 0..<pool.count {
       if !scales.isEmpty { topCosine = max(topCosine ?? dots[0][k], dots[0][k]) }
       let seedCosine = seedVector == nil ? nil : dots[texts.count][k]
       let z = FindSearch.meaningZ(count: scales.count, cosine: { dots[$0][k] }, seedCosine: seedCosine,
                                   scales: scales, seedScale: seedScale, config: config)
-      if wantZs, let z { zs.append(z) }
-      let id = pool.id(k)
+      if wantZs, let z { topZs.insert(z) }
+      let lookedUp = coverage.isEmpty && tagCoverage.isEmpty ? nil : pool.id(k)
+      let words = lookedUp.map { coverage[$0] ?? 0 } ?? 0
+      let tags = lookedUp.map { tagCoverage[$0] ?? 0 } ?? 0
+      // Most photos can't qualify even at the most lenient gate with the largest bonus: skip their filter verdict.
+      guard FindSearch.mayQualify(z: z, coverage: words, tagCoverage: tags, filtered: lenientConfined,
+                                  filterOnly: filterOnly, placeBonus: maxPlaceBonus, config: config) else { continue }
+      let id = lookedUp ?? pool.id(k)
       let row = pool.row(k)
       let v = filtered ? FindSearch.verdict(understanding, soft: soft, created: row.created, latitude: row.lat,
                                             longitude: row.lon, locator: locator, calendar: calendar, config: config)
         : FindSearch.Verdict()
-      let tags = tagCoverage[id] ?? 0
-      guard FindSearch.mayQualify(z: z, coverage: coverage[id] ?? 0, tagCoverage: tags, filtered: v.confined,
-                                  filterOnly: filterOnly, placeBonus: v.placeBonus, config: config) else { continue }
+      guard !filtered || FindSearch.mayQualify(z: z, coverage: words, tagCoverage: tags, filtered: v.confined,
+                                               filterOnly: filterOnly, placeBonus: v.placeBonus, config: config)
+      else { continue }
       if !v.passes {
         if !v.dateOK {
           guard row.created == nil else { continue }  // dated outside the window
@@ -111,29 +130,46 @@ extension SwipefileEngine {
       let candidate = FindSearch.Candidate(
         asset: SearchAsset(id: id, mediaType: row.asset.mediaType, estBytes: row.asset.estBytes, created: row.created,
                            isFavorite: false, originalLocal: nil),
-        cosines: (0..<scales.count).map { dots[$0][k] }, seedCosine: seedCosine, coverage: coverage[id] ?? 0,
+        cosines: (0..<scales.count).map { dots[$0][k] }, seedCosine: seedCosine, coverage: words,
         tagCoverage: tags, latitude: row.lat, longitude: row.lon, eventId: row.eventId,
         tripId: row.eventId.flatMap { events[$0]?.tripId })
       if v.passes { read[id] = candidate } else { unread.append(candidate) }  // no date or location: only counted
     }
+    lap("filter")
+    // Favorite and "on this iPhone" come from SQL. Read them for the answer only, after ranking, unless the "only on
+    // this iPhone" refinement needs them to rank.
     var candidates = unread
-    for asset in try await repositories.searchAssets(ids: Array(read.keys)) {
-      guard var c = read[asset.id] else { continue }
-      c.asset = asset
-      candidates.append(c)
+    let readFirst = refinement.onlyOnThisIPhone
+    if readFirst {
+      for asset in try await repositories.searchAssets(ids: Array(read.keys)) {
+        guard var c = read[asset.id] else { continue }
+        c.asset = asset
+        candidates.append(c)
+      }
+    } else {
+      candidates.append(contentsOf: read.values)
     }
 
-    let topZ = config.nothingFound.isOff ? nil : Array(zs.sorted(by: >).prefix(max(config.nothingFound.gapRank, 1)))
+    lap("read")
+    let topZ = config.nothingFound.isOff ? nil : topZs.descending
     let unchecked = understanding?.hasPlaceFilter == true ? try await repositories.locationUncheckedCount() : 0
     let context = FindSearch.Context(
       scales: scales, seedScale: seedScale, understanding: understanding, locator: locator,
       lookup: SearchTerms.isLookup(terms), compared: pool.count, topCosine: topCosine, topZ: topZ, events: events,
       locationUnchecked: unchecked, calendar: calendar, now: nowValue, refinement: refinement)
     var result = FindSearch.rank(candidates, context: context, config: config)
-    if config.expandRest, !result.sections.isEmpty {
-      FindSearch.fillRest(&result, members: members(of: Set(result.sections.compactMap(\.eventId)),
-                                                    rows: pool.libraryRows, events: events))
+    lap("rank")
+    if !readFirst, !result.nothingFound {
+      let shown = result.matches.map(\.id) + result.weaker.map(\.id)
+      let assets = try await repositories.searchAssets(ids: shown)
+      FindSearch.replaceAssets(&result, with: Dictionary(assets.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a }))
     }
+    lap("read")
+    if config.expandRest, !result.sections.isEmpty {
+      FindSearch.fillRest(&result, members: try await members(rows: pool.libraryRows, events: events))
+    }
+    lap("rest")
+    result.steps = steps
     result.elapsed = clock.now - start
     return result
   }
@@ -159,15 +195,20 @@ extension SwipefileEngine {
     return events
   }
 
-  /// Photo ids of each of `ids` (moments or trips), in time order, from the live, embedded rows.
-  func members(of ids: Set<String>, rows: [RankingRow], events: [String: EventRecord]) -> [String: [String]] {
+  /// Every moment's and trip's photo ids, in time order, from the live, embedded rows; built once per rows generation.
+  func members(rows: [RankingRow], events: [String: EventRecord]) async throws -> [String: [String]] {
+    let generation = try await candidatePool.snapshot().snapshot.generation
+    if let memberCache, memberCache.generation == generation { return memberCache.members }
     var out: [String: [(Double, String)]] = [:]
     for row in rows where row.embedded {
       guard let moment = row.eventId else { continue }
-      for key in [moment, events[moment]?.tripId].compactMap({ $0 }) where ids.contains(key) {
-        out[key, default: []].append((row.created ?? 0, row.asset.id))
-      }
+      let entry = (row.created ?? 0, row.asset.id)
+      out[moment, default: []].append(entry)
+      if let trip = events[moment]?.tripId { out[trip, default: []].append(entry) }
     }
-    return out.mapValues { $0.sorted { $0 < $1 }.map(\.1) }
+    let members = out.mapValues { $0.sorted { $0 < $1 }.map(\.1) }
+    memberCache = (generation, members)
+    return members
   }
+
 }

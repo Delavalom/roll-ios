@@ -79,6 +79,9 @@ public actor SwipefileEngine {
   let candidatePool: CandidatePool
   /// The events table (`Repositories.events`) by id, for the rows generation it was read at (`find`).
   var eventCache: (generation: UInt64, events: [String: EventRecord])? = nil
+  /// Every moment's and trip's live, embedded photo ids in time order, for the rows generation it was built at
+  /// ("rest of this event", `find`).
+  var memberCache: (generation: UInt64, members: [String: [String]])? = nil
 
   private struct PromptKey: Hashable {
     var revision: String

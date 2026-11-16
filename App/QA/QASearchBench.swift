@@ -102,7 +102,7 @@ enum QASearchBench {
             "engine_ms": .double(SearchTimings.ms(result.elapsed)), "strong": .int(result.matches.count),
             "weaker": .int(result.weaker.count), "sections": .int(result.sections.count),
             "refused": .bool(result.nothingFound),
-          ])
+          ].merging(result.steps.map { ("\($0.key)_ms", QAEventLog.Value.double($0.value)) }) { a, _ in a })
         } catch {
           log.write("find_search", ["query": .string(query), "attempt": .int(attempt),
                                     "error": .string(String(describing: type(of: error)))])

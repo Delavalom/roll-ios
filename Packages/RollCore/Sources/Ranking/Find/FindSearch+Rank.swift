@@ -248,6 +248,28 @@ extension FindSearch {
     return out
   }
 
+  /// Puts the stored assets (favorite, "on this iPhone") on the answer's matches, read after ranking. A match whose id is
+  /// missing (deleted since the rows were cached) is dropped, with its section when that empties it; totals follow.
+  public static func replaceAssets(_ result: inout Result, with assets: [String: SearchAsset]) {
+    func patch(_ matches: [Match]) -> [Match] {
+      matches.compactMap { m in
+        guard let a = assets[m.id] else { return nil }
+        var m = m
+        m.asset = a
+        return m
+      }
+    }
+    result.matches = patch(result.matches)
+    result.weaker = patch(result.weaker)
+    result.sections = result.sections.compactMap { section in
+      var section = section
+      section.matches = patch(section.matches)
+      return section.matches.isEmpty ? nil : section
+    }
+    result.totalBytes = result.matches.reduce(0) { $0 + $1.estBytes }
+    result.favorites = result.matches.filter(\.asset.isFavorite).count
+  }
+
   /// Fills each section's `rest`: `members` (event id → its photo ids in time order) minus what the answer shows.
   public static func fillRest(_ result: inout Result, members: [String: [String]]) {
     let shown = Set(result.matches.map(\.id)).union(result.weaker.map(\.id))
