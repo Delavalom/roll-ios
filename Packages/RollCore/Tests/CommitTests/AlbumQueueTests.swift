@@ -55,8 +55,8 @@ struct AlbumQueueTests {
     #expect(try await repo.decisions(for: id).first { $0.assetId == "a" }?.applied == true, "the add stays history")
   }
 
-  @Test func albumAddsUseTheFreeQuotaWhileTheSwitchIsOn() async throws {
-    #expect(FreeQuota.countsAlbumAdds, "today's rule: every applied item counts")
+  @Test func albumAddsAreFreeByDefaultAndUseTheQuotaOnlyWithTheSwitchOn() async throws {
+    #expect(!FreeQuota.countsAlbumAdds, "album adds are free (founder, 2026-11-16)")
     try await repo.upsertAssets(["a", "b", "c"].map { CF.asset($0) })
     let id = try await AlbumQueue.replace(album: "Trip", with: ["a", "b", "c"], repositories: repo)
     let counted = try await plan(id, remaining: 2)
@@ -65,6 +65,12 @@ struct AlbumQueueTests {
     let free = try await plan(id, remaining: 0, albumAddsCount: false)
     #expect(free.albumMoves["Trip"] == ["a", "b", "c"])
     #expect(free.blockedByQuota == 0)
+    let queued = try await repo.queued(for: id)
+    let byDefault = CommitPlanner.plan(
+      queued: queued, records: CF.byId(try await repo.assets(ids: queued.map(\.assetId))),
+      swipefiles: CF.byId(try await repo.swipefiles()), isPro: false, quotaRemaining: 0)
+    #expect(byDefault.albumMoves["Trip"] == ["a", "b", "c"], "the planner's default is the switch: free")
+    #expect(byDefault.blockedByQuota == 0)
   }
 
   @Test func withTheSwitchOffOnlyNonAlbumItemsUseTheQuota() async throws {
@@ -90,11 +96,11 @@ struct AlbumQueueTests {
     #expect(report.quotaSpent == 0)
     #expect(try await FreeQuota(db).remaining() == 50)
 
-    // The default (switch on) charges them, as before.
+    // With the switch on, they're charged.
     try await repo.upsertAssets([CF.asset("c")])
     try await AlbumQueue.replace(album: "Trip", with: ["c"], repositories: repo)
     let counted = PhotoKitCommitter(library: FakeLibrary(log: log), database: db, pro: FixedPro(value: false),
-                                    squish: nil)
+                                    squish: nil, albumAddsCount: true)
     guard case let .applied(second) = try await counted.apply(try await plan(id)) else { return }
     #expect(second.quotaSpent == 1)
   }

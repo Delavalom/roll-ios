@@ -187,9 +187,9 @@ Pending this session (do not quote until the note `docs/investigations/2026-11-1
 
 ## Flagged as risky
 
-1. **Free tier vs albums.** "Make album" commits through the existing committer, so each added photo counts toward the
-   first 50 free items. A 200-photo trip album hits the paywall on the first try. Ads must not say "free albums";
-   founder to decide whether album adds count.
+1. **Free tier vs albums: resolved 2026-11-16.** Album adds are free (`FreeQuota.countsAlbumAdds` false), so a
+   200-photo trip album never hits the paywall. Deletes and squishes still count toward the first 50. Ads can say
+   "make the album"; Pro is sold on cleanup.
 2. **"Keeps itself updated"** (living albums) reads as automatic. Say "offers new photos, you say yes" (guardrail: Roll
    changes nothing on its own).
 3. **"Find any photo" / "in seconds"**: recall and timing are unmeasured. Hold until the eval and A8.

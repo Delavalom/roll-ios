@@ -146,7 +146,7 @@ struct CommitterTests {
     #expect(report.addedToAlbums == ["Beach": ["b1"], "Zoo": ["z1", "z2"]])
     #expect(try await queuedIds("z").isEmpty)
     #expect(try await isDeleted("z1") == false, "album moves keep the asset")
-    #expect(report.quotaSpent == 4)
+    #expect(report.quotaSpent == 1, "only the delete: album adds are free (FreeQuota.countsAlbumAdds)")
   }
 
   @Test func aCancelledAlbumChangeStopsTheRun() async throws {

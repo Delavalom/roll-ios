@@ -27,7 +27,8 @@ a feed or a backup service.
   to pick from and adds only what's picked, through the same commit path as cleanup. A kept-updated ("living")
   album only offers new matches on Home; nothing is added without a tap. [Features/Find, Commit/AlbumQueue.swift]
 - **Give the first 50 applied items for free**, counted only after a change succeeds. A declined system prompt
-  costs nothing. Album adds count too for now (`FreeQuota.countsAlbumAdds`, founder to decide). [ADR-0003, FreeQuota]
+  costs nothing. Album adds are free (`FreeQuota.countsAlbumAdds` false, founder 2026-11-16): adding to an album
+  frees no space, and one trip album would otherwise use up the free tier. Deletes and squishes count. [ADR-0003, FreeQuota]
 - **Say sizes as "about X"**, for photos and videos only, and only what's on this iPhone (iCloud-only originals
   are counted separately). The paywall repeats the taste scan's or Home's own number, never a new one.
   [ADR-0002, TasteScanModel, Overview/PaywallPitch.swift]
