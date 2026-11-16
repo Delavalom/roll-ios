@@ -20,8 +20,8 @@ what Roll does to your photo library. If anything here conflicts with Apple's ag
 
 ## 2. Free tier and Roll Pro
 
-Roll is free to download. The free tier includes your first 50 cleanups (deleting, moving to albums and squishing).
-Roll Pro removes that limit.
+Roll is free to download. Searching and adding photos to albums are free and unlimited. The free tier includes your
+first 50 cleanups (deleting and squishing). Roll Pro removes that limit.
 
 Roll Pro is a one-time in-app purchase sold through the App Store for $14.99. It is not a subscription: you pay
 once, nothing renews, and there is nothing to cancel.
@@ -63,11 +63,17 @@ videos you delete or replace, including after they leave Recently Deleted.
 
 Our Privacy Policy explains how Roll handles your information: https://roll.delavalom.com/privacy
 
-## 7. Changes
+## 7. Acknowledgements
+
+Place names in Roll come from GeoNames (https://www.geonames.org), licensed under the Creative Commons Attribution
+4.0 License (https://creativecommons.org/licenses/by/4.0/). Roll keeps only names, codes, rounded coordinates and
+populations from it, in its own compact format.
+
+## 8. Changes
 
 We may update these terms. If we do, we'll update this page and change the effective date above. Continuing to use
 Roll after a change means you accept the updated terms.
 
-## 8. Contact
+## 9. Contact
 
 Questions about these terms: {{CONTACT_EMAIL}}
