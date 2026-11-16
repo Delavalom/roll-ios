@@ -29,7 +29,7 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Roll uses Face ID to lock your Private swipefile.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Roll saves the smaller copy of photos and videos you squish.</string>
+	<string>Roll saves the smaller copy of photos and videos you squish, and the memory videos you make.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Roll looks at your photos on your iPhone to find what you can delete or shrink. Nothing leaves your phone.</string>
 	<key>RCPublicKey</key>

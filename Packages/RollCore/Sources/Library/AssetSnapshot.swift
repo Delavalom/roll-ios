@@ -37,13 +37,29 @@ public struct AssetSnapshot: Sendable, Equatable, Identifiable {
   public var uti: String?
   /// `PHAsset.modificationDate`, seconds since 1970. Changes on edits and on metadata changes (favorite, say).
   public var modified: Double?
+  /// `PHAsset.location` (WGS 84 degrees), read from the library's own metadata: never geocoded, never sent anywhere.
+  /// Nil when the photo has no location, or an invalid one (see `validLocation`).
+  public var lat: Double?
+  public var lon: Double?
 
   public init(id: String, mediaType: Int, subtypes: Int = 0, created: Double? = nil, pixelW: Int = 0, pixelH: Int = 0,
               duration: Double = 0, isFavorite: Bool = false, burstId: String? = nil, uti: String? = nil,
-              modified: Double? = nil) {
+              modified: Double? = nil, lat: Double? = nil, lon: Double? = nil) {
     self.id = id; self.mediaType = mediaType; self.subtypes = subtypes; self.created = created
     self.pixelW = pixelW; self.pixelH = pixelH; self.duration = duration; self.isFavorite = isFavorite
     self.burstId = burstId; self.uti = uti; self.modified = modified
+    let location = Self.validLocation(lat, lon)
+    self.lat = location?.lat
+    self.lon = location?.lon
+  }
+
+  /// The coordinate if it is one: both finite, within ±90 / ±180, and not exactly (0, 0) (what some apps write for
+  /// "unknown"). Otherwise nil, so a bad coordinate never lands in a place or a trip.
+  public static func validLocation(_ lat: Double?, _ lon: Double?) -> (lat: Double, lon: Double)? {
+    guard let lat, let lon, lat.isFinite, lon.isFinite, abs(lat) <= 90, abs(lon) <= 180, lat != 0 || lon != 0 else {
+      return nil
+    }
+    return (lat, lon)
   }
 
   public var isVideo: Bool { mediaType == MediaKind.video }

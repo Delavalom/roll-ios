@@ -12,6 +12,12 @@ public enum QuotaError: Error, Equatable {
 /// `Repositories.consumeCounter`.
 public struct FreeQuota: Sendable {
   public static let limit = 50
+  /// **The album switch.** Whether adding a photo to an album ("Make album", a living album's new photos, an up-swipe)
+  /// spends a free item like a delete or a squish does. False (founder, 2026-11-16): album adds are free. Adding a
+  /// photo to an album frees no space and deletes nothing, and a trip album is 50–300 photos, so counting them would
+  /// spend the whole free tier on someone's first album. With false, `CommitPlanner` never blocks an album-only item
+  /// and `PhotoKitCommitter` never charges for one. Deletes and squishes still count.
+  public static let countsAlbumAdds = false
   private static let key = "freeUsed"
 
   private let repositories: Repositories

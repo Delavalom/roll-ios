@@ -37,6 +37,8 @@ let package = Package(
     .library(name: "Commit", targets: ["Commit"]),
     .library(name: "Overview", targets: ["Overview"]),
     .library(name: "SquishBridge", targets: ["SquishBridge"]),
+    .library(name: "Places", targets: ["Places"]),
+    .library(name: "Memories", targets: ["Memories"]),
   ],
   dependencies: [
     gemma,
@@ -53,15 +55,19 @@ let package = Package(
     .target(name: "Library"),
     .target(name: "Signals"),
     .target(name: "Indexer", dependencies: ["Library", "Signals", "Store", "Embedding"]),
-    .target(name: "Ranking", dependencies: ["Store", "Embedding"]),
+    .target(name: "Ranking", dependencies: ["Store", "Embedding", "Places"]),
+    // The offline gazetteer (GeoNames, CC-BY 4.0: Resources/NOTICE; built by scripts/make_places.py). No dependencies.
+    .target(name: "Places", resources: [.copy("Resources/places.z"), .copy("Resources/NOTICE")]),
     .target(name: "Dedupe", dependencies: ["Store"]),
     .target(name: "Squish", dependencies: ["Store", "Library"]),
     .target(name: "Monitor"),
     .target(name: "Entitlements", dependencies: ["Store"]),
     .target(name: "Commit", dependencies: ["Store", "Library", "Entitlements"]),
-    .target(name: "Overview", dependencies: ["Store", "Ranking", "Dedupe", "Signals", "Squish", "Library"]),
+    .target(name: "Overview", dependencies: ["Store", "Ranking", "Dedupe", "Signals", "Squish", "Library", "Memories"]),
     // Conforms Squish's ReplaceFlow to Commit's SquishRunner, so neither target depends on the other.
     .target(name: "SquishBridge", dependencies: ["Commit", "Squish", "Store", "Library", "Overview"]),
+    // Memory reel planning: pure, no dependencies.
+    .target(name: "Memories"),
 
     .testTarget(name: "EmbeddingTests", dependencies: ["Embedding", "ModelInstall"]),
     .testTarget(name: "ModelInstallTests", dependencies: ["ModelInstall"]),
@@ -73,15 +79,17 @@ let package = Package(
     .testTarget(name: "SignalsTests", dependencies: ["Signals"], resources: [.copy("Resources")]),
     .testTarget(name: "LibraryTests", dependencies: ["Library"]),
     .testTarget(name: "IndexerTests", dependencies: ["Indexer", "Library", "Signals", "Store", "Embedding"]),
-    .testTarget(name: "RankingTests", dependencies: ["Ranking", "Store", "Embedding"]),
+    .testTarget(name: "RankingTests", dependencies: ["Ranking", "Store", "Embedding", "Places"]),
+    .testTarget(name: "PlacesTests", dependencies: ["Places"]),
     .testTarget(name: "CommitTests", dependencies: ["Commit", "Store", "Entitlements"]),
-    .testTarget(name: "OverviewTests", dependencies: ["Overview", "Store", "Ranking", "Signals", "Squish"]),
+    .testTarget(name: "MemoriesTests", dependencies: ["Memories"]),
+    .testTarget(name: "OverviewTests", dependencies: ["Overview", "Store", "Ranking", "Signals", "Squish", "Memories"]),
   ]
 )
 
 if !hasGemma {
-  let standalone: Set<String> = ["Library", "Signals", "Monitor", "ModelInstall", "LibraryTests", "SignalsTests",
-                                 "MonitorTests", "ModelInstallTests"]
+  let standalone: Set<String> = ["Library", "Signals", "Monitor", "ModelInstall", "Places", "Memories", "LibraryTests",
+                                 "SignalsTests", "MonitorTests", "ModelInstallTests", "PlacesTests", "MemoriesTests"]
   package.dependencies = []
   package.targets = package.targets.filter { standalone.contains($0.name) }
   package.products = package.products.filter { standalone.contains($0.name) }

@@ -8,9 +8,22 @@ struct RollApp: App {
   @UIApplicationDelegateAdaptor(RollAppDelegate.self) private var delegate
   @State private var app: AppModel?
   private let failure: String?
+  /// DEBUG `-QAFindExport` (App/QA/QAFindExport.swift): no AppModel at all, so Roll's database, index and model are
+  /// never opened; the export screen is the whole app.
+  private let findExport: Bool
 
   init() {
     RollAppearance.apply()
+    #if DEBUG
+    findExport = QAFindExport.isRequested
+    if findExport {
+      IndexScheduler.register { nil }
+      failure = nil
+      return
+    }
+    #else
+    findExport = false
+    #endif
     do {
       let model = try AppModel.live()
       // BackgroundTasks needs the handler registered before launch finishes.
@@ -27,7 +40,11 @@ struct RollApp: App {
 
   var body: some Scene {
     WindowGroup {
-      if let app {
+      if findExport {
+        #if DEBUG
+        QAFindExportView()
+        #endif
+      } else if let app {
         RootView().environment(app)
       } else {
         LaunchFailureView(detail: failure ?? "")

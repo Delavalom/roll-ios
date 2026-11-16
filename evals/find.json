@@ -1,0 +1,240 @@
+{
+  "about": "Find eval (docs/superpowers/plans/2026-11-15-find.md): queries the way people search their photos, for scripts/eval find-eval. Groups: activity, event, place-trip, thing, dated (date words: need V2's query understanding), nonsense (the 12 strings from evals/piles.json: an honest search shows no strong match). Labels come from pooled judging of thumbnails plus album membership; album-derived queries live in a private spec in the same format with an albumKey. Every query is embedded bare and with each template ('a photo of {text}' always, plus the templates listed here).",
+  "templates": [],
+  "queries": [
+    {
+      "name": "soccer",
+      "text": "soccer",
+      "group": "activity",
+      "expect": "matches"
+    },
+    {
+      "name": "playing basketball",
+      "text": "playing basketball",
+      "group": "activity",
+      "expect": "matches"
+    },
+    {
+      "name": "at the gym",
+      "text": "at the gym",
+      "group": "activity",
+      "expect": "matches"
+    },
+    {
+      "name": "hiking in the mountains",
+      "text": "hiking in the mountains",
+      "group": "activity",
+      "expect": "matches"
+    },
+    {
+      "name": "swimming pool",
+      "text": "swimming pool",
+      "group": "activity",
+      "expect": "matches"
+    },
+    {
+      "name": "surfing or the beach waves",
+      "text": "surfing or the beach waves",
+      "group": "activity",
+      "expect": "matches"
+    },
+    {
+      "name": "birthday cake with candles",
+      "text": "birthday cake with candles",
+      "group": "event",
+      "expect": "matches"
+    },
+    {
+      "name": "wedding",
+      "text": "wedding",
+      "group": "event",
+      "expect": "matches"
+    },
+    {
+      "name": "concert stage",
+      "text": "concert stage",
+      "group": "event",
+      "expect": "matches"
+    },
+    {
+      "name": "graduation",
+      "text": "graduation",
+      "group": "event",
+      "expect": "matches"
+    },
+    {
+      "name": "christmas tree",
+      "text": "christmas tree",
+      "group": "event",
+      "expect": "matches"
+    },
+    {
+      "name": "halloween costume",
+      "text": "halloween costume",
+      "group": "event",
+      "expect": "matches"
+    },
+    {
+      "name": "at the beach",
+      "text": "at the beach",
+      "group": "place-trip",
+      "expect": "matches"
+    },
+    {
+      "name": "snow",
+      "text": "snow",
+      "group": "place-trip",
+      "expect": "matches"
+    },
+    {
+      "name": "airplane window view",
+      "text": "airplane window view",
+      "group": "place-trip",
+      "expect": "matches"
+    },
+    {
+      "name": "city skyline at night",
+      "text": "city skyline at night",
+      "group": "place-trip",
+      "expect": "matches"
+    },
+    {
+      "name": "road trip",
+      "text": "road trip",
+      "group": "place-trip",
+      "expect": "matches"
+    },
+    {
+      "name": "theme park",
+      "text": "theme park",
+      "group": "place-trip",
+      "expect": "matches"
+    },
+    {
+      "name": "my dog",
+      "text": "my dog",
+      "group": "thing",
+      "expect": "matches"
+    },
+    {
+      "name": "cat",
+      "text": "cat",
+      "group": "thing",
+      "expect": "matches"
+    },
+    {
+      "name": "plate of food at a restaurant",
+      "text": "plate of food at a restaurant",
+      "group": "thing",
+      "expect": "matches"
+    },
+    {
+      "name": "sunset",
+      "text": "sunset",
+      "group": "thing",
+      "expect": "matches"
+    },
+    {
+      "name": "flowers",
+      "text": "flowers",
+      "group": "thing",
+      "expect": "matches"
+    },
+    {
+      "name": "car",
+      "text": "car",
+      "group": "thing",
+      "expect": "matches"
+    },
+    {
+      "name": "baby",
+      "text": "baby",
+      "group": "thing",
+      "expect": "matches"
+    },
+    {
+      "name": "beach last summer",
+      "text": "beach last summer",
+      "group": "dated",
+      "expect": "matches"
+    },
+    {
+      "name": "christmas 2023",
+      "text": "christmas 2023",
+      "group": "dated",
+      "expect": "matches"
+    },
+    {
+      "name": "nonsense 1",
+      "text": "qwzx vbnm plorth",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 2",
+      "text": "asdfghjkl",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 3",
+      "text": "zxqv fnord kpt 7781",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 4",
+      "text": "vrrp glorbix snee",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 5",
+      "text": "blick frum taspo",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 6",
+      "text": "mxyzptlk",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 7",
+      "text": "jjjjj kkkkk",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 8",
+      "text": "flonq trrrn vosk",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 9",
+      "text": "plim plam plooz",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 10",
+      "text": "uuxo pevrit 0042 zank",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 11",
+      "text": "kwerty zib zab",
+      "group": "nonsense",
+      "expect": "nothing"
+    },
+    {
+      "name": "nonsense 12",
+      "text": "ghrelp",
+      "group": "nonsense",
+      "expect": "nothing"
+    }
+  ]
+}

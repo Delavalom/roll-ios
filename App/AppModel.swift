@@ -51,6 +51,8 @@ final class AppModel {
   let indexer: Indexer
   /// Words in screenshots and documents (`TextIndexer`): runs after indexing drains (AppModel+Text.swift).
   let textIndexer: TextIndexer
+  /// Scene labels for Find's tags (`TagIndexer`): after the text pass (AppModel+Text.swift).
+  let tagIndexer: TagIndexer
   let entitlements: Entitlements
   let sampler: DeviceSampler
   let home: HomeModel
@@ -92,6 +94,8 @@ final class AppModel {
   let squishScreen: SquishFormatScreen
   /// Locality and format checks after indexing (`startChecks`), kept for the launch.
   let checks: CandidateChecks
+  /// Living albums: the event pass, then saved searches' new photos, after indexing drains (AppModel+Text.swift).
+  let living: LivingAlbumsModel
   /// Runs the opt-in iCloud upgrade only while Wi-Fi and charging hold (live builds).
   @ObservationIgnored private var upgradeMonitor: ICloudUpgradeMonitor?
 
@@ -125,9 +129,11 @@ final class AppModel {
                              formats: squishScreen)
     indexer = try Indexer(library: environment.library, signals: SignalExtractor(), repo: repositories)
     textIndexer = TextIndexer(library: environment.library, reader: TextRecognizer(), repo: repositories)
+    tagIndexer = TagIndexer(library: environment.library, classifier: SceneClassifier(), repo: repositories)
     entitlements = Entitlements()
     sampler = DeviceSampler()
     home = HomeModel(repositories: repositories)
+    living = LivingAlbumsModel(repositories: repositories)
     thumbnails = environment.thumbnails
     skipsPaywall = environment.skipsPaywall
     access = environment.access.current()
@@ -167,22 +173,6 @@ final class AppModel {
     return try AppModel(environment: environment)
   }
 
-  #if DEBUG
-  /// `-UITestResetState`: a fresh install's state, without reinstalling, except that an unfinished squish survives
-  /// (`AppDatabase.resetForUITests`): its journal is kept so the recovery banner and the copy exclusions still work.
-  private static func resetStateForUITests(database url: URL, defaults: UserDefaults) throws {
-    switch try AppDatabase.resetForUITests(at: url) {
-    case .removedEverything:
-      break
-    case .keptSquishJournal(let open):
-      QARuntime.logger.notice("-UITestResetState kept the squish journal: \(open) unfinished squishes")
-      QARuntime.shared?.log.write("ui_test_reset", ["keptSquishJournal": .bool(true), "openSquishes": .int(open)])
-    }
-    defaults.removeObject(forKey: onboardingKey)
-    defaults.removeObject(forKey: SwipeHint.seenKey)
-  }
-  #endif
-
   /// Called once at launch.
   func start() {
     if environment.isLive { entitlements.configure(apiKey: Entitlements.apiKeyFromInfoPlist()) }
@@ -219,7 +209,7 @@ final class AppModel {
 
   /// The taste scan (spec §10 step 3): syncs the library, then indexes the newest 500 assets.
   func runTasteScan() async throws {
-    await textIndexer.cancel()
+    await cancelAfterIndexPasses()
     try await indexer.sync()
     lastFullSync = .now
     bumpLibrary()
@@ -240,7 +230,7 @@ final class AppModel {
     }
     textGeneration += 1
     indexTask = Task { [weak self] in
-      await self?.textIndexer.cancel()  // the photo pass goes first; the text pass resumes once it drains
+      await self?.cancelAfterIndexPasses()  // the photo pass goes first; text and tags resume once it drains
       var drained = false
       repeat {
         guard let self else { return }
@@ -392,8 +382,11 @@ final class AppModel {
     switch phase {
     case .background:
       textGeneration += 1
-      let indexer = indexer, text = textIndexer
-      Task { await IndexScheduler.appDidEnterBackground(indexer: indexer, text: text) }
+      let indexer = indexer, text = textIndexer, tags = tagIndexer
+      Task {
+        await tags.cancel()
+        await IndexScheduler.appDidEnterBackground(indexer: indexer, text: text)
+      }
     case .active:
       let previous = access
       access = environment.access.current()

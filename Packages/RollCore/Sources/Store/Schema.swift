@@ -146,6 +146,62 @@ public enum Schema {
         """)
     }
 
+    // v11 (Find): where a photo was taken, the events the library groups into, and saved searches.
+    // - `asset.lat` / `lon`: `PHAsset.location` (degrees, WGS 84), library-owned like `created`; NULL when the photo has
+    //   none. `locationChecked` tells "no location" (1, NULL coordinates) from "not read yet" (0): rows stored before v11
+    //   start at 0 and get their location from the next full library sync, which upserts every row's library columns
+    //   anyway (no extra read, no re-embedding).
+    // - `asset.eventId`: the moment (`event.kind = 'moment'`) the photo belongs to, written only by the event pass
+    //   (`Repositories.replaceEvents`). A moment that falls in a trip names it in `event.tripId`, so a photo reaches its
+    //   trip through its moment: one column per asset, no join table.
+    // - `savedSearch`: a living album (a query kept up to date; `SavedSearchRecord`). `lastSeenRowid` is the `asset`
+    //   rowid up to which new photos were already offered.
+    migrator.registerMigration("v11") { db in
+      try db.execute(sql: """
+        ALTER TABLE asset ADD COLUMN lat REAL;
+        ALTER TABLE asset ADD COLUMN lon REAL;
+        ALTER TABLE asset ADD COLUMN locationChecked INTEGER NOT NULL DEFAULT 0;
+        ALTER TABLE asset ADD COLUMN eventId TEXT;
+        CREATE INDEX asset_event ON asset(eventId) WHERE eventId IS NOT NULL;
+        CREATE TABLE event (
+          id TEXT PRIMARY KEY, kind TEXT NOT NULL, startAt REAL NOT NULL, endAt REAL NOT NULL, count INTEGER NOT NULL,
+          located INTEGER NOT NULL, lat REAL, lon REAL, tripId TEXT, city TEXT, admin1 TEXT, country TEXT,
+          countryCode TEXT);
+        CREATE INDEX event_trip ON event(tripId) WHERE tripId IS NOT NULL;
+        CREATE TABLE savedSearch (
+          id TEXT PRIMARY KEY, query TEXT NOT NULL, albumName TEXT NOT NULL,
+          swipefileId TEXT REFERENCES swipefile(id) ON DELETE SET NULL,
+          createdAt REAL NOT NULL, lastRunAt REAL, lastSeenRowid INTEGER NOT NULL DEFAULT 0);
+        """)
+    }
+
+    // v12 (Find tags): Vision scene labels per photo (`Repositories+Tags`), written by the tag pass (`TagIndexer`)
+    // after indexing drains. `assetTagRead` has one row per photo the pass looked at (the classifier's revision, the
+    // long side of the image read, NULL when no local image could be loaded); `assetTag` its labels (confidence
+    // >= 0.1, best 10). Both go with their asset: deleted, marked deleted, or edited (`signalsDone` back to 0, read
+    // again once analysed). `asset_tagOrder` makes the pass's "analysed, not read yet, newest first" query cheap.
+    // Rowid tables on purpose: SQLite reports no changes of WITHOUT ROWID tables to observers (`RankingChanges`).
+    migrator.registerMigration("v12") { db in
+      try db.execute(sql: """
+        CREATE TABLE assetTagRead (
+          assetId TEXT PRIMARY KEY REFERENCES asset(id) ON DELETE CASCADE, revision TEXT NOT NULL, side INTEGER,
+          readAt REAL NOT NULL);
+        CREATE TABLE assetTag (
+          id INTEGER PRIMARY KEY, assetId TEXT NOT NULL REFERENCES asset(id) ON DELETE CASCADE, label TEXT NOT NULL,
+          confidence REAL NOT NULL, UNIQUE (assetId, label));
+        CREATE TRIGGER asset_tagGone AFTER UPDATE OF deleted ON asset WHEN new.deleted = 1 AND old.deleted = 0 BEGIN
+          DELETE FROM assetTag WHERE assetId = new.id;
+          DELETE FROM assetTagRead WHERE assetId = new.id;
+        END;
+        CREATE TRIGGER asset_tagStale AFTER UPDATE OF signalsDone ON asset
+          WHEN new.signalsDone = 0 AND old.signalsDone = 1 BEGIN
+          DELETE FROM assetTag WHERE assetId = new.id;
+          DELETE FROM assetTagRead WHERE assetId = new.id;
+        END;
+        CREATE INDEX asset_tagOrder ON asset(created DESC, id) WHERE deleted = 0 AND signalsDone = 1;
+        """)
+    }
+
     return migrator
   }
 

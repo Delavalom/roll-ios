@@ -66,6 +66,107 @@ struct SearchSpeedBench {
     }
   }
 
+  /// Typed search (Ask Roll's `SwipefileEngine.search`) over the same world: a first call, then the median of 10 warm
+  /// calls per query (stub query embedding, so this is the store read, `dotAll`, gating and ranking).
+  @Test func typedSearch() async throws {
+    let world = try await SearchBenchWorld.make()
+    defer { world.cleanUp() }
+    let queries = ["receipts and invoices", "screenshots of chats", "a dog on the beach", "zxqv blorp"]
+    let clock = ContinuousClock()
+    for query in queries {
+      let firstStart = clock.now
+      _ = try await world.engine.search(query)
+      let first = SearchTimings.ms(clock.now - firstStart)
+      var warm: [Double] = []
+      var count = 0
+      for _ in 0..<10 {
+        let start = clock.now
+        let result = try await world.engine.search(query)
+        warm.append(SearchTimings.ms(clock.now - start))
+        count = result.matches.count + result.weaker.count
+      }
+      warm.sort()
+      print("bench search \"\(query)\" results=\(count) first=\(String(format: "%.2f", first))"
+            + " warmMedian=\(String(format: "%.2f", warm[warm.count / 2])) warmMin=\(String(format: "%.2f", warm[0]))")
+    }
+    // Find variants over the same library (V2 parses the query; V3 groups by event, with no events stored here; "all"
+    // adds seeds, tags, a relative cut and a nothing-found test).
+    let seeds = try await world.engine.search("a dog on the beach").matches.prefix(3).map(\.id)
+    var all = FindConfig.v3
+    all.understanding = true
+    all.tags = true
+    all.relativeCut = 0.6
+    all.nothingFound = NothingFoundTest(minTopGap: 1)
+    let variants: [(String, FindConfig)] = [("v0", .v0), ("v1", .v1), ("v2", .v2), ("v3", .v3), ("all", all)]
+    for (name, config) in variants {
+      let query = "a dog on the beach"
+      let picked = name == "all" ? Array(seeds) : []
+      _ = try await world.engine.find(query, config: config, seeds: picked)
+      var warm: [Double] = []
+      for _ in 0..<10 {
+        let start = clock.now
+        _ = try await world.engine.find(query, config: config, seeds: picked)
+        warm.append(SearchTimings.ms(clock.now - start))
+      }
+      warm.sort()
+      print("bench find \(name) warmMedian=\(String(format: "%.2f", warm[warm.count / 2]))"
+            + " warmMin=\(String(format: "%.2f", warm[0]))")
+    }
+  }
+
+  /// Tags (V4) over the same world: every photo gets 3–10 scene labels in the store (the tag pass keeps >= 0.1, top 10;
+  /// one label in seven from 29 everyday ones, the rest from 600 others, so "dog" is on ~3 % of photos, as Vision's
+  /// ~1,300 identifiers spread),
+  /// then `find` with tags off, with tags on, and with `FindConfig.shipping`: a first call (reads and folds the labels
+  /// into a `TagIndex`), the median of 10 warm calls, and `TagIndex.coverage` alone. Tags should add < 5 ms warm.
+  @Test func typedSearchWithTags() async throws {
+    let world = try await SearchBenchWorld.make()
+    defer { world.cleanUp() }
+    let vocabulary = ["sport", "ball", "grass", "beach", "sand", "ocean", "dog", "pet", "cake", "outdoor", "sky",
+                      "food", "dessert", "snow", "stage", "people", "adult", "structure", "plant", "document", "text",
+                      "screenshot", "night_sky", "car", "vehicle", "wedding_dress", "candle", "furniture", "child"]
+    var g = SeededRNG(seed: 4)
+    var items: [TagFields] = []
+    for id in world.ids {
+      let labels = (0..<Int.random(in: 3...10, using: &g)).map { _ in
+        TagLabel(label: Int.random(in: 0..<7, using: &g) == 0 ? vocabulary.randomElement(using: &g)!
+                   : "label_\(Int.random(in: 0..<600, using: &g))",
+                 confidence: Double.random(in: 0.1...0.95, using: &g))
+      }
+      items.append(TagFields(id: id, labels: labels, revision: "bench", side: 360))
+    }
+    for start in stride(from: 0, to: items.count, by: 2_000) {
+      try await world.repo.commitTags(Array(items[start..<min(start + 2_000, items.count)]))
+    }
+    let clock = ContinuousClock()
+    let query = "a dog on the beach"
+    var tagsOn = FindConfig.v0
+    tagsOn.tags = true
+    for (name, config) in [("v0", FindConfig.v0), ("v0+tags", tagsOn), ("shipping", FindConfig.shipping)] {
+      let firstStart = clock.now
+      _ = try await world.engine.find(query, config: config)
+      let first = SearchTimings.ms(clock.now - firstStart)
+      var warm: [Double] = []
+      for _ in 0..<10 {
+        let start = clock.now
+        _ = try await world.engine.find(query, config: config)
+        warm.append(SearchTimings.ms(clock.now - start))
+      }
+      warm.sort()
+      print("bench find+tags \(name) first=\(String(format: "%.2f", first))"
+            + " warmMedian=\(String(format: "%.2f", warm[warm.count / 2])) warmMin=\(String(format: "%.2f", warm[0]))")
+    }
+    let index = TagIndex(labels: try await world.repo.tagLabels(minConfidence: 0.3))
+    var times: [Double] = []
+    for _ in 0..<10 {
+      let start = clock.now
+      _ = index.coverage(queryTerms: SearchTerms.queryTerms(query))
+      times.append(SearchTimings.ms(clock.now - start))
+    }
+    times.sort()
+    print("bench tagIndex photos=\(index.photoCount) coverageMedian=\(String(format: "%.3f", times[times.count / 2]))")
+  }
+
   static func dict(_ t: SearchTimings) -> [String: Double] {
     Dictionary(uniqueKeysWithValues: t.milliseconds.map { ($0.step, ($0.ms * 1000).rounded() / 1000) })
   }

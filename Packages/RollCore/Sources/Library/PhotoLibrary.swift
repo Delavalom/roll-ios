@@ -240,12 +240,14 @@ public struct PhotoLibrary: Sendable {
 
 extension AssetSnapshot {
   /// Builds a snapshot from a PHAsset without touching its resources (`uti` stays nil; see `PhotoLibrary.utis(for:)`).
+  /// The location is the asset's own metadata (`PHAsset.location`); nothing is geocoded.
   public init(_ asset: PHAsset) {
     self.init(
       id: asset.localIdentifier, mediaType: asset.mediaType.rawValue, subtypes: Int(asset.mediaSubtypes.rawValue),
       created: asset.creationDate?.timeIntervalSince1970, pixelW: asset.pixelWidth, pixelH: asset.pixelHeight,
       duration: asset.duration, isFavorite: asset.isFavorite, burstId: asset.burstIdentifier, uti: nil,
-      modified: asset.modificationDate?.timeIntervalSince1970)
+      modified: asset.modificationDate?.timeIntervalSince1970,
+      lat: asset.location?.coordinate.latitude, lon: asset.location?.coordinate.longitude)
   }
 }
 #endif

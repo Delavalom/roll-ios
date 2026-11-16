@@ -5,9 +5,17 @@ import GRDB
 public struct RankingRow: Sendable, Equatable {
   public var asset: RankingAsset
   public var embedded: Bool
+  /// What typed search (`Ranking.FindSearch`) filters and groups by (v11): date, location and moment.
+  public var created: Double?
+  public var lat: Double?
+  public var lon: Double?
+  public var locationChecked: Bool
+  public var eventId: String?
 
-  public init(asset: RankingAsset, embedded: Bool) {
-    self.asset = asset; self.embedded = embedded
+  public init(asset: RankingAsset, embedded: Bool, created: Double? = nil, lat: Double? = nil, lon: Double? = nil,
+              locationChecked: Bool = false, eventId: String? = nil) {
+    self.asset = asset; self.embedded = embedded; self.created = created; self.lat = lat; self.lon = lon
+    self.locationChecked = locationChecked; self.eventId = eventId
   }
 }
 
@@ -44,7 +52,8 @@ extension Repositories {
   /// Every `asset` column ranking reads (`rankingRows`, `rankingCandidates` and `CandidateFilter`). `RankingChanges`
   /// counts updates of exactly these, so a column read here must be listed here.
   public static let rankingColumns = ["id", "mediaType", "subtypes", "estBytes", "blur", "aesthetic", "isUtility",
-                                      "sensitive", "previewSide", "deleted", "embedded"]
+                                      "sensitive", "previewSide", "deleted", "embedded",
+                                      "created", "lat", "lon", "locationChecked", "eventId"]
 
   /// Starts counting the commits that change what ranking reads (see `RankingChanges`). Observes while the returned
   /// object is alive; read its `generation` before reading rows to stamp them.
@@ -58,7 +67,8 @@ extension Repositories {
   /// what an in-memory pool keeps, so each pile filters it with `CandidateFilter.matches` instead of SQL.
   public func rankingRows() async throws -> [RankingRow] {
     let sql = """
-      SELECT id, mediaType, subtypes, estBytes, blur, aesthetic, isUtility, sensitive, previewSide, embedded
+      SELECT id, mediaType, subtypes, estBytes, blur, aesthetic, isUtility, sensitive, previewSide, embedded,
+        created, lat, lon, locationChecked, eventId
       FROM asset WHERE deleted = 0
       """
     return try await database.writer.read { db in
@@ -70,7 +80,8 @@ extension Repositories {
           asset: RankingAsset(id: row[0], mediaType: row[1], subtypes: row[2], estBytes: row[3], blur: row[4],
                               aesthetic: row[5], isUtility: row[6], sensitive: row[7],
                               qualityTrusted: (previewSide ?? 0) >= AssetRecord.qualityAnalysisSide),
-          embedded: row[9]))
+          embedded: row[9], created: row[10], lat: row[11], lon: row[12], locationChecked: row[13],
+          eventId: row[14]))
       }
       return out
     }

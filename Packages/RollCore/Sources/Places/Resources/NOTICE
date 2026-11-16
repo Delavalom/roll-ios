@@ -1,0 +1,6 @@
+Place names in Roll come from GeoNames (https://www.geonames.org), licensed under the Creative Commons Attribution
+4.0 License (https://creativecommons.org/licenses/by/4.0/). Files used: cities15000, countryInfo, admin1CodesASCII
+and alternateNamesV2 (English and Spanish names only), from https://download.geonames.org/export/dump/.
+
+Roll changed the data: it keeps only names, codes, rounded coordinates and populations, in its own compact format
+(places.z, built by scripts/make_places.py). Place names are looked up on the device; nothing is sent anywhere.

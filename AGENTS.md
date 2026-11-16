@@ -30,7 +30,15 @@ App/                      RollApp (registers IndexScheduler, builds AppModel), R
                           ModelIssue / StubLoader (DEBUG only: previews, -UITestStubEmbedder); RollApp's delegate hands
                           background-session events to BackgroundTransport
   Features/Onboarding/    one intro page, permission, TasteScanView (run(limit: 500)), then the paywall (with the scan's PaywallPitch)
-  Features/Home/          HomeModel (CleanupScanner, throttled rescans on libraryRevision), cards, squish recovery banner
+  Features/Home/          HomeModel (CleanupScanner, throttled rescans on libraryRevision), cards, squish recovery banner,
+                          living-album offers ("12 new photos for Soccer")
+  Features/Ask/           AskModel (+Find: engine.find with FindConfig.shipping, closest 12 when refused, seeds, album
+                          drafts), AnswerView + FindResultBody (FindAnswer: event sections, weaker fold, notes), chips
+  Features/Find/          Make album (AlbumMakerModel/View: AlbumSelection grid → AlbumQueue → CommitModel), album
+                          created (Keep this album updated, Make a video), LivingAlbumsModel (EventPass + newMatches
+                          after indexing drains; offers only, never adds silently)
+  Features/Memories/      MemoryVideoExporter, PhotoKitReelSource, MemoryVideoModel/View (progress, cancel, preview,
+                          Share, Save to Photos add-only), behind Features.memoryVideos (Shared/Features.swift)
   Features/Swipefiles/    list, NewSwipefileView, SwipeReviewView/Model (card stack; CardImages prefetches the top 4,
                           a card with nothing on screen can only be skipped; SwipeHint explains the swipes once on an Ask
                           answer's stack, flag in defaults), CommitSheet/CommitModel
@@ -55,16 +63,23 @@ Packages/RollCore/        Local SwiftPM package; one target per module
                           the activator gets model/ and the marker's ModelIdentity, and only the marker stays; old
                           revision in use until the new one is staged, then deleted), BackgroundTransport (background URLSessions, resumable; its bookkeeping
                           is TransportBook, tested without a network)
-  Store/                  GRDB schema (v1-v10; v10: assetText + FTS5 keyword index, Repositories.keywordCoverage), records, Repositories, VectorStore (actor over EmbeddingIndex),
+  Store/                  GRDB schema (v1-v12; v10: assetText + FTS5 keyword index, Repositories.keywordCoverage; v11: location,
+                          events, saved searches; v12: assetTag + assetTagRead scene labels, Repositories+Tags; RankingChanges
+                          counts tag writes apart as tagGeneration), records, Repositories, VectorStore (actor over EmbeddingIndex),
                           squishJournal, squishRefusal (remembered run-time refusals; hold while asset.modified is unchanged)
-  Entitlements/           FreeQuota (policy only; the counter is Repositories.consumeCounter), ProStatus protocol
+  Entitlements/           FreeQuota (policy only; the counter is Repositories.consumeCounter; `countsAlbumAdds` is THE
+                          switch for whether album adds spend free items, true today), ProStatus protocol
   Commit/                 CommitPlanner (pure; `protecting:` keeps one shot of a duplicate group), PhotoKitCommitter
                           (deletes in chunks of 500, albums, squishes via the SquishRunner seam; records with
                           recordApplied, then spends quota; retrySquishDeletes enforces the free quota itself),
                           SquishRunner protocol
   Dedupe/                 DuplicateGrouper (no chaining: bursts, then exact-hash copies, then moments: each member within 60 s and print distance < 0.30 of the group's first shot, up to 64 checked; injected print distance), KeeperPolicy
   Squish/                 SquishCandidates + SquishPlanner (spec §8 rules, 30% savings floor; depends on Store only), SquishEligibility (typed refusals incl. formats), VideoSquisher (HEVC export), PhotoSquisher (HEIC 0.8, keeps gain map + metadata), ReplaceFlow (needs full access; prepare copies, journaled in Store, then one commitDeletes that re-verifies inside the change block; PhotoKit behind an internal seam, iOS only)
-  Ranking/                Preset (filters, boosts, prompts), Scorer, LogisticClassifier (vDSP), SwipefileEngine (actor: in-memory candidate rows (CandidatePool, refreshed after ranking-relevant writes) + one VectorStore.dotAll matrix product, aligned as integers (PoolScores); untrained piles on each query's own scale (QueryScale, z >= 2) with weaker matches folded (Fold, 0.4); rank-based once trained, class-balanced retraining, isLikelyExhausted); SwipeDeck protocol + SignalDeck (Screenshots/Blurry/Big videos without the model); LibrarySearch (typed queries: z + keyword coverage, DigUp-style), SearchTerms
+  Ranking/                Preset (filters, boosts, prompts), Scorer, LogisticClassifier (vDSP), SwipefileEngine (actor: in-memory candidate rows (CandidatePool, refreshed after ranking-relevant writes) + one VectorStore.dotAll matrix product, aligned as integers (PoolScores); untrained piles on each query's own scale (QueryScale, z >= 2) with weaker matches folded (Fold, 0.4); rank-based once trained, class-balanced retraining, isLikelyExhausted); SwipeDeck protocol + SignalDeck (Screenshots/Blurry/Big videos without the model); LibrarySearch (typed queries: z + keyword coverage, DigUp-style), SearchTerms; Find/ (FindSearch V0-V5,
+                          FindConfig: `FindConfig.shipping` is THE config the app ships (Ask, more like these, living
+                          albums), tuned from the find eval (ADR-0006: V0 + cut 0.6 + nothing-found, understanding with
+                          holiday words kept and soft places, tags, events for sections only); TagIndex (labels folded
+                          once, loaded by CandidatePool per tag write); FindAnswer, AlbumSelection, SeedPick, LivingAlbumInbox)
   Overview/               CleanupSummary/CleanupScanner (Home categories, duplicate groups minus keepers, freeable total:
                           deletions at full size + big videos at SquishPlanner.offer savings; journaled copies and
                           open squishes excluded; groups() reads feature prints, scan(groups:) the slim rows),
@@ -79,12 +94,14 @@ Packages/RollCore/        Local SwiftPM package; one target per module
                           CardImage (ImageRequestSpec, CardImageLoader: best local image, else a download on Wi-Fi only,
                           else "unavailable", 8 s lookup timeout; CardGate; CardPrefetch), SwipeVerdict (gate → record, skip
                           or ignore: only a card on screen records), SharedWiFiCheck + NetworkPath (Low Data Mode allowed)
-  Signals/                Vision signals: blur, aesthetics, feature print (FP01 raw floats), dHash, sensitive content; AssetSignals; TextRecognizer (.accurate at 960 px, no language correction)
-  Indexer/                TextIndexer (words of gated images: screenshots + isUtility, after indexing drains, pauses from thermal .fair); Indexer actor (sync/apply, run(limit:allowNetwork:), flush, cancel, setEmbedder(_:openVectors:), AsyncStream progress) over LibrarySource/SignalSource/
+  Signals/                Vision signals: blur, aesthetics, feature print (FP01 raw floats), dHash, sensitive content; AssetSignals; TextRecognizer (.accurate at 960 px, no language correction); SceneClassifier (VNClassifyImageRequest, Find tags)
+  Indexer/                TextIndexer (words of gated images: screenshots + isUtility, after indexing drains, pauses from thermal .fair);
+                          TagIndexer (Vision scene labels of every analysed photo at 360 px, >= 0.1 top 10, after the text pass,
+                          same throttling, unread when no local image); Indexer actor (sync/apply, run(limit:allowNetwork:), flush, cancel, setEmbedder(_:openVectors:), AsyncStream progress) over LibrarySource/SignalSource/
                           IndexRepository/VectorSink protocols; ThermalGate; IndexScheduler (BGProcessingTask, iOS)
 UITests/                  SmokeTests: launch, and the seeded flow (onboarding → taste scan → Screenshots → swipe 5 →
                           apply → system delete alert → count drops by 5); PaywallTests: both plans, prices, trial,
-                          links (needs RC_PUBLIC_KEY + network); OnboardingPitchTests: the paywall after the taste scan repeats its number. DEBUG launch args -UITestStubEmbedder,
+                          links (needs RC_PUBLIC_KEY + network); OnboardingPitchTests: the paywall after the taste scan repeats its number; FindFlowTests: search → Make album → album created (adds to an album, deletes nothing), plus a tour with -UITestNoRefusal (the stub embedder never clears the nothing-found test). DEBUG launch args -UITestStubEmbedder,
                           -UITestSkipPaywall, -UITestResetState (keeps the squish journal while a squish is open),
                           -UITestOpen paywall|squish, -UITestTab. DeviceQATests: device QA (docs/qa/); -QAAlbum runs
                           use their own database under Application Support/qa
