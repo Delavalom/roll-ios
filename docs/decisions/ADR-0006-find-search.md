@@ -46,14 +46,24 @@ Tags cost ~1.4 s per query over 30k photos because every photo's labels were fol
   index (`TagIndex`), not per query.
 - **Events group, never rank**: sections by moment and "rest of this event" (`groupByEvent`, `expandRest`), support
   weight 0.
+- **A bare holiday is a word.** "halloween costume" doesn't filter by date; "christmas 2023", "last christmas" and
+  "this halloween" do (`bareHolidayFilters` off by default). Filtering costumes to 31 October–2 November dropped
+  P@20 from .55 to 0.
 
-Round 3 of the eval (`find-eval`, variants V2s, V24s and SHIP; 2026-11-15, before judging the ~5 new results it
-brought into the top 20) measured, P@20 overall: V0 .823, V4 .841, V2s .782, V24s .799, SHIP .797 (median answer 61,
-9 of 12 nonsense queries refused, no real query refused). Album trip queries: V2s .800, as V0 (round 2's V2: .48).
-"christmas 2023" with its dates enforced: V2s .85 (round 2's V2 .2, V0 0). What still costs SHIP against V4: the
-scorer judges dated queries on their subject only ("beach last summer": V0 1.0, but 2 of its 83 relevant photos are
-from last summer), and "halloween costume" falls from .55 to 0 because the holiday filter keeps only 31 October to
-1 November while most costume photos are from other days.
+Round 4 of the eval (2026-11-15, all fixes in; `docs/investigations/2026-11-15-find-eval.md`) measured, over the 37
+real queries:
+
+| Variant | P@10 | P@20 | P@20, dates enforced | Median answer | Nonsense refused |
+|---|---|---|---|---|---|
+| V0 | .865 | .823 | .770 | 676 | 0 / 12 |
+| V4 | .884 | .841 | .788 | 657 | 0 / 12 |
+| SHIP | .860 | .812 | .812 | 69 | 9 / 12 |
+
+"Dates enforced" scores "christmas 2023" and "beach last summer" only on photos from those dates. V0 and V4 ignore
+the dates (P@20 0 on both). SHIP scores .85, and .10 on "beach last summer", where .10 is the maximum because only 2 such
+photos exist. 17 tiles in round 4 are unjudged (.04 of the top 20 for the date variants) and are counted as wrong. SHIP
+loses .03 P@20 to V4 on undated queries and .08 recall@100 to V0 because of the cut. In exchange its answers are ten times
+smaller and it refuses nonsense.
 
 ## Consequences
 
