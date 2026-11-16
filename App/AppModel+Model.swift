@@ -127,6 +127,9 @@ extension AppModel {
 
   private func modelFailed(_ error: any Error, attempt: Int) {
     guard attempt == modelAttempt else { return }  // superseded: the new attempt owns the state
+    // Install errors name files and steps, never photos: public, so a TestFlight build's log says why.
+    Logger(subsystem: "com.delavalom.roll", category: "model")
+      .error("the on-device model didn't load: \(String(describing: error), privacy: .public)")
     modelState = .unavailable(ModelIssue(error))
     modelTask = nil
   }

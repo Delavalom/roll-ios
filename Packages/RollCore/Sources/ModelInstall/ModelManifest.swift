@@ -7,7 +7,7 @@ import Foundation
 /// {"format": 1, "archive": "EmbeddingGemma2.aar", "size": 366000000, "sha256": "<64 hex>",
 ///  "unpacked_size": 485000000, "revision": "v1.0.0", "functions": ["embed_text_16", ...]}
 /// ```
-/// `unpacked_size`, `revision` and `functions` are optional and unknown keys are ignored, so the publisher can add
+/// `unpacked_size`, `revision`, `functions` and `image_budget` are optional and unknown keys are ignored, so the publisher can add
 /// fields. The archive must be a single file name next to `manifest.json`, other than the names Roll uses in the same
 /// folder. `size` and `unpacked_size` are positive and at most `maxBytes`, so the space arithmetic can't overflow.
 public struct ModelManifest: Sendable, Equatable {
@@ -15,11 +15,13 @@ public struct ModelManifest: Sendable, Equatable {
   public static let supportedFormat = 1
   /// 4 GiB: far above the model (about 359 MB packed); a larger size is a bad manifest, not a model.
   public static let maxBytes: Int64 = 4 << 30
-  /// The functions Roll loads: the four text lengths and the five image buckets of both budgets (embeddinggemma-coreml
-  /// `egcm/functions.py`; `EmbeddingGemma.textFunctions` and `imageFunctions(budget:)` in the package).
-  public static let requiredFunctions: Set<String> = Set(
-    [16, 32, 64, 128].map { "embed_text_\($0)" }
-      + [70, 280].flatMap { b in ["tall", "portrait", "square", "landscape", "wide"].map { "embed_image_\(b)_\($0)" } })
+  /// The functions Roll loads from one image budget's package (embeddinggemma-coreml ADR-0010: `b70/` and `b280/`
+  /// each hold only their own image functions): the four text lengths and that budget's five image buckets
+  /// (`egcm/functions.py`; `EmbeddingGemma.textFunctions` and `imageFunctions(budget:)` in the package).
+  public static func requiredFunctions(budget: Int) -> Set<String> {
+    Set([16, 32, 64, 128].map { "embed_text_\($0)" }
+          + ["tall", "portrait", "square", "landscape", "wide"].map { "embed_image_\(budget)_\($0)" })
+  }
   /// What the archive must contain at its root (what `EmbeddingGemma.load(.installed(_:repo:revision:))` requires).
   public static let requiredFiles = ["EmbeddingGemma2.mlpackage/Manifest.json", "tokenizer/tokenizer.json",
                                      "tokenizer/tokenizer_config.json"]
@@ -52,9 +54,12 @@ public struct ModelManifest: Sendable, Equatable {
     let unpacked_size: Int64?
     let revision: String?
     let functions: [String]?
+    let image_budget: Int?
   }
 
-  public static func decode(_ data: Data) throws -> ModelManifest {
+  /// `data` as the manifest of image `budget`'s package: a listed `image_budget` must be that budget, and a listed
+  /// `functions` must hold everything Roll loads from it.
+  public static func decode(_ data: Data, budget: Int) throws -> ModelManifest {
     let w: Wire
     do { w = try JSONDecoder().decode(Wire.self, from: data) } catch {
       throw ModelInstallError.invalidManifest("not an object with archive, size and sha256")
@@ -69,8 +74,11 @@ public struct ModelManifest: Sendable, Equatable {
     if let unpacked = w.unpacked_size, !(1...maxBytes).contains(unpacked) {
       throw ModelInstallError.invalidManifest("bad unpacked_size \(unpacked)")
     }
+    if let served = w.image_budget, served != budget {
+      throw ModelInstallError.invalidManifest("image budget \(served), not \(budget)")
+    }
     if let fns = w.functions {
-      let missing = requiredFunctions.subtracting(fns)
+      let missing = requiredFunctions(budget: budget).subtracting(fns)
       guard missing.isEmpty else {
         throw ModelInstallError.invalidManifest("missing functions \(missing.sorted().joined(separator: ", "))")
       }

@@ -17,8 +17,8 @@ enum Fixture {
   /// A well-formed pin that matches no manifest: enough for a model that is already installed.
   static let anyPin = String(repeating: "d", count: 64)
 
-  static func model(_ revision: String = revisionA, manifestSHA256: String? = anyPin) -> PublishedModel {
-    PublishedModel(repo: "owner/model", revision: revision, manifestSHA256: manifestSHA256)
+  static func model(_ revision: String = revisionA, manifestSHA256: String? = anyPin, budget: Int = 70) -> PublishedModel {
+    PublishedModel(repo: "owner/model", revision: revision, budget: budget, manifestSHA256: manifestSHA256)
   }
 
   /// A small folder in the published archive layout (`required` false leaves the tokenizer out).
@@ -51,19 +51,27 @@ enum Fixture {
   }
 
   /// The archive bytes and a matching manifest for a fresh model folder.
+  /// The archive and its manifest as the publisher writes them for one image `budget`: its functions and
+  /// `image_budget` listed, like `b70/manifest.json` and `b280/manifest.json` on the Hub.
   static func published(in dir: URL, required: Bool = true, payload: String = "weights",
-                        unpackedSize: Int64? = nil) throws -> (archive: Data, manifest: Data) {
+                        unpackedSize: Int64? = nil, budget: Int = 70) throws -> (archive: Data, manifest: Data) {
     let src = try modelFolder(in: dir, required: required, payload: payload)
     let out = dir.appending(path: "\(UUID().uuidString).aar")
     try archive(src, to: out)
     let data = try Data(contentsOf: out)
-    return (data, manifestJSON(size: Int64(data.count), sha256: Checksum.sha256(data: data), unpackedSize: unpackedSize))
+    return (data, manifestJSON(size: Int64(data.count), sha256: Checksum.sha256(data: data), unpackedSize: unpackedSize,
+                               budget: budget))
   }
 
+  /// With `budget`, the manifest also lists that budget's functions and `image_budget`, as published.
   static func manifestJSON(archive: String = "EmbeddingGemma2.aar", size: Int64, sha256: String,
-                           unpackedSize: Int64? = nil) -> Data {
+                           unpackedSize: Int64? = nil, budget: Int? = nil) -> Data {
     var object: [String: Any] = ["format": 1, "archive": archive, "size": size, "sha256": sha256]
     if let unpackedSize { object["unpacked_size"] = unpackedSize }
+    if let budget {
+      object["image_budget"] = budget
+      object["functions"] = ModelManifest.requiredFunctions(budget: budget).sorted()
+    }
     return try! JSONSerialization.data(withJSONObject: object, options: [.sortedKeys])
   }
 }

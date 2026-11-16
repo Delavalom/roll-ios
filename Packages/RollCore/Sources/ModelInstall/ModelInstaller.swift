@@ -236,7 +236,7 @@ public actor ModelInstaller {
   /// `manifest.json`: reused from an earlier attempt if it still matches the pin, else downloaded and checked.
   private func fetchManifest(allowCellular: Bool) async throws -> ModelManifest {
     let url = folders.manifest
-    if let data = try? Data(contentsOf: url), pinned(data), let manifest = try? ModelManifest.decode(data) {
+    if let data = try? Data(contentsOf: url), pinned(data), let manifest = try? ModelManifest.decode(data, budget: model.budget) {
       return manifest
     }
     await gateNetwork(allowCellular: allowCellular, totalBytes: nil)
@@ -248,7 +248,7 @@ public actor ModelInstaller {
       try? FileManager.default.removeItem(at: part)
       throw ModelInstallError.manifestMismatch
     }
-    let manifest = try ModelManifest.decode(data)
+    let manifest = try ModelManifest.decode(data, budget: model.budget)
     do {
       try? FileManager.default.removeItem(at: url)
       try FileManager.default.moveItem(at: part, to: url)
