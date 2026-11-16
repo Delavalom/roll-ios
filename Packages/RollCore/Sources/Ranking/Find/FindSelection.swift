@@ -26,6 +26,36 @@ public struct AlbumSelection: Sendable, Equatable {
     if selected.remove(id) == nil { selected.insert(id) }
   }
 
+  /// A drag across the grid, as in Photos: the first photo flips, and every photo between it and the finger (in grid
+  /// order) takes that new state; photos the drag leaves again go back to how they were before it.
+  private struct Drag: Sendable, Equatable {
+    let anchor: Int
+    let selecting: Bool
+    let before: Set<String>
+  }
+
+  private var drag: Drag?
+
+  /// Starts a drag on the photo at `index` (clamped to the grid) and flips it.
+  public mutating func beginDrag(at index: Int) {
+    guard !ids.isEmpty else { return }
+    let anchor = clamped(index)
+    drag = Drag(anchor: anchor, selecting: !selected.contains(ids[anchor]), before: selected)
+    continueDrag(to: anchor)
+  }
+
+  /// The finger is over the photo at `index` (clamped to the grid).
+  public mutating func continueDrag(to index: Int) {
+    guard let drag else { return }
+    let end = clamped(index)
+    let range = ids[min(drag.anchor, end)...max(drag.anchor, end)]
+    selected = drag.selecting ? drag.before.union(range) : drag.before.subtracting(range)
+  }
+
+  public mutating func endDrag() { drag = nil }
+
+  private func clamped(_ index: Int) -> Int { min(max(index, 0), ids.count - 1) }
+
   public mutating func selectAll() { selected = Set(ids) }
   public mutating func deselectAll() { selected = [] }
 

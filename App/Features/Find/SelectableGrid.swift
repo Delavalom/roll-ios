@@ -1,16 +1,23 @@
 import SwiftUI
 
-/// Three columns of square thumbnails, each with a check in its corner; tapping toggles it. Unselected photos dim a
+/// Three columns of square thumbnails, each with a check in its corner; tapping toggles it, and a sideways drag across
+/// the grid selects (or deselects) every photo it passes, as in Photos (`DragSelectGesture`). Unselected photos dim a
 /// little so what goes into the album stands out.
 struct SelectableGrid: View {
   let ids: [String]
   let isSelected: (String) -> Bool
   let toggle: (String) -> Void
+  /// A drag started on, or moved over, the photo at an index (out of range past the grid's ends), then ended.
+  var dragBegan: (Int) -> Void = { _ in }
+  var dragMoved: (Int) -> Void = { _ in }
+  var dragEnded: () -> Void = {}
 
-  private let columns = Array(repeating: GridItem(.flexible(), spacing: 4), count: 3)
+  private static let spacing: CGFloat = 4
+  private let columns = Array(repeating: GridItem(.flexible(), spacing: spacing), count: 3)
+  @State private var width: CGFloat = 0
 
   var body: some View {
-    LazyVGrid(columns: columns, spacing: 4) {
+    LazyVGrid(columns: columns, spacing: Self.spacing) {
       ForEach(Array(ids.enumerated()), id: \.element) { index, id in
         let on = isSelected(id)
         Color.clear
@@ -34,5 +41,21 @@ struct SelectableGrid: View {
           .accessibilityIdentifier("album.cell.\(index)")
       }
     }
+    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+    .gesture(DragSelectGesture(
+      index: { [width] in Self.index(at: $0, width: width) },
+      began: { i in withAnimation(Roll.Motion.quick) { dragBegan(i) } },
+      moved: { i in withAnimation(Roll.Motion.quick) { dragMoved(i) } },
+      ended: dragEnded))
+  }
+
+  /// The cell under a point in the grid's coordinates, reading order; a gap belongs to the cell before it. Above the
+  /// grid is negative and below it is past the end (the selection clamps both).
+  static func index(at point: CGPoint, width: CGFloat) -> Int {
+    let stride = (width - 2 * spacing) / 3 + spacing
+    guard stride > spacing else { return 0 }
+    let column = min(max(Int((point.x / stride).rounded(.down)), 0), 2)
+    let row = Int((point.y / stride).rounded(.down))
+    return row * 3 + column
   }
 }

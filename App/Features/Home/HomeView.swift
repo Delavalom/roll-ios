@@ -1,4 +1,7 @@
 import Overview
+#if DEBUG
+import Photos
+#endif
 import Ranking
 import Store
 import SwiftUI
@@ -86,6 +89,9 @@ private struct AskHome: View {
       .navigationTitle("Roll")
       .navigationDestination(for: HomeRoute.self, destination: destination)
       .task(id: app.libraryRevision) { await loadFans() }
+      #if DEBUG
+      .task { openAlbumForUITest() }
+      #endif
       .onChange(of: path) { _, path in
         // Back from swiping: "Swipe through N" counts what's left.
         if path.isEmpty { Task { await model.refreshRemaining() } }
@@ -96,6 +102,22 @@ private struct AskHome: View {
       }
     }
   }
+
+  #if DEBUG
+  /// `-UITestOpen album`: a Make album grid of the library's newest 30 photos, none selected (swipe-to-select test).
+  private func openAlbumForUITest() {
+    let arguments = ProcessInfo.processInfo.arguments
+    guard let i = arguments.firstIndex(of: "-UITestOpen"), i + 1 < arguments.count, arguments[i + 1] == "album",
+          path.isEmpty else { return }
+    let options = PHFetchOptions()
+    options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+    options.fetchLimit = 30
+    var ids: [String] = []
+    PHAsset.fetchAssets(with: .image, options: options).enumerateObjects { asset, _, _ in ids.append(asset.localIdentifier) }
+    guard !ids.isEmpty else { return }
+    path.append(.album(model.store(AlbumDraft(ids: ids, preselected: [], name: "Drag test", query: nil))))
+  }
+  #endif
 
   /// Paper under the status bar, fading into the page, so the conversation scrolls out of sight cleanly.
   private var topFade: some View {

@@ -34,7 +34,8 @@ App/                      RollApp (registers IndexScheduler, builds AppModel), R
                           living-album offers ("12 new photos for Soccer")
   Features/Ask/           AskModel (+Find: engine.find with FindConfig.shipping, closest 12 when refused, seeds, album
                           drafts), AnswerView + FindResultBody (FindAnswer: event sections, weaker fold, notes), chips
-  Features/Find/          Make album (AlbumMakerModel/View: AlbumSelection grid → AlbumQueue → CommitModel), album
+  Features/Find/          Make album (AlbumMakerModel/View: AlbumSelection grid, tap or swipe to select (DragSelectGesture,
+                          Photos-style, autoscrolls at the edges) → AlbumQueue → CommitModel), album
                           created (Keep this album updated, Make a video), LivingAlbumsModel (EventPass + newMatches
                           after indexing drains; offers only, never adds silently)
   Features/Memories/      MemoryVideoExporter, PhotoKitReelSource, MemoryVideoModel/View (progress, cancel, preview,
