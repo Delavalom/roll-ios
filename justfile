@@ -3,11 +3,11 @@ set shell := ["bash", "-euo", "pipefail", "-c"]
 gen:
     xcodegen generate
 
-# Build for the iOS Simulator. Pretty output only if xcbeautify is installed.
+# Build for the iOS Simulator (4 parallel jobs on the 16 GB Mac; ROLL_JOBS overrides). Pretty output only if xcbeautify is installed.
 build: gen
     #!/usr/bin/env bash
     set -euo pipefail
-    cmd=(xcodebuild -scheme Roll -destination 'generic/platform=iOS Simulator' build)
+    cmd=(xcodebuild -scheme Roll -destination 'generic/platform=iOS Simulator' -jobs "${ROLL_JOBS:-4}" build)
     if command -v xcbeautify >/dev/null; then "${cmd[@]}" | xcbeautify; else "${cmd[@]}"; fi
 
 # RollCore unit tests on macOS; JUnit results land in Packages/RollCore/.build for `just status`.

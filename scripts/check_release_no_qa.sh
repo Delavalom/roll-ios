@@ -19,7 +19,7 @@ for tool in xcodebuild strings file; do command -v "$tool" >/dev/null || harness
 out=build/dd-release-check
 rm -rf "$out"
 trap 'rm -rf "$out"' EXIT
-xcodebuild build -scheme Roll -configuration Release -destination 'generic/platform=iOS' -derivedDataPath "$out" \
+xcodebuild build -scheme Roll -configuration Release -destination 'generic/platform=iOS' -derivedDataPath "$out" -jobs "${ROLL_JOBS:-4}" \
   CODE_SIGNING_ALLOWED=NO -quiet || harness "the Release build failed"
 
 app="$out/Build/Products/Release-iphoneos/Roll.app"
