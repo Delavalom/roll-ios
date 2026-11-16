@@ -147,6 +147,9 @@ extension FindSearch {
     public var confined = false
     /// Soft places: `FindConfig.placeBonus` when located in the place.
     public var placeBonus: Float = 0
+
+    /// No filter: passes, not confined.
+    public init() {}
   }
 
   /// Whether the query's places are soft (`FindConfig.PlaceMode.soft`) for this answer. A date- or place-only answer

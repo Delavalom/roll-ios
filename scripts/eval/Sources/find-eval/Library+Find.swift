@@ -8,9 +8,6 @@ import Store
 /// What the FindSearch variants read besides vectors and the store, all from the phone export (the database copy may
 /// predate the location columns): dates, locations, moments and trips, Vision tags.
 extension FindLibrary {
-  /// Vision labels kept as tags (V4).
-  static let tagConfidence = 0.3
-
   /// The export's `created`, else nil.
   func created(_ id: String) -> Double? { export[id]?.created }
   func location(_ id: String) -> (lat: Double?, lon: Double?) { (export[id]?.lat, export[id]?.lon) }
@@ -45,15 +42,18 @@ extension FindLibrary {
     return e
   }
 
-  /// id → Vision identifiers with confidence >= `tagConfidence`.
-  func tags() -> [String: [String]] {
-    if let t = tagsCache { return t }
-    var t: [String: [String]] = [:]
+  /// Vision identifiers with confidence >= `minConfidence` (`FindConfig.tagMinConfidence`, as the app's engine loads
+  /// them from `assetTag`), folded once into a `TagIndex` per threshold. The export kept labels >= 0.1, top 10: what
+  /// the app's tag pass stores.
+  func tagIndex(minConfidence: Double) -> TagIndex {
+    if let t = tagsCache[minConfidence] { return t }
+    var labels: [String: [String]] = [:]
     for (id, line) in vision where !line.missing {
-      let kept = line.labels.filter { $0.confidence >= Self.tagConfidence }.map(\.identifier)
-      if !kept.isEmpty { t[id] = kept }
+      let kept = line.labels.filter { $0.confidence >= minConfidence }.map(\.identifier)
+      if !kept.isEmpty { labels[id] = kept }
     }
-    tagsCache = t
+    let t = TagIndex(labels: labels)
+    tagsCache[minConfidence] = t
     return t
   }
 

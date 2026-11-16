@@ -4,26 +4,36 @@ import Places
 import Ranking
 import Store
 
-/// RollCore's `FindSearch` variants (round 2), one `FindConfig` each.
+/// RollCore's `FindSearch` variants (rounds 2 and 3), one `FindConfig` each.
 enum FindVariants {
   static var all: [any FindVariant] {
     func cut(_ ratio: Float) -> FindConfig { var c = FindConfig.v0; c.relativeCut = ratio; return c }
-    var v23 = FindConfig.v2; v23.events = true; v23.groupByEvent = true
+    // Round 2's V2, kept reproducible: holiday words only filter, places are hard.
+    var v2 = FindConfig.v2; v2.understandingOptions.keepHolidayWords = false; v2.placeMode = .hard
+    var v23 = v2; v23.events = true; v23.groupByEvent = true
     var v234 = v23; v234.tags = true
     var nf = FindConfig.v0; nf.nothingFound.minTopCosine = 0.735
     var v5 = FindConfig.v5; v5.seedAlpha = 0.5
+    // Round 3: the fixed understanding (holiday words stay embedded, soft places), with tags, and the shipped config.
+    var v2s = FindConfig.v2; v2s.understandingOptions.keepHolidayWords = true; v2s.placeMode = .soft
+    var v24s = v2s; v24s.tags = true
     return [
       FindSearchVariant(name: "F0", about: "FindSearch with .v0 (must equal V0 exactly; pool checks it)", config: .v0),
       FindSearchVariant(name: "C60", about: ".v0 + relativeCut 0.6", config: cut(0.6)),
       FindSearchVariant(name: "C70", about: ".v0 + relativeCut 0.7", config: cut(0.7)),
-      FindSearchVariant(name: "V2", about: ".v2: dates and places filter, the rest embedded", config: .v2),
+      FindSearchVariant(name: "V2", about: "round 2's .v2: dates, holidays and places filter (hard), the rest embedded",
+                        config: v2),
+      FindSearchVariant(name: "V2s", about: ".v2 fixed: holiday words filter and stay embedded; soft places "
+                        + "(elsewhere dropped, there +\(v2s.placeBonus) z, unlocated compete; words stay)", config: v2s),
+      FindSearchVariant(name: "V24s", about: "V2s + Vision tags (confidence >= \(v24s.tagMinConfidence))", config: v24s),
+      FindSearchVariant(name: "SHIP", about: "FindConfig.shipping exactly", config: .shipping),
       FindSearchVariant(name: "V3", about: ".v3: event support bonus, sections by event", config: .v3),
       FindSearchVariant(name: "V4", about: ".v4: Vision tags (confidence >= 0.3) fused like words", config: .v4),
       FindSearchVariant(name: "V5", about: ".v0 + seeds: the first 3 labelled-relevant ids in V0's top 20, "
                         + "seedAlpha 0.5; seeds removed from the answer (skipped with fewer than 3)",
                         config: v5, seeded: true),
-      FindSearchVariant(name: "V23", about: "V2 + V3", config: v23),
-      FindSearchVariant(name: "V234", about: "V2 + V3 + V4", config: v234),
+      FindSearchVariant(name: "V23", about: "round 2's V2 + V3", config: v23),
+      FindSearchVariant(name: "V234", about: "round 2's V2 + V3 + V4", config: v234),
       FindSearchVariant(name: "NF", about: ".v0 + nothingFound(minTopCosine 0.735)", config: nf),
     ]
   }
@@ -34,7 +44,8 @@ enum FindVariants {
 /// Inputs: query texts `Ranking.FindQuery.texts(for: semantic, config:)` (semantic = V2's understood text, which
 /// `embed --export` embedded); every text's cosines and `QueryScale` over the whole index; the seed centroid's (V5);
 /// words from the store's text index (`keywordCoverage`); per photo the export's created, latitude and longitude, its
-/// moment and trip (`EventGrouper` over the export), Vision tags (`TagFusion`). Candidates are the pool entries
+/// moment and trip (`EventGrouper` over the export), Vision tags (`TagIndex` from `vision.jsonl` at the config's
+/// `tagMinConfidence`, the app's threshold). Candidates are the pool entries
 /// `FindSearch.mayQualify` lets through and that pass the query's filters, plus those failing a filter only for lack of
 /// a date or location (counted, as the engine does). `now` is the export's newest date.
 struct FindSearchVariant: FindVariant {
@@ -75,6 +86,7 @@ struct FindSearchVariant: FindVariant {
     let filtered = understanding?.hasFilter == true
     let semantic = understanding?.semanticText ?? text
     let filterOnly = filtered && understanding!.isFilterOnly
+    let soft = FindSearch.softPlaces(understanding, filterOnly: filterOnly, config: config)
     let texts = filterOnly ? [] : Ranking.FindQuery.texts(for: semantic.isEmpty ? text : semantic, config: config)
     let rows = try texts.map { try lib.scores($0) }
     let seedRow = seeds.isEmpty ? nil : lib.seedScores(seeds)
@@ -85,7 +97,8 @@ struct FindSearchVariant: FindVariant {
     let coverage = terms.isEmpty ? [:] : try await lib.repositories.keywordCoverage(terms: terms)
     let events = config.events || config.groupByEvent || config.supportLevel == .trip || filterOnly
       ? try lib.events() : nil
-    let tags = config.tags ? lib.tags() : [:]
+    let tagCoverage = config.tags && !terms.isEmpty
+      ? lib.tagIndex(minConfidence: config.tagMinConfidence).coverage(queryTerms: terms) : [:]
 
     var zs: [Float] = []
     var topCosine: Float? = nil
@@ -99,27 +112,27 @@ struct FindSearchVariant: FindVariant {
                                   seedScale: seedScale, config: config)
       if wantZs, let z { zs.append(z) }
       let id = lib.ids[r]
-      let tagCoverage = config.tags ? TagFusion.coverage(queryTerms: terms, labels: tags[id] ?? []) : 0
-      guard FindSearch.mayQualify(z: z, coverage: coverage[id] ?? 0, tagCoverage: tagCoverage, filtered: filtered,
-                                  filterOnly: filterOnly, config: config) else { continue }
       let created = lib.created(id)
       let (lat, lon) = lib.location(id)
+      let v = filtered ? FindSearch.verdict(understanding, soft: soft, created: created, latitude: lat, longitude: lon,
+                                            locator: locator, calendar: calendar, config: config)
+        : FindSearch.Verdict()
+      let tags = tagCoverage[id] ?? 0
+      guard FindSearch.mayQualify(z: z, coverage: coverage[id] ?? 0, tagCoverage: tags, filtered: v.confined,
+                                  filterOnly: filterOnly, placeBonus: v.placeBonus, config: config) else { continue }
+      if !v.passes {
+        if !v.dateOK {
+          guard created == nil else { continue }  // dated outside the window
+        } else if soft || (lat != nil && lon != nil) {
+          continue  // located elsewhere
+        }
+      }
       let moment = events?.assignment[id]
       let candidate = FindSearch.Candidate(
         asset: SearchAsset(id: id, mediaType: 0, estBytes: 0, created: created, isFavorite: false, originalLocal: nil),
-        cosines: rows.map { $0[r] }, seedCosine: seedCosine, coverage: coverage[id] ?? 0, tagCoverage: tagCoverage,
+        cosines: rows.map { $0[r] }, seedCosine: seedCosine, coverage: coverage[id] ?? 0, tagCoverage: tags,
         latitude: lat, longitude: lon, eventId: moment, tripId: moment.flatMap { events?.tripOf[$0] })
-      if let u = understanding, filtered {
-        let dateOK = u.matchesDate(created, calendar: calendar)
-        guard dateOK || created == nil else { continue }
-        let placeOK = dateOK && u.matchesPlace(latitude: lat, longitude: lon, locator: locator)
-        if !(dateOK && placeOK) {
-          if dateOK, lat != nil, lon != nil { continue }  // located elsewhere
-          unread[id] = candidate  // no date or no location: only counted
-          continue
-        }
-      }
-      read[id] = candidate
+      if v.passes { read[id] = candidate } else { unread[id] = candidate }  // no date or location: only counted
     }
     // The store's search fields for every candidate; `created` stays the export's (the database copy may be older).
     var candidates: [FindSearch.Candidate] = []

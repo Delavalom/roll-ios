@@ -23,13 +23,18 @@ func embedCommand(specs: [URL], model: URL, store: URL, out: URL, export: URL?) 
   if let export {
     let (now, located) = exportClock(try JSONLines.decode(ExportAsset.self, from: export), indexed: nil)
     let gazetteer = try Gazetteer.load()
+    // Every understanding variant's parse (round 2's V2 removes holiday and place words; V2s and SHIP keep them).
+    let configs = FindVariants.all.compactMap { ($0 as? FindSearchVariant)?.config }.filter(\.understanding)
     var added = 0
     for q in queries {
-      let u = Understood.of(q.text.trimmingCharacters(in: .whitespacesAndNewlines),
-                            now: now ?? Date().timeIntervalSince1970, gazetteer: gazetteer, located: located, config: .v2)
-      if let s = u.semanticText, !texts.contains(s) { texts.append(s); added += 1 }
+      for config in configs {
+        let u = Understood.of(q.text.trimmingCharacters(in: .whitespacesAndNewlines),
+                              now: now ?? Date().timeIntervalSince1970, gazetteer: gazetteer, located: located,
+                              config: config)
+        if let s = u.semanticText, !texts.contains(s) { texts.append(s); added += 1 }
+      }
     }
-    print("V2 understanding: \(added) semantic texts besides the queries' own")
+    print("understanding variants: \(added) semantic texts besides the queries' own")
   }
 
   let clock = ContinuousClock()

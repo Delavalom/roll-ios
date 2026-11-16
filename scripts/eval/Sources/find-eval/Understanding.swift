@@ -21,7 +21,7 @@ struct Understood {
   static func of(_ text: String, now: Double, gazetteer: Gazetteer?,
                  located: [(latitude: Double, longitude: Double)], config: FindConfig) -> Understood {
     var u = QueryUnderstanding.parse(text, now: Date(timeIntervalSince1970: now), calendar: .current,
-                                     gazetteer: gazetteer, options: config.understandingOptions)
+                                     gazetteer: gazetteer, options: config.parseOptions)
     var locator: PlaceLocator? = nil
     if u.hasPlaceFilter, let gazetteer {
       let place = PlaceLocator(gazetteer: gazetteer)

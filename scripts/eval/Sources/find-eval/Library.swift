@@ -3,6 +3,7 @@ import FindEvalKit
 import Foundation
 import GRDB
 import Places
+import Ranking
 import Store
 
 /// Everything a variant can read about the library, loaded once per `pool` run. Private: ids, dates, places.
@@ -36,7 +37,7 @@ final class FindLibrary {
 
   // Lazily built for the FindSearch variants (`Library+Find.swift`).
   var eventsCache: (assignment: [String: String], tripOf: [String: String], moments: Int, trips: Int)?
-  var tagsCache: [String: [String]]?
+  var tagsCache: [Double: TagIndex] = [:]
   var gazetteerCache: Gazetteer??
   var locatedCache: [(latitude: Double, longitude: Double)]?
   /// (variant name, slug) → answer, so a variant can build on another's (V5 on V0) without running it twice.
