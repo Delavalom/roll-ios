@@ -41,7 +41,7 @@ done
 needles=(
   # Types and helpers (App/QA, RollCore's #if DEBUG files).
   "QARuntime" "QAEventLog" "QAMetrics" "QAPause" "QACounters" "QALibrary" "QASquishAudit" "QAInventory"
-  "QAThumbProbe" "QAFindExport" "QAFindExporter" "QAKeepAwake" "QAController" "QADebugOverlay" "QAScopeGate" "QAReadOnlyGate" "QAAlbumGate"
+  "QAThumbProbe" "QASearchBench" "QAFindExport" "QAFindExporter" "QAKeepAwake" "QAController" "QADebugOverlay" "QAScopeGate" "QAReadOnlyGate" "QAAlbumGate"
   "QAScopeViolation" "QASquishHooks" "QAStoreStats" "QAMediaProbe" "QADolbyVisionExperiment" "qaScoped"
   "resetForUITests" "UITestResetOutcome" "PhotoKitFingerprint" "QARestock" "QARestockRoom" "QAMemoryReel" "removeFromQAAlbum"
   # Launch arguments.
@@ -56,7 +56,7 @@ needles=(
   "qa_gate" "qa_config_error" "qa_fake_space" "qa_exhaust_quota" "ui_test_reset" "locality_scan" "types_resolved"
   "upgrade_pass" "squish_before_delete" "squish_prepared" "squish_failed" "squish_commit" "squish_copy_after_delete"
   "squish_catalog" "index_batch" "index_run" "store_stats" "library_totals" "sync_read" "signal_timing"
-  "thumb_probe" "album_inventory" "dv_experiment" "keep_awake" "qa_restock"
+  "thumb_probe" "album_inventory" "dv_experiment" "keep_awake" "qa_restock" "search_bench" "typed_search" "find_search"
   # The keep-awake call (QAKeepAwake).
   "setIdleTimerDisabled:"
 )

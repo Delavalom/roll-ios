@@ -28,6 +28,7 @@ enum QASearchBench {
         guard ContinuousClock.now - since >= .seconds(30), let engine = app.engine else { continue }
         await run(engine: engine, log: log)
         await runTyped(engine: engine, log: log)
+        await runFind(engine: engine, log: log)
         return
       }
     }
@@ -79,6 +80,32 @@ enum QASearchBench {
         } catch {
           log.write("typed_search", ["query": .string(query), "attempt": .int(attempt),
                                      "error": .string(String(describing: type(of: error)))])
+        }
+      }
+    }
+  }
+
+  /// Find's typed queries through the shipping config (`FindConfig.shipping`: understanding, tags, relative cut,
+  /// nothing-found, event sections), each `repeats` times. Logs `find_search`: query, attempt, milliseconds (embedding
+  /// and the first tag-index load included), engine milliseconds, strong, weaker, sections, refused. Counts only.
+  static let findQueries = ["soccer", "christmas 2023", "beach last summer", "halloween costume", "my dog",
+                            "birthday cake with candles", "road trip", "xkqzv plorb"]
+
+  private static func runFind(engine: SwipefileEngine, log: QAEventLog) async {
+    for query in findQueries {
+      for attempt in 1...repeats {
+        let start = ContinuousClock.now
+        do {
+          let result = try await engine.find(query, config: .shipping)
+          log.write("find_search", [
+            "query": .string(query), "attempt": .int(attempt), "ms": .double(SearchTimings.ms(ContinuousClock.now - start)),
+            "engine_ms": .double(SearchTimings.ms(result.elapsed)), "strong": .int(result.matches.count),
+            "weaker": .int(result.weaker.count), "sections": .int(result.sections.count),
+            "refused": .bool(result.nothingFound),
+          ])
+        } catch {
+          log.write("find_search", ["query": .string(query), "attempt": .int(attempt),
+                                    "error": .string(String(describing: type(of: error)))])
         }
       }
     }
