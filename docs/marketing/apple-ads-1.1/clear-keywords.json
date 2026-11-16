@@ -1,0 +1,78 @@
+{
+ "_note": "Shape to check against KeywordCreateBulkRequest when the founder says go; adGroupId comes from the ad group create.",
+ "adGroupId": "AD_GROUP_ID",
+ "keywords": [
+  {
+   "text": "clean up iphone",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "photo cleaner",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "delete photos",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "clean up photos free",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "photo delete swipe",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "duplicate photo cleaner",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "storage cleaner",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "screenshot cleaner",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "clean up photos",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.50",
+    "currency": "USD"
+   }
+  }
+ ]
+}

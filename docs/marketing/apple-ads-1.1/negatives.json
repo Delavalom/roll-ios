@@ -1,0 +1,49 @@
+{
+ "_note": "Campaign-level negatives for all three campaigns; check against NegativeKeywordCreateBulkRequest.",
+ "keywords": [
+  {
+   "text": "recover deleted photos",
+   "matchType": "EXACT"
+  },
+  {
+   "text": "photo recovery",
+   "matchType": "EXACT"
+  },
+  {
+   "text": "photo editor",
+   "matchType": "EXACT"
+  },
+  {
+   "text": "ai photo editor",
+   "matchType": "EXACT"
+  },
+  {
+   "text": "ai photo enhancer",
+   "matchType": "EXACT"
+  },
+  {
+   "text": "photo roulette",
+   "matchType": "EXACT"
+  },
+  {
+   "text": "reverse image search",
+   "matchType": "EXACT"
+  },
+  {
+   "text": "find my iphone",
+   "matchType": "EXACT"
+  },
+  {
+   "text": "photo book",
+   "matchType": "EXACT"
+  },
+  {
+   "text": "prints",
+   "matchType": "EXACT"
+  },
+  {
+   "text": "swipewipe",
+   "matchType": "EXACT"
+  }
+ ]
+}
