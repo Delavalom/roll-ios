@@ -1,0 +1,25 @@
+{
+ "name": "Roll US Search Brand 1.1",
+ "status": "PAUSED",
+ "adAccountId": 24268190,
+ "promotedObjectType": "APPSTORE_APP",
+ "promotedObjectId": "6826174715",
+ "billingEvent": "TAPS",
+ "dailyBudget": {
+  "value": {
+   "amount": "2",
+   "currency": "USD"
+  }
+ },
+ "targeting": {
+  "countryOrRegion": {
+   "include": [
+    "US"
+   ]
+  }
+ },
+ "bidStrategy": {
+  "bidStrategyType": "MANUAL_CPT",
+  "bidStrategyGoal": "TAP"
+ }
+}

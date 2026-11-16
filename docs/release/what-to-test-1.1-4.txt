@@ -1,0 +1,19 @@
+Roll 1.1 (4): Find. Use your own iPhone. Do destructive things (delete, squish) only inside a small album you can afford to lose, such as "Roll QA". Making albums is safe: it only adds.
+
+1. Find a trip. In Ask Roll type a trip the way you'd say it: a city or country plus a year ("Lisbon 2024"), a holiday with a year ("christmas 2023"), or a season ("beach last summer"). The answer should come grouped by moment, with weaker matches folded below.
+
+2. Make album. From an answer (or one of its sections) tap Make album, leave out anything that doesn't belong, Create. The album should appear in Photos with exactly what you picked. Nothing is deleted. Album adds don't use your 50 free changes: check the free count before and after.
+
+3. Keep this album updated. Turn it on after making an album, take or save a few new matching photos, reopen Roll. Home should offer them ("N new photos for ..."); nothing is added until you tap Add.
+
+4. More like these. Pick a few photos in an answer and ask for more like them.
+
+5. Nonsense. Type gibberish ("plim plam plooz"). Roll should say nothing clearly matched and show the closest few, not a long list.
+
+6. Speed and heat. The first search after a launch is slower (it loads the tag index); after that answers should feel instant. Watch for heat while the new scene-label pass runs after indexing.
+
+7. Cleanup still works as in 1.0: piles, duplicates, squish, paywall (one-time Roll Pro), Restore.
+
+Memory videos are off in this build on purpose.
+
+Feedback: take a screenshot in Roll and tap Share Beta Feedback, or email hi@delavalom.com.

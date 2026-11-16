@@ -6,7 +6,7 @@ Replaces the Kleo draft. Paste this, attach `docs/design/ask-roll/video/ask-roll
 
 I have 29,682 photos and videos on my iPhone 13 Pro Max. Today I typed "handwritten note" into them and got the right photo back in 24 milliseconds. Nothing left the phone to do that.
 
-The idea isn't mine. Abdur Rahim released DigUp (digup.arahim.dev), a Mac app that runs Google DeepMind's EmbeddingGemma 2 over your files, and it took off on r/LocalLLaMA. I wanted it in my pocket. So I spent a week getting Gemma onto the iPhone's Neural Engine, and building Roll, an app that uses it: describe a pile of photos in plain words, it finds the pile, you swipe to clean it. The model is a one-time 343 MB download. After that every photo and video becomes a vector that stays on the device. Search works in airplane mode.
+The idea isn't mine. Abdur Rahim released DigUp (digup.arahim.dev), a Mac app that runs Google DeepMind's EmbeddingGemma 2 over your files, and it took off on r/LocalLLaMA. I wanted it in my pocket. So I spent a week getting Gemma running on the iPhone itself, and building Roll, an app that uses it: describe a pile of photos in plain words, it finds the pile, you swipe to clean it. The model is a one-time 343 MB download. After that every photo and video becomes a vector that stays on the device. Search works in airplane mode.
 
 Some numbers, measured on my own library. It's a Debug build, so the TestFlight and App Store ones should come in faster.
 
@@ -17,7 +17,7 @@ Warm search holds about 630 MB of memory. On a 2021 phone.
 
 The first version of search took about 300 ms per query. Splitting the steps apart showed one full scored sort per prompt, so I replaced it with a single vDSP matrix multiply, kept the candidate rows in memory and aligned the scores as integers. 14.5 ms.
 
-Two things were genuinely hard. Core ML first loads the model as one ~1 GB blob, more memory than iOS gives a Neural Engine model, so it's now 9 functions compiled one at a time. And iOS deletes the compiled model when the phone has under about 2 GB free, which on a nearly full phone means compiling for 20 minutes, watching the cache vanish, and doing it again.
+Two things were genuinely hard. Core ML first loads the model as one ~1 GB blob, more memory than iOS gives a single on-device model, so it's now 9 functions compiled one at a time. And iOS deletes the compiled model when the phone has under about 2 GB free, which on a nearly full phone means compiling for 20 minutes, watching the cache vanish, and doing it again.
 
 I don't trust numbers without a check, so every step of the conversion is gated against Google's original model across 8 stages, and the build fails if the vectors drift.
 

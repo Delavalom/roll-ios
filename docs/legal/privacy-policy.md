@@ -9,19 +9,23 @@ DRAFT. Not published. Before hosting at https://roll.delavalom.com/privacy:
 
 Effective date: {{EFFECTIVE_DATE}}
 
-Roll is a photo cleanup app for iPhone made by {{DEVELOPER_NAME}} ("we"). This policy explains what happens to your
+Roll is a photo cleanup and search app for iPhone made by {{DEVELOPER_NAME}} ("we"). This policy explains what happens to your
 information when you use Roll. The short version: your photos are analyzed on your iPhone and are never uploaded.
 We don't run analytics, we don't track you, and we don't have accounts.
 
 ## Your photos stay on your iPhone
 
 Roll asks for access to your photo library so it can find things you may want to delete, move to an album or
-shrink ("squish"). All of that analysis runs on your device:
+shrink ("squish"), and find the photos you describe (Find). All of that analysis runs on your device:
 
 - Roll reads your photos and videos through Apple's Photos framework and analyzes them on your iPhone, using an AI
   model that runs on the device and Apple's on-device Vision and Sensitive Content Analysis frameworks.
 - No photos, videos, thumbnails, embeddings (the numbers the AI model computes from a photo), or the descriptions
   you type are sent to us or to anyone else.
+- To find a trip or a place, Roll reads where and when each photo was taken from the photo's own information in your
+  library (the location your camera saved with it, if any). Place names come from a list of places built into the app
+  (from GeoNames), so Roll works out which city or country a photo is in on your iPhone, without looking anything up
+  online. Roll doesn't use Location Services and never asks where you are now.
 - If you use iCloud Photos, Roll may ask Photos to download the full-size original of an item from your own iCloud
   Photos library so it can be analyzed or squished. That download is between your device and Apple, as part of
   iCloud Photos.
@@ -30,8 +34,11 @@ shrink ("squish"). All of that analysis runs on your device:
 
 Roll keeps its working data in the app's own private storage on your iPhone:
 
-- an index of your library: item identifiers, dates, sizes and types, and the results of the on-device analysis
-  (for example blur and quality scores, image fingerprints used to find duplicates, and AI embeddings);
+- an index of your library: item identifiers, dates, sizes and types, where each photo was taken (the latitude and
+  longitude saved with it, if any), and the results of the on-device analysis (for example blur and quality scores,
+  image fingerprints used to find duplicates, words read in screenshots and documents, scene labels such as "beach"
+  or "dog", the trips and moments your photos group into with their place names, and AI embeddings);
+- the albums you ask Roll to keep up to date: the search and the album name;
 - your swipefiles: their names, the descriptions you type, your swipe decisions, and small models trained on your
   device from those decisions;
 - a record of squishes in progress, so an interrupted squish can be finished or undone;
@@ -39,7 +46,7 @@ Roll keeps its working data in the app's own private storage on your iPhone:
 - the downloaded AI model.
 
 The AI embeddings and the AI model are excluded from iCloud and computer backups. The rest of the index (including
-the image fingerprints, your swipefiles and the descriptions you typed) is stored in a database that is not
+the image fingerprints, photo locations, words, scene labels, your swipefiles and the descriptions you typed) is stored in a database that is not
 excluded, so if you back up your iPhone to iCloud or to a computer, it is included in that backup, which is stored
 by Apple or on your computer and not by us.
 
@@ -120,4 +127,8 @@ Source notes (for maintainers; delete when publishing):
   purchases-ios 5.x HTTPClient default headers include X-Apple-Device-Identifier (identifierForVendor), device
   model, OS and app version, preferred locales and storefront.
 - Face ID: LocalAuthentication in App/Features/Swipefiles/SwipefileListModel.swift.
+- Find (1.1): Store/Schema.swift v10 (assetText: words read in screenshots and utility images), v11 (asset.lat/lon from
+  PHAsset.location, event with city/admin1/country, savedSearch with query and albumName), v12 (assetTag Vision scene
+  labels). Place names: Places/Gazetteer.swift over the bundled Resources/places.z (GeoNames, CC-BY 4.0, NOTICE);
+  no CLGeocoder, no Location Services, no NSLocation usage string.
 -->

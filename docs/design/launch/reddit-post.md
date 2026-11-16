@@ -6,11 +6,11 @@ Post it BEFORE the LinkedIn recap, the way DigUp did it: Reddit first, then the 
 
 ## Title
 
-Roll: EmbeddingGemma 2 on the iPhone's Neural Engine. Searching 29,682 photos offline in ~15 ms
+Roll: EmbeddingGemma 2 on the iPhone, on-device. Searching 29,682 photos offline in ~25 ms
 
 ## Body
 
-DigUp showed what Google DeepMind's EmbeddingGemma 2 can do over a whole file library on a Mac. I wanted that on the phone, so I ported the model to Core ML, ran it on the Neural Engine, and built Roll, an iPhone app where you describe a pile of photos in plain words and swipe to clean it. Every photo and video becomes a vector on the device; the model is a one-time 343 MB download and search never touches the network.
+DigUp showed what Google DeepMind's EmbeddingGemma 2 can do over a whole file library on a Mac. I wanted that on the phone, so I ported the model to Core ML, ran it on the phone, and built Roll, an iPhone app where you describe a pile of photos in plain words and swipe to clean it. Every photo and video becomes a vector on the device; the model is a one-time 343 MB download and search never touches the network.
 
 What a search looks like:
 
@@ -27,7 +27,7 @@ Measured on my own library, iPhone 13 Pro Max, Debug build (TestFlight and App S
 * index the whole 29,685-item library in 75.8 minutes, 0 failures (about 27 minutes of that was the pause while the phone is hot, so an unpaced run is faster)
 * warm search holds about 630 MB
 
-What was hard: Core ML loads the model as one ~1 GB blob, past what iOS gives a Neural Engine model, so it's 9 functions compiled one at a time (first launch ~20 minutes, then iOS caches it, and deletes that cache if free space drops under ~2 GB). Search started at ~300 ms per query because of one full scored sort per prompt; a single vDSP matrix multiply plus integer-aligned rows got it to 14.5 ms.
+What was hard: Core ML loads the model as one ~1 GB blob, past what iOS gives a single on-device model, so it's 9 functions compiled one at a time (first launch ~20 minutes, then iOS caches it, and deletes that cache if free space drops under ~2 GB). Search started at ~300 ms per query because of one full scored sort per prompt; a single vDSP matrix multiply plus integer-aligned rows got it to 14.5 ms.
 
 Every step of the conversion is tested against Google's original model across 8 stages, with gates that fail the build if the vectors drift. No vibes, cosine checks.
 

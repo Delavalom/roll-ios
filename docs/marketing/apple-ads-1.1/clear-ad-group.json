@@ -1,0 +1,11 @@
+{
+ "_note": "Shape to check against AdGroupCreate when the founder says go; campaignId comes from the campaign create.",
+ "campaignId": "CAMPAIGN_ID",
+ "name": "Clear 1.1 exact",
+ "status": "PAUSED",
+ "defaultBidAmount": {
+  "amount": "1.50",
+  "currency": "USD"
+ },
+ "automatedKeywordsOptIn": false
+}

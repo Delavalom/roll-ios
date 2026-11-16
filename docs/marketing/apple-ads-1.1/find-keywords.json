@@ -1,0 +1,86 @@
+{
+ "_note": "Shape to check against KeywordCreateBulkRequest when the founder says go; adGroupId comes from the ad group create.",
+ "adGroupId": "AD_GROUP_ID",
+ "keywords": [
+  {
+   "text": "find photos",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.00",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "photo search",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.00",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "ai photo search",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.00",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "search photos",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.00",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "photo finder",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.00",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "trip album",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.00",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "trip photos",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.00",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "find my photos",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.00",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "photo organizer",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.00",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "album maker",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "1.00",
+    "currency": "USD"
+   }
+  }
+ ]
+}

@@ -1,0 +1,38 @@
+{
+ "_note": "Shape to check against KeywordCreateBulkRequest when the founder says go; adGroupId comes from the ad group create.",
+ "adGroupId": "AD_GROUP_ID",
+ "keywords": [
+  {
+   "text": "roll photo cleaner",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "0.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "roll private ai photo cleaner",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "0.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "roll photos",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "0.50",
+    "currency": "USD"
+   }
+  },
+  {
+   "text": "roll app",
+   "matchType": "EXACT",
+   "bidAmount": {
+    "amount": "0.50",
+    "currency": "USD"
+   }
+  }
+ ]
+}
