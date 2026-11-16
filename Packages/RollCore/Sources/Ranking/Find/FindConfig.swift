@@ -69,7 +69,8 @@ public struct FindConfig: Sendable, Equatable, Codable {
 
   // MARK: V2 understanding
 
-  /// Dates and places in the query filter; only the rest is embedded (`QueryUnderstanding`).
+  /// Dates and places in the query filter (`QueryUnderstanding`). Month, season, year and relative-date words leave
+  /// the embedded text; holiday words stay (`Options.keepHolidayWords`), and so do place words when `placeMode` is soft.
   public var understanding = false
   public var understandingOptions = QueryUnderstanding.Options()
   /// The z gate once a date or place filter applies. 1.0: inside a trip or a month most photos are already about the

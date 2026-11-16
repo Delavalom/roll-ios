@@ -47,8 +47,13 @@ Tags cost ~1.4 s per query over 30k photos because every photo's labels were fol
 - **Events group, never rank**: sections by moment and "rest of this event" (`groupByEvent`, `expandRest`), support
   weight 0.
 
-Round 3 of the eval (`find-eval`, variants V2s, V24s and SHIP) measures the fixed understanding and this exact
-config; its numbers go in the eval note.
+Round 3 of the eval (`find-eval`, variants V2s, V24s and SHIP; 2026-11-15, before judging the ~5 new results it
+brought into the top 20) measured, P@20 overall: V0 .823, V4 .841, V2s .782, V24s .799, SHIP .797 (median answer 61,
+9 of 12 nonsense queries refused, no real query refused). Album trip queries: V2s .800, as V0 (round 2's V2: .48).
+"christmas 2023" with its dates enforced: V2s .85 (round 2's V2 .2, V0 0). What still costs SHIP against V4: the
+scorer judges dated queries on their subject only ("beach last summer": V0 1.0, but 2 of its 83 relevant photos are
+from last summer), and "halloween costume" falls from .55 to 0 because the holiday filter keeps only 31 October to
+1 November while most costume photos are from other days.
 
 ## Consequences
 
