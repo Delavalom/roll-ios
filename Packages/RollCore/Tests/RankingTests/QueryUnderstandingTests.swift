@@ -111,13 +111,29 @@ struct QueryUnderstandingDateTests {
   ]
 
   @Test(arguments: anyYear) func anyYearWindows(_ c: AnyYear) {
-    let u = parse(c.query)
+    var filtering = QueryUnderstanding.Options()
+    filtering.bareHolidayFilters = true
+    let u = parse(c.query, options: filtering)
     #expect(u.semanticText == c.semantic)
     #expect(u.dateRanges.isEmpty)
     #expect(!u.anyYearWindows.isEmpty)
     for t in c.inside { #expect(u.matchesDate(t, calendar: calendar), "inside \(t)") }
     for t in c.outside { #expect(!u.matchesDate(t, calendar: calendar), "outside \(t)") }
     #expect(!u.matchesDate(nil, calendar: calendar), "an undated photo never passes a date filter")
+  }
+
+  /// By default a holiday the query doesn't date is only a word: "halloween costume" filtered to 31 Oct–2 Nov lost most
+  /// costumes in the find eval (P@20 0.55 → 0). A year or "last"/"this" still makes it a filter.
+  @Test(arguments: ["halloween costume", "christmas", "christmas tree", "navidad", "easter eggs", "thanksgiving dinner"])
+  func bareHolidaysAreWords(_ query: String) {
+    let u = parse(query)
+    #expect(!u.hasDateFilter)
+    #expect(u.semanticText == query)
+  }
+
+  @Test(arguments: ["christmas 2023", "last christmas", "this halloween", "navidad 2024"])
+  func datedHolidaysFilter(_ query: String) {
+    #expect(parse(query).hasDateFilter)
   }
 
   @Test(arguments: ["may", "march", "summer", "spring", "fall", "mayo", "1234", "2099", "dog", "trip"])

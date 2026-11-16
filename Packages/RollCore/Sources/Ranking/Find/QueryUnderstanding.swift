@@ -36,6 +36,10 @@ public enum QueryUnderstanding {
     /// for that query although all 34 relevant photos were in its 98 results; the word ranks them. Only the holiday's
     /// own words stay ("last", "2023", "pasada" still go).
     public var keepHolidayWords = true
+    /// A holiday with neither a year nor "last"/"this" in the query ("halloween costume") filters too. Off (default),
+    /// it is only a word: the find eval (2026-11-15) measured "halloween costume" P@20 0.55 → 0 when it filtered to
+    /// 31 Oct–2 Nov (costumes are worn on other days). "christmas 2023" and "last christmas" still filter.
+    public var bareHolidayFilters = false
     /// Place words filter *and* stay in the embedded text (`FindConfig.PlaceMode.soft` sets it). Off, they only filter.
     /// A query whose only other words are general ones ("Lisbon trip") is then not `isFilterOnly`: it is embedded.
     public var keepPlaceWords = false

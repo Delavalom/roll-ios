@@ -17,7 +17,18 @@ extension QueryUnderstanding {
     let nowYear = calendar.component(.year, from: now)
 
     // Dates.
-    let found = dateExpressions(folded, nowYear: nowYear, options: options)
+    var found = dateExpressions(folded, nowYear: nowYear, options: options)
+    // A bare holiday ("halloween costume") is a word, not a date, unless the query dates it (a year, "last", "this").
+    if !options.bareHolidayFilters {
+      let dated = found.contains { expr in
+        switch expr.1 {
+        case .year, .relativeYear: true
+        case .periodic(.holiday, let q): q != nil
+        default: false
+        }
+      }
+      if !dated { found.removeAll { if case .periodic(.holiday, nil) = $0.1 { true } else { false } } }
+    }
     var holidayTokens = Set<Int>()
     for (range, expr) in found {
       for i in range { tokens[i].role = .date }
