@@ -117,7 +117,8 @@ scripts/                  seed_sim.sh + make_seed_media.py (Roll-QA), gen_status
 .github/workflows/ci.yml  manual-only CI (see Start here)
 docs/                     MILESTONES.md, decisions/ (ADRs), superpowers/ (spec, plan), legal/ (privacy policy and terms:
                           the source of truth for the site)
-site/                     https://roll.delavalom.com (Vercel project roll-site): `python3 site/build.py` renders
+site/                     https://roll.delavalom.com (Cloudflare Worker roll-site, `cd site && mise exec -- wrangler deploy`;
+                          was Vercel until 2026-11-16): `python3 site/build.py` renders
                           docs/legal/*.md + src/pages into public/ (committed, served as is; values in site.json)
 ```
 

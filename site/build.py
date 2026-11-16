@@ -9,7 +9,8 @@ Standard library only. Usage: python3 site/build.py
 - / and /support come from site/src/pages/*.html (body fragments with a two-line header: title, description).
 - site/src/style.css and site/src/static/* are copied as they are.
 
-The output is committed so the deploy needs no build step (Vercel serves site/public as plain static files).
+The output is committed so the deploy needs no build step: `cd site && mise exec -- wrangler deploy` (Cloudflare
+Worker roll-site, Workers Static Assets; wrangler.jsonc). Security headers: src/static/_headers.
 """
 
 from __future__ import annotations
