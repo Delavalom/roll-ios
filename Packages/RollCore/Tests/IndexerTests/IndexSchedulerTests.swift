@@ -53,6 +53,61 @@ struct IndexSchedulerTests {
     }
   }
 
+  @Test func setUpRunsBeforeIndexing() async throws {
+    try await Harness.with(count: 30) { h in
+      let indexer = try h.indexer()
+      try await indexer.sync()
+      let bg = FakeBackgroundTask()
+      let embeddedAtSetUp = Mutex<Int?>(nil)
+      let work = IndexScheduler.perform(
+        indexer: { indexer },
+        setUp: {
+          let n = try? await h.count("embedded = 1")
+          embeddedAtSetUp.withLock { $0 = n }
+        },
+        setExpirationHandler: bg.setExpiration, reschedule: bg.reschedule, complete: bg.complete)
+      await work.value
+      #expect(embeddedAtSetUp.withLock { $0 } == 0, "nothing was indexed before setUp")
+      #expect(try await h.count("embedded = 1") == 30)
+      #expect(bg.completed == [true])
+    }
+  }
+
+  @Test func aSetUpWithoutTheModelStillIndexesSignals() async throws {
+    try await Harness.with(count: 12) { h in
+      let indexer = try h.indexer(embedder: false)
+      try await indexer.sync()
+      let bg = FakeBackgroundTask()
+      let work = IndexScheduler.perform(indexer: { indexer }, setUp: {}, setExpirationHandler: bg.setExpiration,
+                                        reschedule: bg.reschedule, complete: bg.complete)
+      await work.value
+      #expect(try await h.count("signalsDone = 1") == 12)
+      #expect(bg.reschedules == 1, "embedding is left for when the model loads")
+    }
+  }
+
+  @Test func expirationDuringSetUpStopsAndReschedules() async throws {
+    try await Harness.with(count: 12) { h in
+      let indexer = try h.indexer()
+      try await indexer.sync()
+      let bg = FakeBackgroundTask()
+      let started = Mutex(false)
+      let work = IndexScheduler.perform(
+        indexer: { indexer },
+        setUp: {
+          started.withLock { $0 = true }
+          while !Task.isCancelled { try? await Task.sleep(for: .milliseconds(1)) }
+        },
+        setExpirationHandler: bg.setExpiration, reschedule: bg.reschedule, complete: bg.complete)
+      try await Harness.waitUntil { started.withLock { $0 } }
+      bg.expire()
+      await work.value
+      #expect(bg.completed == [false])
+      #expect(bg.reschedules == 1)
+      #expect(try await h.count("signalsDone = 1") == 0, "no indexing after an expired setUp")
+    }
+  }
+
   @Test func noIndexerYetCompletesAsFailedAndReschedules() async {
     let bg = FakeBackgroundTask()
     let work = IndexScheduler.perform(indexer: { nil }, setExpirationHandler: bg.setExpiration,
