@@ -11,6 +11,7 @@ import Observation
 import Overview
 import Ranking
 import Signals
+import Setup
 import Squish
 import SquishBridge
 import Store
@@ -58,6 +59,8 @@ final class AppModel {
   let home: HomeModel
   let thumbnails: any ThumbnailProvider
   let skipsPaywall: Bool
+  /// The on-device AI's setup: the model, then the whole library read (SetupModel.swift, AppModel+Setup.swift).
+  let setup: SetupModel
   /// Verified squish copies, shared by every runner so a copy prepared (or reconciled) by one commits through another.
   let squishRegistry = PreparedRegistry()
 
@@ -81,7 +84,7 @@ final class AppModel {
   /// Bumped when the Store's view of the library changed: an index batch landed, a sync or a commit finished.
   private(set) var libraryRevision = 0
   /// Assets analysed from a small local preview because their originals are in iCloud.
-  private(set) var previewCount = 0
+  var previewCount = 0
   /// "Improve with iCloud originals" (Home): when on, preview rows are re-analysed from full images downloaded from
   /// iCloud, only on Wi-Fi while the iPhone charges.
   var improveWithICloud: Bool {
@@ -97,17 +100,19 @@ final class AppModel {
   /// Living albums: the event pass, then saved searches' new photos, after indexing drains (AppModel+Text.swift).
   let living: LivingAlbumsModel
   /// Runs the opt-in iCloud upgrade only while Wi-Fi and charging hold (live builds).
-  @ObservationIgnored private var upgradeMonitor: ICloudUpgradeMonitor?
+  @ObservationIgnored var upgradeMonitor: ICloudUpgradeMonitor?
 
   @ObservationIgnored let environment: AppEnvironment
   @ObservationIgnored var modelTask: Task<Void, Never>?
   /// Bumped per `loadModel`, so a superseded attempt (cancelled for mobile data) can't report or fail the new one.
   @ObservationIgnored var modelAttempt = 0
-  @ObservationIgnored private var indexTask: Task<Void, Never>?
+  /// The installer said it's unpacking or activating (not still checking or fetching the manifest): `setupModelStep`.
+  @ObservationIgnored var modelInstalling = false
+  @ObservationIgnored private(set) var indexTask: Task<Void, Never>?
   @ObservationIgnored private var indexAgain = false
   /// Bumped when a new indexing loop starts or the app goes to the background: a text pass queued by an earlier
   /// drain (`afterIndexDrained`) checks it and doesn't start.
-  @ObservationIgnored private(set) var textGeneration = 0
+  @ObservationIgnored var textGeneration = 0
   @ObservationIgnored private var progressTask: Task<Void, Never>?
   @ObservationIgnored private var observerTask: Task<Void, Never>?
   @ObservationIgnored private var lastBatch = (runId: -1, batch: -1)
@@ -139,6 +144,9 @@ final class AppModel {
     access = environment.access.current()
     onboardingComplete = environment.defaults.bool(forKey: Self.onboardingKey)
     improveWithICloud = environment.defaults.bool(forKey: Self.improveWithICloudKey)
+    let bridge = SetupBridge()
+    setup = SetupModel(work: AppSetupWork(bridge: bridge), defaults: environment.defaults)
+    bridge.app = self
   }
 
   /// The production app. DEBUG builds only (the UI smoke test, Task 14): `-UITestStubEmbedder` attaches
@@ -154,6 +162,7 @@ final class AppModel {
     #if DEBUG
     let arguments = ProcessInfo.processInfo.arguments
     if arguments.contains("-UITestStubEmbedder") { loader = StubLoader() }
+    if arguments.contains("-UITestHoldModel") { loader = HeldLoader() }
     skipsPaywall = arguments.contains("-UITestSkipPaywall")
     // Device QA (App/QA): `-QAAlbum` scopes the library to one album and keeps its own database, vector index and
     // onboarding flag under Application Support/qa; `-QAMetrics` records identifier-free metrics.
@@ -177,6 +186,7 @@ final class AppModel {
   func start() {
     if environment.isLive { entitlements.configure(apiKey: Entitlements.apiKeyFromInfoPlist()) }
     observeProgress()
+    setup.observe()
     Task { try? await ensurePresetSwipefiles() }
     if onboardingComplete || access.canRead { loadModel() }
     if onboardingComplete { bumpLibrary() }
@@ -184,6 +194,8 @@ final class AppModel {
       startIndexing()
       observeLibrary()
     }
+    // A launch on screen (not iOS's overnight job): setup advances while Roll is open.
+    if environment.isLive, UIApplication.shared.applicationState != .background { holdSetupInFront() }
     Task { await reconcileSquishes() }
   }
 
@@ -194,6 +206,7 @@ final class AppModel {
     if access.canRead {
       loadModel()
       observeLibrary()
+      holdSetupInFront()
       await reconcileSquishes()
     }
   }
@@ -205,6 +218,7 @@ final class AppModel {
     environment.defaults.set(true, forKey: Self.onboardingKey)
     bumpLibrary()
     if access.canRead { startIndexing() }
+    holdSetupInFront()
   }
 
   /// The taste scan (spec §10 step 3): syncs the library, then indexes the newest 500 assets.
@@ -271,72 +285,6 @@ final class AppModel {
     }
   }
 
-  /// The opt-in iCloud upgrade (it downloads full images): watched for its whole run, so it runs only while it's on,
-  /// preview rows are left, and the iPhone is on Wi-Fi (not expensive or constrained) and charging. When a condition
-  /// fails the Indexer is cancelled and local indexing resumes without the network.
-  private func refreshUpgrade() {
-    guard environment.isLive else { return }
-    if upgradeMonitor == nil {
-      let indexer = indexer, text = textIndexer
-      let supervisor = ICloudUpgradeSupervisor(
-        run: { [weak self] in
-          #if DEBUG
-          QARuntime.shared?.log.write("upgrade_pass", ["state": .string("started")])
-          #endif
-          // Words only after a finished upgrade: a cancelled one (backgrounded, Wi-Fi or charging lost) must not
-          // start a network text pass.
-          if (try? await indexer.run(allowNetwork: true, upgradePreviews: true)) != nil {
-            _ = try? await text.run(allowNetwork: true)
-          }
-          await MainActor.run {
-            guard let self else { return }
-            Task { self.previewCount = (try? await self.repositories.previewAssetCount()) ?? self.previewCount }
-            self.bumpLibrary()
-          }
-        },
-        cancel: { [weak self] in
-          #if DEBUG
-          QARuntime.shared?.log.write("upgrade_pass", ["state": .string("cancelled: Wi-Fi or charging stopped")])
-          #endif
-          await indexer.cancel()
-          await text.cancel()
-          await MainActor.run { self?.startIndexing() }  // local work goes on without the network
-        })
-      upgradeMonitor = ICloudUpgradeMonitor(supervisor: supervisor)
-    }
-    upgradeMonitor?.refresh(enabled: improveWithICloud, pending: previewCount > 0)
-  }
-
-  /// After indexing has drained: checks where the originals of cleanup candidates are (Home's latest candidates, so
-  /// its duplicate groups are reused, plus Squish's; not-yet-checked first, largest first, each at most once an hour),
-  /// then local big videos' formats, at utility priority with network off. Unknown counts as iCloud until then. Runs
-  /// outside `indexTask`; a call during a round makes one more round after it (`CandidateChecks`).
-  private func startChecks() {
-    guard environment.isLive, access.canRead else { return }
-    let checks = checks, candidates = home.hasLoaded ? home.summary.localityCandidates : nil
-    Task.detached(priority: .utility) { [weak self] in
-      guard let outcome = await checks.run(homeCandidates: candidates) else { return }  // folded into a running round
-      #if DEBUG
-      let ms = Int(outcome.elapsed.components.seconds * 1000
-                   + outcome.elapsed.components.attoseconds / 1_000_000_000_000_000)
-      QARuntime.shared?.log.write("locality_scan", [
-        "candidates": .int(outcome.candidates), "checked": .int(outcome.locality.checked),
-        "local": .int(outcome.locality.local), "iCloud": .int(outcome.locality.iCloud),
-        "unanswered": .int(outcome.locality.unanswered), "timedOut": .int(outcome.locality.timedOut),
-        "formats": .int(outcome.formats.recorded), "rounds": .int(outcome.rounds), "ms": .int(ms),
-      ])
-      #endif
-      if outcome.changed { await self?.bumpLibrary() }
-    }
-  }
-
-  /// Probes local big videos' formats so Squish and Home's savings leave Dolby Vision (and ProRes/Log) out.
-  func screenSquishFormats() async {
-    guard environment.isLive, access == .full || access == .limited else { return }
-    // Passes change Home's squish savings too, so refresh either way (Home rescans are throttled).
-    if (try? await squishScreen.run()) != nil { bumpLibrary() }
-  }
-
   /// Follows the Indexer's progress, and bumps `libraryRevision` after each 200-asset batch and each finished run
   /// (that's when the Store has new signals to show).
   private func observeProgress() {
@@ -382,19 +330,33 @@ final class AppModel {
     switch phase {
     case .background:
       textGeneration += 1
-      let indexer = indexer, text = textIndexer, tags = tagIndexer
+      indexAgain = false
+      let setup = setup
       Task {
-        await tags.cancel()
-        await IndexScheduler.appDidEnterBackground(indexer: indexer, text: text)
+        // iOS 26's continued task still holds setup: indexing keeps going for it (it stops it when it ends).
+        if await setup.releaseFront() { return }
+        await self.stopIndexingForBackground()
       }
     case .active:
       let previous = access
       access = environment.access.current()
       if access != previous { accessChanged(from: previous) }
       if onboardingComplete { startIndexing() }
+      holdSetupInFront()
+      setup.restart()
     default:
       break
     }
+  }
+
+  /// Roll is going to the background (or a background runner ended there): flush and stop indexing and the passes
+  /// after it, without another round of the loop (`indexAgain` would start a run iOS then suspends), and ask for the
+  /// overnight job if work is left.
+  func stopIndexingForBackground() async {
+    textGeneration += 1
+    indexAgain = false
+    await tagIndexer.cancel()
+    await IndexScheduler.appDidEnterBackground(indexer: indexer, text: textIndexer)
   }
 
   /// Access changed in Settings while Roll was away: start what the new level allows.
@@ -403,6 +365,7 @@ final class AppModel {
     if access.canRead, !previous.canRead {
       loadModel()
       observeLibrary()
+      holdSetupInFront()
     }
     if access == .full || previous == .full { Task { await reconcileSquishes() } }
     bumpLibrary()

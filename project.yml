@@ -15,7 +15,7 @@ settings:
     SWIFT_VERSION: "6.0"
     TARGETED_DEVICE_FAMILY: "1"
     MARKETING_VERSION: "1.1"
-    CURRENT_PROJECT_VERSION: "5"
+    CURRENT_PROJECT_VERSION: "6"
     SWIFT_STRICT_CONCURRENCY: complete
     ENABLE_USER_SCRIPT_SANDBOXING: YES
 targets:
@@ -33,7 +33,8 @@ targets:
         NSPhotoLibraryUsageDescription: Roll looks at your photos on your iPhone to find what you can delete or shrink. Nothing leaves your phone.
         NSPhotoLibraryAddUsageDescription: Roll saves the smaller copy of photos and videos you squish, and the memory videos you make.
         NSFaceIDUsageDescription: Roll uses Face ID to lock your Private swipefile.
-        BGTaskSchedulerPermittedIdentifiers: [com.delavalom.roll.index]
+        # The overnight index job, and iOS 26's continued setup task (dynamic suffix: com.delavalom.roll.setup.run).
+        BGTaskSchedulerPermittedIdentifiers: [com.delavalom.roll.index, com.delavalom.roll.setup.*]
         UIBackgroundModes: [processing]
         UILaunchScreen: {}
         ITSAppUsesNonExemptEncryption: false
@@ -46,6 +47,9 @@ targets:
       path: App/Roll.entitlements
       properties:
         com.apple.developer.sensitivecontentanalysis.client: [analysis]
+        # The model lives in this group's container so its path, and the Neural Engine's compile cache, survive app
+        # updates (ModelLocation; an experiment, docs/superpowers/specs/2026-11-16-durable-setup-design.md).
+        com.apple.security.application-groups: [group.com.delavalom.roll]
     settings:
       base:
         # iPhone only. XcodeGen's iOS target preset sets "1,2", which overrides the project-level value above.
@@ -78,7 +82,7 @@ targets:
           fi
     dependencies:
       - package: RollCore
-        products: [Embedding, ModelInstall, Store, Library, Signals, Indexer, Ranking, Dedupe, Squish, Monitor, Entitlements, Commit, Overview, SquishBridge, Memories]
+        products: [Embedding, ModelInstall, Store, Library, Signals, Indexer, Ranking, Dedupe, Squish, Monitor, Entitlements, Commit, Overview, SquishBridge, Memories, Setup]
       - package: EmbeddingGemma
         products: [EmbeddingGemma]
       - package: RevenueCat
