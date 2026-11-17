@@ -17,7 +17,9 @@ struct OnboardingView: View {
     case .tasteScan:
       TasteScanView(model: model.scan, onContinue: model.next)
     case .paywall:
-      PaywallStep(pitch: model.paywallPitch, onClose: model.finish)
+      PaywallStep(pitch: model.paywallPitch, onClose: model.next)
+    case .setup:
+      SetupView(context: .onboarding, onContinue: model.finish)
     }
   }
 }

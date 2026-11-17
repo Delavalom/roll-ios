@@ -27,8 +27,10 @@ struct RollApp: App {
     do {
       let model = try AppModel.live()
       // BackgroundTasks needs the handler registered before launch finishes.
+      // The overnight job readies the on-device AI first (the whole setup), so its index run embeds too.
       IndexScheduler.register(indexer: { [indexer = model.indexer] in indexer },
-                              text: { [text = model.textIndexer] in text })
+                              text: { [text = model.textIndexer] in text },
+                              setUp: { [weak model] in await model?.runSetupOvernight() })
       model.start()
       _app = State(initialValue: model)
       failure = nil

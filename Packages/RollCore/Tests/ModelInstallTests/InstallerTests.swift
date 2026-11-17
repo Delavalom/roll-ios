@@ -4,31 +4,7 @@ import Testing
 
 /// The install state machine over a fake transport (no network), the real Apple Archive extractor and a fake
 /// activator.
-struct InstallerTests {
-  private let archiveName = "EmbeddingGemma2.aar"
-
-  /// Pinned to the manifest `transport` serves (a build pins the published one), else to `Fixture.anyPin`.
-  private func installer(_ model: PublishedModel? = nil, revision: String = Fixture.revisionA, root: URL,
-                         transport: FakeTransport, extractor: any ArchiveExtractor = AppleArchiveExtractor(),
-                         conditions: InstallConditions = .fixed()) -> ModelInstaller {
-    ModelInstaller(model: model ?? Fixture.model(revision, manifestSHA256: transport.pin ?? Fixture.anyPin),
-                   root: root, transport: transport, extractor: extractor, conditions: conditions)
-  }
-
-  private func publish(in dir: TempDir, required: Bool = true, payload: String = "weights") throws -> FakeTransport {
-    let p = try Fixture.published(in: dir.url, required: required, payload: payload)
-    return FakeTransport(["manifest.json": p.manifest, archiveName: p.archive])
-  }
-
-  private func root(_ dir: TempDir) -> URL { dir.url.appending(path: "RollModel") }
-  private func store(_ dir: TempDir) -> URL { dir.url.appending(path: "PackageStore") }
-  private func revisionFolder(_ dir: TempDir, _ revision: String = Fixture.revisionA) -> URL {
-    root(dir).appending(path: "owner--model/\(revision)")
-  }
-  private func identity(_ revision: String = Fixture.revisionA) -> ModelIdentity {
-    ModelIdentity(repo: "owner/model", revision: revision)
-  }
-
+struct InstallerTests: InstallerTesting {
   @Test func nothingIsDownloadedBeforeTheModelIsPublished() async throws {
     let dir = TempDir()
     defer { dir.cleanUp() }
@@ -76,6 +52,7 @@ struct InstallerTests {
     #expect(steps.all.suffix(2) == [.unpacking, .activating])
   }
 
+  /// A phone on the larger image budget downloads `b280/`, whose manifest lists only the 280 functions.
   @Test func theNextLaunchActivatesWithoutTheNetwork() async throws {
     let dir = TempDir()
     defer { dir.cleanUp() }
@@ -172,107 +149,6 @@ struct InstallerTests {
     }
   }
 
-  @Test func offWiFiItSaysSoAndKeepsTheDownloadWiFiOnly() async throws {
-    let dir = TempDir()
-    defer { dir.cleanUp() }
-    let transport = try publish(in: dir)
-    let steps = Steps()
-    let sut = installer(root: root(dir), transport: transport, conditions: .fixed(.cellular))
-
-    _ = try await sut.load(activator: FakeActivator(), report: steps.report)
-
-    #expect(steps.all.first == .waiting(.wifi, totalBytes: nil))
-    #expect(steps.all.contains { if case .waiting(.wifi, let total?) = $0 { total > 0 } else { false } })
-    #expect(transport.calls.allSatisfy { !$0.allowCellular })
-  }
-
-  @Test func offWiFiTheLastStepBeforeTheTransferIsWaiting() async throws {
-    let dir = TempDir()
-    defer { dir.cleanUp() }
-    let transport = try publish(in: dir)
-    transport.hang(archiveName)  // the background session holding the download until Wi-Fi
-    let steps = Steps()
-    let sut = installer(root: root(dir), transport: transport, conditions: .fixed(.cellular))
-
-    let waiting = Task { try await sut.prepare(allowCellular: false, report: steps.report) }
-    while transport.calls(for: archiveName).isEmpty { try await Task.sleep(for: .milliseconds(5)) }
-
-    guard case .waiting(.wifi, let total?) = steps.all.last else {
-      Issue.record("expected waiting for Wi-Fi with the size, got \(steps.all)")
-      return
-    }
-    #expect(total > 0)
-    #expect(!steps.all.contains { if case .downloading = $0 { true } else { false } })
-    waiting.cancel()
-    _ = try? await waiting.value
-  }
-
-  @Test func offWiFiDownloadingIsReportedOnlyOnceBytesArrive() async throws {
-    let dir = TempDir()
-    defer { dir.cleanUp() }
-    let transport = try publish(in: dir)
-    let steps = Steps()
-    let sut = installer(root: root(dir), transport: transport, conditions: .fixed(.cellular))
-
-    _ = try await sut.prepare(allowCellular: false, report: steps.report)
-
-    #expect(!steps.all.contains(where: { if case .downloading(0, _) = $0 { true } else { false } }))
-    let first = try #require(steps.all.firstIndex { if case .downloading = $0 { true } else { false } })
-    #expect(first > 0)
-    guard case .waiting(.wifi, _?) = steps.all[first - 1] else {
-      Issue.record("expected waiting right before the first bytes, got \(steps.all)")
-      return
-    }
-  }
-
-  @Test func onWiFiDownloadingIsReportedAtOnce() async throws {
-    let dir = TempDir()
-    defer { dir.cleanUp() }
-    let transport = try publish(in: dir)
-    transport.hang(archiveName)
-    let steps = Steps()
-    let sut = installer(root: root(dir), transport: transport)
-
-    let running = Task { try await sut.prepare(allowCellular: false, report: steps.report) }
-    while transport.calls(for: archiveName).isEmpty { try await Task.sleep(for: .milliseconds(5)) }
-
-    guard case .downloading(0, let total) = steps.all.last else {
-      Issue.record("expected downloading from zero, got \(steps.all)")
-      return
-    }
-    #expect(total > 0)
-    running.cancel()
-    _ = try? await running.value
-  }
-
-  @Test func lowDataModeOnWiFiWaitsLikeCellular() async throws {
-    let dir = TempDir()
-    defer { dir.cleanUp() }
-    let transport = try publish(in: dir)
-    let steps = Steps()
-    var lowData = NetworkPath.wifi
-    lowData.isConstrained = true
-    let sut = installer(root: root(dir), transport: transport, conditions: .fixed(lowData))
-
-    _ = try await sut.load(activator: FakeActivator(), report: steps.report)
-
-    #expect(steps.all.first == .waiting(.lowDataMode, totalBytes: nil))
-    #expect(transport.calls.allSatisfy { !$0.allowCellular })
-  }
-
-  @Test func mobileDataWhenThePersonAllowsIt() async throws {
-    let dir = TempDir()
-    defer { dir.cleanUp() }
-    let transport = try publish(in: dir)
-    let steps = Steps()
-    let sut = installer(root: root(dir), transport: transport, conditions: .fixed(.cellular))
-
-    _ = try await sut.load(allowCellular: true, activator: FakeActivator(), report: steps.report)
-
-    #expect(!steps.all.contains { if case .waiting = $0 { true } else { false } })
-    #expect(transport.calls.allSatisfy { $0.allowCellular })
-  }
-
   @Test func anArchiveThatFinishedInTheBackgroundIsNotDownloadedAgain() async throws {
     let dir = TempDir()
     defer { dir.cleanUp() }
@@ -330,23 +206,6 @@ struct InstallerTests {
 
     #expect(x == y)
     #expect(transport.calls(for: archiveName).count == 1)
-  }
-
-  @Test func allowingMobileDataRestartsAWiFiOnlyDownload() async throws {
-    let dir = TempDir()
-    defer { dir.cleanUp() }
-    let transport = try publish(in: dir)
-    transport.hang(archiveName)
-    let sut = installer(root: root(dir), transport: transport, conditions: .fixed(.cellular))
-
-    let waiting = Task { try await sut.prepare(allowCellular: false) { _ in } }
-    while transport.calls(for: archiveName).isEmpty { try await Task.sleep(for: .milliseconds(5)) }
-    transport.hang(archiveName, false)
-    let folder = try await sut.prepare(allowCellular: true) { _ in }
-
-    #expect(await sut.localState() == .staged(folder))
-    #expect(transport.calls(for: archiveName).map(\.allowCellular) == [false, true])
-    await #expect(throws: CancellationError.self) { try await waiting.value }
   }
 
   @Test func aNewRevisionDownloadsWhileTheOldOneStaysInUseAndReplacesItLater() async throws {
@@ -443,7 +302,7 @@ struct InstallerTests {
     let extractor = HookedExtractor { _ in throw ModelInstallError.insufficientSpace(required: 0, available: 0) }
     let sut = installer(root: root(dir), transport: transport, extractor: extractor,
                         conditions: .fixed(available: 1 << 40))
-    let manifest = try ModelManifest.decode(try #require(transport.file("manifest.json")))
+    let manifest = try ModelManifest.decode(try #require(transport.file("manifest.json")), budget: 70)
 
     await #expect(throws: ModelInstallError.insufficientSpace(
       required: InstallSpace.required(manifest, alreadyDownloaded: manifest.size), available: 1 << 40)) {

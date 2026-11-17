@@ -39,6 +39,7 @@ let package = Package(
     .library(name: "SquishBridge", targets: ["SquishBridge"]),
     .library(name: "Places", targets: ["Places"]),
     .library(name: "Memories", targets: ["Memories"]),
+    .library(name: "Setup", targets: ["Setup"]),
   ],
   dependencies: [
     gemma,
@@ -68,6 +69,8 @@ let package = Package(
     .target(name: "SquishBridge", dependencies: ["Commit", "Squish", "Store", "Library", "Overview"]),
     // Memory reel planning: pure, no dependencies.
     .target(name: "Memories"),
+    // The on-device AI setup's sequence (model, then the library read), leases and progress; the app supplies the work.
+    .target(name: "Setup"),
 
     .testTarget(name: "EmbeddingTests", dependencies: ["Embedding", "ModelInstall"]),
     .testTarget(name: "ModelInstallTests", dependencies: ["ModelInstall"]),
@@ -83,13 +86,15 @@ let package = Package(
     .testTarget(name: "PlacesTests", dependencies: ["Places"]),
     .testTarget(name: "CommitTests", dependencies: ["Commit", "Store", "Entitlements"]),
     .testTarget(name: "MemoriesTests", dependencies: ["Memories"]),
+    .testTarget(name: "SetupTests", dependencies: ["Setup"]),
     .testTarget(name: "OverviewTests", dependencies: ["Overview", "Store", "Ranking", "Signals", "Squish", "Memories"]),
   ]
 )
 
 if !hasGemma {
-  let standalone: Set<String> = ["Library", "Signals", "Monitor", "ModelInstall", "Places", "Memories", "LibraryTests",
-                                 "SignalsTests", "MonitorTests", "ModelInstallTests", "PlacesTests", "MemoriesTests"]
+  let standalone: Set<String> = ["Library", "Signals", "Monitor", "ModelInstall", "Places", "Memories", "Setup", "LibraryTests",
+                                 "SignalsTests", "MonitorTests", "ModelInstallTests", "PlacesTests", "MemoriesTests",
+                                 "SetupTests"]
   package.dependencies = []
   package.targets = package.targets.filter { standalone.contains($0.name) }
   package.products = package.products.filter { standalone.contains($0.name) }

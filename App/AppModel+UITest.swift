@@ -1,5 +1,7 @@
 #if DEBUG
+import Embedding
 import Foundation
+import ModelInstall
 import Store
 
 extension AppModel {
@@ -15,6 +17,18 @@ extension AppModel {
     }
     defaults.removeObject(forKey: onboardingKey)
     defaults.removeObject(forKey: SwipeHint.seenKey)
+    for key in [SetupModel.startedKey, SetupModel.finishedOnceKey, SetupModel.notifyKey, SetupModel.notifiedKey] {
+      defaults.removeObject(forKey: key)
+    }
+  }
+}
+
+/// `-UITestHoldModel`: a model download that reports a third done and never finishes, so the setup card and screen
+/// can be tested in a stable state (SetupFlowTests).
+struct HeldLoader: EmbedderLoader {
+  func load(allowCellular: Bool, report: @escaping @Sendable (InstallStep) -> Void) async throws -> any Embedder {
+    report(.downloading(completedBytes: 120_000_000, totalBytes: 359_000_000))
+    while true { try await Task.sleep(for: .seconds(3600)) }
   }
 }
 #endif

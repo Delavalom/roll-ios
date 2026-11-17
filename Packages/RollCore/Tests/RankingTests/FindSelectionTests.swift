@@ -29,6 +29,52 @@ struct AlbumSelectionTests {
     #expect(!AlbumSelection(ids: [], preselected: [], name: "x").allSelected)
   }
 
+  /// Photos-style drag: the first photo's new state is applied to everything between it and the finger, in grid order.
+  @Test func dragSelectsTheRangeFromTheFirstPhoto() {
+    var s = AlbumSelection(ids: ["a", "b", "c", "d", "e", "f"], preselected: ["e"], name: "x")
+    s.beginDrag(at: 1)
+    #expect(s.orderedSelection == ["b", "e"])
+    s.continueDrag(to: 4)
+    #expect(s.orderedSelection == ["b", "c", "d", "e"])
+    s.continueDrag(to: 5)
+    #expect(s.orderedSelection == ["b", "c", "d", "e", "f"])
+    // Back over photos the drag passed: they return to how they were before it.
+    s.continueDrag(to: 2)
+    #expect(s.orderedSelection == ["b", "c", "e"])
+    // Past the first photo, the other way.
+    s.continueDrag(to: 0)
+    #expect(s.orderedSelection == ["a", "b", "e"])
+    s.endDrag()
+    s.continueDrag(to: 5)
+    #expect(s.orderedSelection == ["a", "b", "e"], "no drag in progress: nothing changes")
+  }
+
+  @Test func dragFromASelectedPhotoDeselects() {
+    var s = AlbumSelection(ids: ["a", "b", "c", "d"], preselected: ["a", "b", "d"], name: "x")
+    s.beginDrag(at: 0)
+    s.continueDrag(to: 2)
+    #expect(s.orderedSelection == ["d"])
+    s.continueDrag(to: 1)
+    #expect(s.orderedSelection == ["d"], "c stays as it was before the drag: not selected")
+    s.continueDrag(to: 0)
+    #expect(s.orderedSelection == ["b", "d"])
+    s.endDrag()
+    s.continueDrag(to: 3)
+    #expect(s.orderedSelection == ["b", "d"])
+  }
+
+  @Test func dragClampsToTheGrid() {
+    var s = AlbumSelection(ids: ["a", "b", "c"], preselected: [], name: "x")
+    s.beginDrag(at: 7)
+    #expect(s.orderedSelection == ["c"])
+    s.continueDrag(to: -3)
+    #expect(s.allSelected)
+    var empty = AlbumSelection(ids: [], preselected: [], name: "x")
+    empty.beginDrag(at: 0)
+    empty.continueDrag(to: 2)
+    #expect(empty.count == 0)
+  }
+
   @Test func needsANameAndDefaultsToTheQuery() {
     var s = AlbumSelection(ids: ["a"], preselected: ["a"], name: AlbumSelection.defaultName(query: "  soccer games "))
     #expect(s.name == "Soccer games")

@@ -78,7 +78,10 @@ struct AlbumMakerView: View {
       .accessibilityIdentifier("album.toggleAll")
     }
     SelectableGrid(ids: model.selection.ids, isSelected: model.selection.isSelected,
-                   toggle: { model.selection.toggle($0) })
+                   toggle: { model.selection.toggle($0) },
+                   dragBegan: { model.selection.beginDrag(at: $0) },
+                   dragMoved: { model.selection.continueDrag(to: $0) },
+                   dragEnded: { model.selection.endDrag() })
     Text("Roll adds the photos to an album in Photos, on this iPhone. Nothing is moved or deleted.")
       .font(Roll.Typeface.caption)
       .foregroundStyle(.rollInk3)

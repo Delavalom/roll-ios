@@ -14,10 +14,10 @@ struct GemmaActivatorTests {
     return (dir, GemmaActivator(store: ModelStore(root: dir.appending(path: "store"))))
   }
 
-  @Test func theManifestRequiresExactlyTheFunctionsThePackageLoads() {
-    let package = Set(EmbeddingGemma.textFunctions + EmbeddingGemma.imageFunctions(budget: 70)
-                        + EmbeddingGemma.imageFunctions(budget: 280))
-    #expect(ModelManifest.requiredFunctions == package)
+  @Test(arguments: [70, 280])
+  func theManifestRequiresExactlyTheFunctionsThePackageLoads(budget: Int) {
+    let package = Set(EmbeddingGemma.textFunctions + EmbeddingGemma.imageFunctions(budget: budget))
+    #expect(ModelManifest.requiredFunctions(budget: budget) == package)
   }
 
   @Test func theArchiveMustHoldThePackageAndTokenizerNamesThePackageInstalls() {

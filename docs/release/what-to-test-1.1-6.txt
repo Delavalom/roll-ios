@@ -1,0 +1,17 @@
+Roll 1.1 (6): the on-device AI now sets itself up to the end, even when you leave Roll. Use your own iPhone.
+
+1. Set up (new phone, or delete and reinstall Roll). The last onboarding step is "Set up on-device AI". Tap Set up: it shows two stages, "Getting the AI ready" and "Reading your photos", with counts. The screen stays on while it shows. Tap "Tell me when it's ready" and allow notifications.
+
+2. Leave Roll (iOS 26). Go to the Home Screen or another app mid-way. iOS should show "Setting up Roll" with a progress bar (Lock Screen / Dynamic Island) and setup keeps going. When it finishes, you should get one notification. Note if iOS stopped it, and when.
+
+3. Home card. Skip with "Not now", or come back mid-way: Home shows the setup card with progress, a cleanup line to use while you wait, and "Set up" or "Finish setting up". Waiting for Wi-Fi, not enough space and Retry still appear there.
+
+4. Overnight. Leave Roll unfinished and plug your iPhone in overnight on Wi-Fi: in the morning, setup should be further along or done.
+
+5. Updating (the experiment). This build moves the AI's files to a place that app updates shouldn't touch. Installing this build over 1.1 (5) prepares once more (minutes). When the next build arrives, update to it and note how long "Getting the AI ready" takes: about 30 seconds means the experiment worked; minutes means it didn't.
+
+6. Everything in 1.1 (5) still applies: swipe to select in Make album, find a trip, Make album, Keep this album updated, More like these, and cleanup (piles, duplicates, squish, paywall, Restore).
+
+Memory videos are off in this build on purpose.
+
+Feedback: take a screenshot in Roll and tap Share Beta Feedback, or email hi@delavalom.com.

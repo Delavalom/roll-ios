@@ -5,8 +5,71 @@ import Testing
 struct ManifestTests {
   private let sha = String(repeating: "0123456789abcdef", count: 4)
 
+  /// The manifests published at `PublishedModel.current` (b70/ and b280/ of 8036f0bb), byte for byte: each lists only
+  /// its own budget's image functions. Requiring both budgets' rejected every download (TestFlight build 4, 2026-11-16).
+  static let published70 = """
+    {
+      "archive": "EmbeddingGemma2.aar",
+      "format": 1,
+      "functions": [
+        "embed_image_70_landscape",
+        "embed_image_70_portrait",
+        "embed_image_70_square",
+        "embed_image_70_tall",
+        "embed_image_70_wide",
+        "embed_text_128",
+        "embed_text_16",
+        "embed_text_32",
+        "embed_text_64"
+      ],
+      "image_budget": 70,
+      "revision": "v1.0.0",
+      "sha256": "57011c9f3d7ac190efe3c89c205eef416a3cda8c2bea8f8647c404d57397a1b0",
+      "size": 343177992,
+      "unpacked_size": 434986234
+    }
+    """
+  static let published280 = """
+    {
+      "archive": "EmbeddingGemma2.aar",
+      "format": 1,
+      "functions": [
+        "embed_image_280_landscape",
+        "embed_image_280_portrait",
+        "embed_image_280_square",
+        "embed_image_280_tall",
+        "embed_image_280_wide",
+        "embed_text_128",
+        "embed_text_16",
+        "embed_text_32",
+        "embed_text_64"
+      ],
+      "image_budget": 280,
+      "revision": "v1.0.0",
+      "sha256": "a0a74ee7d93352cdb408598345d5411618ad371cc186439c4971d075f22946d5",
+      "size": 352911045,
+      "unpacked_size": 454948607
+    }
+    """
+
+  @Test func acceptsThePublishedManifestOfEachBudget() throws {
+    let m70 = try ModelManifest.decode(Data(Self.published70.utf8), budget: 70)
+    #expect(m70.size == 343_177_992 && m70.functions?.count == 9)
+    let m280 = try ModelManifest.decode(Data(Self.published280.utf8), budget: 280)
+    #expect(m280.sha256 == "a0a74ee7d93352cdb408598345d5411618ad371cc186439c4971d075f22946d5")
+  }
+
+  @Test func rejectsTheOtherBudgetsManifest() {
+    #expect(throws: ModelInstallError.invalidManifest("image budget 280, not 70")) {
+      try ModelManifest.decode(Data(Self.published280.utf8), budget: 70)
+    }
+    #expect(throws: ModelInstallError.invalidManifest("image budget 70, not 280")) {
+      try ModelManifest.decode(Data(Self.published70.utf8), budget: 280)
+    }
+  }
+
   @Test func decodesTheMinimalManifest() throws {
-    let m = try ModelManifest.decode(Fixture.manifestJSON(size: 366_000_000, sha256: sha))
+    let m = try ModelManifest.decode(Fixture.manifestJSON(size: 366_000_000, sha256: sha), budget: 70)
     #expect(m == ModelManifest(archive: "EmbeddingGemma2.aar", size: 366_000_000, sha256: sha))
     #expect(m.unpackedSize == nil && m.label == nil && m.functions == nil)
   }
@@ -14,46 +77,46 @@ struct ManifestTests {
   @Test func readsTheOptionalFieldsAndIgnoresUnknownOnes() throws {
     let json = """
       {"format": 1, "archive": "m.aar", "size": 10, "sha256": "\(sha)", "unpacked_size": 14, "revision": "v1.0.0",
-       "functions": \(ModelManifest.requiredFunctions.sorted()), "publisher_note": {"anything": true}}
+       "functions": \(ModelManifest.requiredFunctions(budget: 70).sorted()), "publisher_note": {"anything": true}}
       """
-    let m = try ModelManifest.decode(Data(json.utf8))
+    let m = try ModelManifest.decode(Data(json.utf8), budget: 70)
     #expect(m.unpackedSize == 14)
     #expect(m.label == "v1.0.0")
-    #expect(Set(m.functions ?? []) == ModelManifest.requiredFunctions)
+    #expect(Set(m.functions ?? []) == ModelManifest.requiredFunctions(budget: 70))
   }
 
   @Test(arguments: ["../m.aar", "dir/m.aar", "/m.aar", ".m.aar", "", "manifest.json", "m.aar.download",
                     "m.aar.resume", "..", "unpacked", "Unpacked", "Manifest.JSON"])
   func rejectsArchiveNamesThatAreNotOnePlainFile(_ name: String) {
     #expect(throws: ModelInstallError.self) {
-      try ModelManifest.decode(Fixture.manifestJSON(archive: name, size: 10, sha256: sha))
+      try ModelManifest.decode(Fixture.manifestJSON(archive: name, size: 10, sha256: sha), budget: 70)
     }
   }
 
   @Test(arguments: [String(repeating: "A", count: 64), "abc", String(repeating: "g", count: 64)])
   func rejectsHashesThatAreNotLowercaseSHA256(_ hash: String) {
-    #expect(throws: ModelInstallError.self) { try ModelManifest.decode(Fixture.manifestJSON(size: 10, sha256: hash)) }
+    #expect(throws: ModelInstallError.self) { try ModelManifest.decode(Fixture.manifestJSON(size: 10, sha256: hash), budget: 70) }
   }
 
   @Test func rejectsAnEmptyArchive() {
-    #expect(throws: ModelInstallError.self) { try ModelManifest.decode(Fixture.manifestJSON(size: 0, sha256: sha)) }
+    #expect(throws: ModelInstallError.self) { try ModelManifest.decode(Fixture.manifestJSON(size: 0, sha256: sha), budget: 70) }
   }
 
   @Test(arguments: [Int64(-1), 0, ModelManifest.maxBytes + 1, Int64.max])
   func rejectsANegativeOrAbsurdUnpackedSize(_ unpacked: Int64) {
     #expect(throws: ModelInstallError.self) {
-      try ModelManifest.decode(Fixture.manifestJSON(size: 10, sha256: sha, unpackedSize: unpacked))
+      try ModelManifest.decode(Fixture.manifestJSON(size: 10, sha256: sha, unpackedSize: unpacked), budget: 70)
     }
   }
 
   @Test(arguments: [ModelManifest.maxBytes + 1, Int64.max])
   func rejectsAnAbsurdArchiveSize(_ size: Int64) {
-    #expect(throws: ModelInstallError.self) { try ModelManifest.decode(Fixture.manifestJSON(size: size, sha256: sha)) }
+    #expect(throws: ModelInstallError.self) { try ModelManifest.decode(Fixture.manifestJSON(size: size, sha256: sha), budget: 70) }
   }
 
   @Test func theLargestSizesStillAddUpWithoutOverflow() throws {
     let max = ModelManifest.maxBytes
-    let m = try ModelManifest.decode(Fixture.manifestJSON(size: max, sha256: sha, unpackedSize: max))
+    let m = try ModelManifest.decode(Fixture.manifestJSON(size: max, sha256: sha, unpackedSize: max), budget: 70)
     #expect(m.unpackedSize == max)
     #expect(InstallSpace.required(m, alreadyDownloaded: 0) == 3 * max)
   }
@@ -61,27 +124,28 @@ struct ManifestTests {
   @Test func rejectsANewerFormat() {
     let json = #"{"format": 2, "archive": "m.aar", "size": 10, "sha256": "\#(sha)"}"#
     #expect(throws: ModelInstallError.invalidManifest("format 2 is newer than this app")) {
-      try ModelManifest.decode(Data(json.utf8))
+      try ModelManifest.decode(Data(json.utf8), budget: 70)
     }
   }
 
   @Test func rejectsAFunctionListWithoutWhatRollLoads() {
-    let fns = ModelManifest.requiredFunctions.subtracting(["embed_image_280_wide"]).sorted()
+    let fns = ModelManifest.requiredFunctions(budget: 280).subtracting(["embed_image_280_wide"]).sorted()
     let json = #"{"archive": "m.aar", "size": 10, "sha256": "\#(sha)", "functions": \#(fns)}"#
     #expect(throws: ModelInstallError.invalidManifest("missing functions embed_image_280_wide")) {
-      try ModelManifest.decode(Data(json.utf8))
+      try ModelManifest.decode(Data(json.utf8), budget: 280)
     }
   }
 
   @Test func rejectsMalformedJSON() {
-    #expect(throws: ModelInstallError.self) { try ModelManifest.decode(Data("[]".utf8)) }
-    #expect(throws: ModelInstallError.self) { try ModelManifest.decode(Data(#"{"archive": "m.aar"}"#.utf8)) }
+    #expect(throws: ModelInstallError.self) { try ModelManifest.decode(Data("[]".utf8), budget: 70) }
+    #expect(throws: ModelInstallError.self) { try ModelManifest.decode(Data(#"{"archive": "m.aar"}"#.utf8), budget: 70) }
   }
 
-  @Test func requiredFunctionsAreTheFourTextLengthsAndTenImageBuckets() {
-    #expect(ModelManifest.requiredFunctions.count == 14)
-    #expect(ModelManifest.requiredFunctions.contains("embed_text_128"))
-    #expect(ModelManifest.requiredFunctions.contains("embed_image_70_tall"))
+  @Test func requiredFunctionsAreTheFourTextLengthsAndThatBudgetsFiveImageBuckets() {
+    let b70 = ModelManifest.requiredFunctions(budget: 70), b280 = ModelManifest.requiredFunctions(budget: 280)
+    #expect(b70.count == 9 && b280.count == 9)
+    #expect(b70.contains("embed_text_128") && b70.contains("embed_image_70_tall") && !b70.contains("embed_image_280_tall"))
+    #expect(b280.contains("embed_image_280_wide") && !b280.contains("embed_image_70_wide"))
   }
 }
 

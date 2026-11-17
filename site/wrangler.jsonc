@@ -1,0 +1,8 @@
+{
+  // roll.delavalom.com: the static site in public/ (built by build.py, committed) served by Workers Static Assets.
+  // Clean URLs (/privacy -> privacy.html, no trailing slash) and the security headers in public/_headers match the
+  // old Vercel config (src/static/vercel.json, kept until Vercel is retired).
+  "name": "roll-site",
+  "compatibility_date": "2026-11-16",
+  "assets": { "directory": "./public", "html_handling": "drop-trailing-slash", "not_found_handling": "404-page" }
+}

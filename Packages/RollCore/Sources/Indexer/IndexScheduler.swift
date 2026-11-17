@@ -15,7 +15,8 @@ public enum IndexScheduler {
   public static let taskIdentifier = "com.delavalom.roll.index"
 
   /// The body of a background run, without BackgroundTasks types so it can be tested on macOS.
-  /// Runs `indexer.run()`, then the text pass if there is one (`text`, after a finished index run: words are read
+  /// Runs `setUp` first (the app readies the on-device model there, so the run embeds as well as analyses; whatever it
+  /// manages, indexing follows), then `indexer.run()`, then the text pass if there is one (`text`, after a finished index run: words are read
   /// from analysed images only); the expiration handler stops both (`indexer.cancel()` is a hard stop, even for
   /// a run the Indexer keeps alive; completed work is flushed or committed first). Reschedules if work is left,
   /// counting embedding work even when no embedder is attached yet (the model may load next time) and unread
@@ -24,6 +25,7 @@ public enum IndexScheduler {
   public static func perform(
     indexer: @escaping @Sendable () async -> Indexer?,
     text: @escaping @Sendable () async -> TextIndexer? = { nil },
+    setUp: @escaping @Sendable () async -> Void = {},
     setExpirationHandler: (@escaping @Sendable () -> Void) -> Void,
     reschedule: @escaping @Sendable () -> Void,
     complete: @escaping @Sendable (Bool) -> Void
@@ -36,6 +38,7 @@ public enum IndexScheduler {
         return
       }
       resolved.set(indexer)
+      await setUp()
       var success = false
       do {
         try await indexer.run()
@@ -108,12 +111,14 @@ extension IndexScheduler {
   /// the identifier is missing from Info.plist.
   @discardableResult
   public static func register(indexer: @escaping @Sendable () async -> Indexer?,
-                              text: @escaping @Sendable () async -> TextIndexer? = { nil }) -> Bool {
+                              text: @escaping @Sendable () async -> TextIndexer? = { nil },
+                              setUp: @escaping @Sendable () async -> Void = {}) -> Bool {
     BGTaskScheduler.shared.register(forTaskWithIdentifier: taskIdentifier, using: nil) { task in
       let box = TaskBox(task: task)
       perform(
         indexer: indexer,
         text: text,
+        setUp: setUp,
         setExpirationHandler: { handler in box.task.expirationHandler = handler },
         reschedule: { submit() },
         complete: { box.task.setTaskCompleted(success: $0) })

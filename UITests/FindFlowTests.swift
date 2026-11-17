@@ -24,6 +24,71 @@ final class FindFlowTests: XCTestCase {
     createAlbum(app)
   }
 
+  /// Swipe to select on the Make album grid, as in Photos: a sideways drag selects every photo it passes, a drag from a
+  /// selected photo deselects, and an up/down swipe still scrolls. Creates nothing.
+  @MainActor
+  func testDragSelectsAcrossTheGrid() throws {
+    let app = launch(extra: ["-UITestOpen", "album"], home: false)
+    let all = app.buttons["album.toggleAll"]
+    let count = app.staticTexts["album.count"]
+    XCTAssertTrue(all.waitForExistence(timeout: 20), "the Make album grid didn't open")
+    XCTAssertTrue(count.label.hasPrefix("0 of"), count.label)
+
+    func cell(_ i: Int) -> XCUICoordinate {
+      app.descendants(matching: .any)["album.cell.\(i)"].coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
+    }
+    // The first two rows on screen (the grid is lazy: cells below the fold don't exist yet).
+    let sixth = app.descendants(matching: .any)["album.cell.5"]
+    for _ in 0..<6 where !(sixth.exists && sixth.isHittable) {
+      let mid = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.6))
+      mid.press(forDuration: 0.05, thenDragTo: mid.withOffset(CGVector(dx: 0, dy: -150)))
+      sleep(1)
+    }
+    XCTAssertTrue(app.descendants(matching: .any)["album.cell.0"].isHittable, "the first row scrolled away")
+    // Row 1 col 1 → row 2 col 3: photos 0 to 5 in reading order.
+    cell(0).press(forDuration: 0.05, thenDragTo: cell(5))
+    waitUntil(timeout: 3) { count.label.hasPrefix("6 of") }
+    XCTAssertTrue(count.label.hasPrefix("6 of"), "drag from photo 1 to 6: \(count.label)")
+    shot("d1-drag-selected")
+
+    // From a selected photo, sideways: deselects what it passes.
+    cell(5).press(forDuration: 0.05, thenDragTo: cell(3))
+    waitUntil(timeout: 3) { count.label.hasPrefix("3 of") }
+    XCTAssertTrue(count.label.hasPrefix("3 of"), "drag back from photo 6 to 4: \(count.label)")
+
+    // Up/down still scrolls and selects nothing.
+    let first = app.descendants(matching: .any)["album.cell.0"]
+    let top = first.frame.minY
+    cell(4).press(forDuration: 0.05, thenDragTo: cell(1).withOffset(CGVector(dx: 0, dy: -200)))
+    sleep(1)
+    XCTAssertLessThan(first.frame.minY, top - 50, "an upward swipe didn't scroll the grid")
+    XCTAssertTrue(count.label.hasPrefix("3 of"), "an upward swipe changed the selection: \(count.label)")
+  }
+
+  /// Swipe to select, holding the finger at the bottom edge: the grid scrolls and the selection follows the finger.
+  @MainActor
+  func testDragSelectAutoscrolls() throws {
+    let app = launch(extra: ["-UITestOpen", "album"], home: false)
+    let count = app.staticTexts["album.count"]
+    let create = app.buttons["album.create"]
+    XCTAssertTrue(create.waitForExistence(timeout: 20), "the Make album grid didn't open")
+    let first = app.descendants(matching: .any)["album.cell.0"]
+    XCTAssertTrue(first.waitForExistence(timeout: 5))
+    let top = first.frame.minY
+
+    // From the third row's first photo sideways and down to just above the Add button (mostly sideways, so it
+    // selects), then hold.
+    let start = app.descendants(matching: .any)["album.cell.6"].coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5))
+    let edge = create.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0)).withOffset(CGVector(dx: 0, dy: -24))
+    XCTAssertGreaterThan(edge.screenPoint.x - start.screenPoint.x, edge.screenPoint.y - start.screenPoint.y,
+                         "the drag must start sideways")
+    start.press(forDuration: 0.05, thenDragTo: edge, withVelocity: .default, thenHoldForDuration: 2)
+    shot("d2-autoscrolled")
+    let selected = Int(count.label.prefix { $0.isNumber }) ?? 0
+    XCTAssertGreaterThan(selected, 12, "holding at the bottom edge didn't scroll the selection on: \(count.label)")
+    XCTAssertLessThan(first.frame.minY, top - 100, "holding at the bottom edge didn't scroll")
+  }
+
   /// A found answer with sections, the section's album grid and the created screen, and the memory video sheet.
   @MainActor
   func testFindTour() throws {
@@ -59,14 +124,14 @@ final class FindFlowTests: XCTestCase {
   // MARK: Steps
 
   @MainActor
-  private func launch(extra: [String] = []) -> XCUIApplication {
+  private func launch(extra: [String] = [], home: Bool = true) -> XCUIApplication {
     let app = XCUIApplication()
     app.launchArguments += ["-UITestSkipPaywall", "-onboardingComplete", "YES", "-UITestStubEmbedder"] + extra
     app.launch()
     let allow = app.buttons["Allow Photos access"]
     if allow.waitForExistence(timeout: 5) { allow.tap() }
     allowPhotosAccessIfAsked()
-    XCTAssertTrue(app.buttons["home.card.screenshots"].waitForExistence(timeout: 60))
+    if home { XCTAssertTrue(app.buttons["home.card.screenshots"].waitForExistence(timeout: 60)) }
     return app
   }
 

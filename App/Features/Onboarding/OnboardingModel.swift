@@ -7,7 +7,7 @@ import Store
 
 /// Onboarding (spec §10): one intro page, Photos permission, the taste scan, then the paywall. The aha is the taste
 /// scan's number, so only one page stands before the permission ask; the swipes are taught where they're used
-/// (`SwipeHint`).
+/// (`SwipeHint`). Last, with Photos access, the on-device AI's setup screen (`SetupView`): one tap starts it.
 @Observable @MainActor
 final class OnboardingModel {
   enum Step: Equatable {
@@ -15,6 +15,7 @@ final class OnboardingModel {
     case permission
     case tasteScan
     case paywall
+    case setup
   }
 
   private(set) var step: Step = .intro
@@ -34,9 +35,15 @@ final class OnboardingModel {
     switch step {
     case .intro: step = .permission
     case .permission: break
-    case .tasteScan: app.skipsPaywall ? finish() : (step = .paywall)
-    case .paywall: finish()
+    case .tasteScan: app.skipsPaywall ? toSetup() : (step = .paywall)
+    case .paywall: toSetup()
+    case .setup: finish()
     }
+  }
+
+  /// The setup step needs Photos access (it reads the library); without it onboarding ends here.
+  private func toSetup() {
+    app.access.canRead ? (step = .setup) : finish()
   }
 
   /// Asks for Photos access; on success the model download and the taste scan start.

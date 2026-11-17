@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # Builds Roll in Release (unsigned) and checks that none of the DEBUG-only device-QA and UI-test code shipped: QA
-# types, launch arguments, metrics event names, the keep-awake idle-timer call and the RevenueCat Test Store key.
+# types, launch arguments, metrics event names and the RevenueCat Test Store key. (The idle-timer call itself ships
+# since 1.1 (6): the setup screen keeps the screen awake while setup runs. QA's keep-awake is still caught by its
+# type and event names, QAKeepAwake and keep_awake.)
 # Run it before every TestFlight upload (`just release-check`). Needs about 2 GB free and Roll.xcodeproj (`just gen`).
 #
 # Exit 0: clean. Exit 1: a finding. Exit 2: the check itself couldn't run (build failed, no Release product, the scan
@@ -43,11 +45,11 @@ needles=(
   "QARuntime" "QAEventLog" "QAMetrics" "QAPause" "QACounters" "QALibrary" "QASquishAudit" "QAInventory"
   "QAThumbProbe" "QASearchBench" "QAFindExport" "QAFindExporter" "QAKeepAwake" "QAController" "QADebugOverlay" "QAScopeGate" "QAReadOnlyGate" "QAAlbumGate"
   "QAScopeViolation" "QASquishHooks" "QAStoreStats" "QAMediaProbe" "QADolbyVisionExperiment" "qaScoped"
-  "resetForUITests" "UITestResetOutcome" "PhotoKitFingerprint" "QARestock" "QARestockRoom" "QAMemoryReel" "removeFromQAAlbum"
+  "resetForUITests" "UITestResetOutcome" "HeldLoader" "PhotoKitFingerprint" "QARestock" "QARestockRoom" "QAMemoryReel" "removeFromQAAlbum"
   # Launch arguments.
   "-QAAlbum" "-QAMetrics" "-QAPauseBeforeSquishDelete" "-QAFakeAvailableBytes" "-QAThumbProbe" "-QAFindExport" "-QAExhaustFreeQuota"
   "-QADolbyVisionExperiment" "-QAMemoryReel" "-QAMemoryReelSeconds" "-QARestock" "-QASquishStartEmpty" "-RCTestStore" "-UITestStubEmbedder" "-UITestSkipPaywall" "-UITestResetState"
-  "-UITestOpen" "-UITestTab"
+  "-UITestOpen" "-UITestTab" "-UITestHoldModel"
   # Fixed QA text, files and accessibility identifiers. (Not a bare "RCTestStore": RevenueCat itself has
   # @objc(RCTestStore). The Test Store key is checked in Info.plist below.)
   "QA scope" "metrics.jsonl" "thumb-request.txt" "Find export (QA)" "qa.continueDelete" "com.delavalom.roll.qa" "qa-restock" "qa.restock" "QA restock"
@@ -57,8 +59,6 @@ needles=(
   "upgrade_pass" "squish_before_delete" "squish_prepared" "squish_failed" "squish_commit" "squish_copy_after_delete"
   "squish_catalog" "index_batch" "index_run" "store_stats" "library_totals" "sync_read" "signal_timing"
   "thumb_probe" "album_inventory" "dv_experiment" "keep_awake" "qa_restock" "search_bench" "typed_search" "find_search"
-  # The keep-awake call (QAKeepAwake).
-  "setIdleTimerDisabled:"
 )
 fail=0
 for needle in "${needles[@]}"; do
@@ -69,5 +69,5 @@ done
 key=$(/usr/libexec/PlistBuddy -c "Print :RCTestStoreKey" "$app/Info.plist" 2>/dev/null || true)
 if [ -n "$key" ]; then echo "FAIL: RCTestStoreKey is not empty in Release"; fail=1; fi
 
-[ "$fail" = 0 ] && echo "PASS: Release has no device-QA or UI-test code, no idle-timer call and an empty Test Store key"
+[ "$fail" = 0 ] && echo "PASS: Release has no device-QA or UI-test code and an empty Test Store key"
 exit "$fail"

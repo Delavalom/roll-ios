@@ -24,12 +24,19 @@ extension AppModel {
   /// Loads the model (downloading it if needed) and attaches it. Safe to call again: a retry after a failure.
   func loadModel(allowCellular: Bool = false) {
     guard modelTask == nil, engine == nil else { return }
+    modelInstalling = false
+    setup.restart()  // a retry after a block: setup's runners pick the new attempt up (no-op while a run goes)
     modelState = .loading(nil)
     modelAttempt += 1
     let attempt = modelAttempt
     let loader = environment.loader, indexer = indexer, database = database
     let base = environment.supportDirectory, opened = OpenedStore()
     modelTask = Task { [weak self] in
+      // A little time when Roll leaves mid-install: the package holds a file lock in the App Group container while it
+      // installs and compiles, and iOS ends an app suspended with such a lock (0xdead10cc).
+      let background = UIKitBackgroundExecution()
+      let token = background.begin(name: "Load the on-device AI") {}
+      defer { if let token { background.end(token) } }
       do {
         let embedder = try await loader.load(allowCellular: allowCellular) { step in
           Task { @MainActor in self?.modelStepped(step, attempt: attempt) }
@@ -78,6 +85,7 @@ extension AppModel {
       if case .loading(let previous?) = modelState, previous.completedBytes > done { return }
       modelState = .loading(progress)
     case .unpacking, .activating:
+      modelInstalling = true
       modelState = .loading(nil)
     }
   }
@@ -127,6 +135,9 @@ extension AppModel {
 
   private func modelFailed(_ error: any Error, attempt: Int) {
     guard attempt == modelAttempt else { return }  // superseded: the new attempt owns the state
+    // Install errors name files and steps, never photos: public, so a TestFlight build's log says why.
+    Logger(subsystem: "com.delavalom.roll", category: "model")
+      .error("the on-device model didn't load: \(String(describing: error), privacy: .public)")
     modelState = .unavailable(ModelIssue(error))
     modelTask = nil
   }

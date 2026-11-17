@@ -65,9 +65,14 @@ struct GemmaLoader: EmbedderLoader {
       return try await GemmaEmbedder.load(source: source, budget: budget)
     }
     #endif
-    return try await installer.load(allowCellular: allowCellular, activator: GemmaActivator(budget: budget),
-                                    report: report)
+    return try await installer.load(allowCellular: allowCellular,
+                                    activator: GemmaActivator(budget: budget, store: Self.store), report: report)
   }
+
+  /// The package's store, where the model and its compiled form live (the path iOS's Neural Engine cache keys on):
+  /// in the App Group container beside `ModelInstaller.defaultRoot` when Roll has one (`ModelLocation`).
+  static let store = ModelStore(root: ModelLocation.resolve(local: ModelStore.defaultRoot,
+                                                            sharedSupport: ModelLocation.groupSupport()))
 }
 
 #if DEBUG
