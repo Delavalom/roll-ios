@@ -45,6 +45,11 @@ final class SmokeTests: XCTestCase {
     waitUntil(timeout: 10) { continueButton.isEnabled }
     continueButton.tap()
 
+    // The setup step (SetupFlowTests covers it): not now.
+    let notNow = app.buttons["setup.notNow"]
+    XCTAssertTrue(notNow.waitForExistence(timeout: 15), "the setup step didn't follow the taste scan")
+    notNow.tap()
+
     // Home: the Screenshots card, once the scan's numbers are in.
     let card = app.buttons["home.card.screenshots"]
     XCTAssertTrue(card.waitForExistence(timeout: 30))

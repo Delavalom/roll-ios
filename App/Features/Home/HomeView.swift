@@ -147,7 +147,7 @@ private struct AskHome: View {
     libraryLine.padding(.top, Roll.Space.xs)
 
     VStack(spacing: Roll.Space.s) {
-      ModelStatusView()
+      SetupCard()
       SquishRecoveryBanner()
       LivingAlbumCards { saved in
         if let draft = app.living.draft(for: saved) { path.append(.album(model.store(draft))) }
