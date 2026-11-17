@@ -1,0 +1,11 @@
+Roll 1.1 (5): fixes the on-device AI download, and adds swipe to select. Use your own iPhone. Making albums is safe: it only adds.
+
+1. On-device AI download (the fix). In 1.1 (4) a phone without the model never got it: Home said "On-device AI not ready" and Retry failed within a second. On a phone that never had the model (or after deleting and reinstalling Roll), open Roll on Wi-Fi: Home should show the download (about 343 MB) going up, then "Getting the on-device AI ready", then Ask Roll should work. If it fails, note what Home says and when.
+
+2. Swipe to select. In Make album, drag your finger sideways across photos: every photo it passes is selected, in reading order (dragging down takes whole rows). Start on a selected photo to deselect instead. Going back over photos puts them back as they were. Hold your finger near the bottom or top edge: the grid scrolls and keeps selecting. An up or down swipe still just scrolls. Tapping a photo still toggles it.
+
+3. Everything in 1.1 (4) still applies: find a trip ("Lisbon 2024"), Make album, Keep this album updated, More like these, nonsense queries, and cleanup (piles, duplicates, squish, paywall, Restore).
+
+Memory videos are off in this build on purpose.
+
+Feedback: take a screenshot in Roll and tap Share Beta Feedback, or email hi@delavalom.com.
