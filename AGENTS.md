@@ -29,7 +29,10 @@ App/                      RollApp (registers IndexScheduler, builds AppModel), R
   EmbedderLoader.swift    GemmaLoader (ModelInstaller + GemmaActivator; in DEBUG, EGCM_MODEL_PATH or a bundled copy override it),
                           ModelIssue / StubLoader (DEBUG only: previews, -UITestStubEmbedder); RollApp's delegate hands
                           background-session events to BackgroundTransport
-  Features/Onboarding/    one intro page, permission, TasteScanView (run(limit: 500)), then the paywall (with the scan's PaywallPitch)
+  Features/Onboarding/    one intro page, permission, TasteScanView (run(limit: 500)), the paywall (with the scan's PaywallPitch),
+                          then the setup step (Features/Setup: SetupView, Home's SetupCard)
+  Setup/ + AppModel+Setup SetupModel (progress, foreground lease, notification), AppSetupWork (loadModel + indexing loop
+                          as RollCore Setup's SetupWork), ContinuedSetup (iOS 26 BGContinuedProcessingTask), SetupText
   Features/Home/          HomeModel (CleanupScanner, throttled rescans on libraryRevision), cards, squish recovery banner,
                           living-album offers ("12 new photos for Soccer")
   Features/Ask/           AskModel (+Find: engine.find with FindConfig.shipping, closest 12 when refused, seeds, album
@@ -56,7 +59,9 @@ Packages/RollCore/        Local SwiftPM package; one target per module
                           folder → EmbeddingGemma.load(.installed(folder, repo:, revision:)) with the folder's own repo and
                           revision: moved into the package's store, not copied, compiled once; downloads again only when
                           the package says .downloadFailed, i.e. neither its install nor the files are there)
-  ModelInstall/           PublishedModel.current (THE constant to set at publish: repo, commit, manifest sha256),
+  Setup/                  SetupCoordinator (actor): model then library read, leases per runner (foreground, iOS 26
+                          continued task, overnight job), derived not stored, one creeping progress bar (SetupProgress)
+  ModelInstall/           ModelLocation (model folders in the App Group container, moved once), PublishedModel.current (THE constant to set at publish: repo, commit, manifest sha256),
                           ModelManifest (manifest.json: one .aar + size + sha256), DownloadPolicy (Wi-Fi, not expensive,
                           not Low Data Mode, unless the person allows mobile data), InstallSpace (archive + 2x unpacked: covers
                           archive + unpacked while extracting and unpacked + compiled while the package compiles),
