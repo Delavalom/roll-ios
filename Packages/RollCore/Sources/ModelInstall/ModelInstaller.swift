@@ -68,8 +68,11 @@ public actor ModelInstaller {
   private var inFlight: (id: UUID, allowCellular: Bool, task: Task<URL, any Error>)?
   private var background: Task<Void, Never>?
 
-  /// `Application Support/RollModel`.
-  public static var defaultRoot: URL { URL.applicationSupportDirectory.appending(path: "RollModel") }
+  /// `RollModel` in the App Group container when Roll has one, else in Application Support (`ModelLocation`); resolved
+  /// once per process, moving an existing model into the group the first time.
+  public static let defaultRoot: URL = ModelLocation.resolve(
+    local: URL.applicationSupportDirectory.appending(path: ModelLocation.folderName),
+    sharedSupport: ModelLocation.groupSupport())
 
   public init(model: PublishedModel, root: URL = ModelInstaller.defaultRoot, transport: any ModelTransport,
               extractor: any ArchiveExtractor = AppleArchiveExtractor(), conditions: InstallConditions) {
