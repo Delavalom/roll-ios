@@ -1,4 +1,4 @@
-Roll 1.1 (6): the on-device AI now sets itself up to the end, even when you leave Roll. Use your own iPhone.
+Roll 1.2 (6): the on-device AI now sets itself up to the end, even when you leave Roll. Use your own iPhone.
 
 1. Set up (new phone, or delete and reinstall Roll). The last onboarding step is "Set up on-device AI". Tap Set up: it shows two stages, "Getting the AI ready" and "Reading your photos", with counts. The screen stays on while it shows. Tap "Tell me when it's ready" and allow notifications.
 
