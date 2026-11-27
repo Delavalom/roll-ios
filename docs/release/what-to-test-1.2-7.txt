@@ -1,0 +1,15 @@
+Roll 1.2 (7): the photo grids react the moment you touch them. This is the build submitted for App Review. Use your own iPhone.
+
+1. Make album. Search for a trip, tap Make album. Touch a photo: it should shrink right away, before you lift your finger. Press and hold one for a second or two, then let go: it should be selected.
+
+2. Drag to select. Swipe across a row and down: the check marks should stay under your finger, with no trail behind it.
+
+3. Quick double tap. Tap a photo twice fast: the check mark should fade back out smoothly, never vanish in one frame.
+
+4. Search answers. In an Ask answer, photos should also react at touch-down.
+
+5. Everything in 1.2 (6) still applies: setup that finishes (Set up step, iOS 26 background progress, Home's setup card, overnight), plus find, albums and cleanup.
+
+Memory videos are off in this build on purpose.
+
+Feedback: take a screenshot in Roll and tap Share Beta Feedback, or email hi@delavalom.com.
