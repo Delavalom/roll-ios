@@ -162,7 +162,8 @@ struct RefineChips: View {
   }
 }
 
-/// The check in a picked cell's corner (blue: the album color), or an empty ring.
+/// The check in a picked cell's corner (blue: the album color), or an empty ring. The tick is always there and fades
+/// with the fill: inserted and removed with `if`, it popped out in one frame when a second tap turned a pick back.
 struct PickMark: View {
   let on: Bool
 
@@ -170,7 +171,9 @@ struct PickMark: View {
     ZStack {
       Circle().fill(on ? Roll.Palette.album : .black.opacity(0.18))
       Circle().strokeBorder(.white, lineWidth: 1.5)
-      if on { Image(systemName: "checkmark").font(.system(size: 11, weight: .bold)).foregroundStyle(.white) }
+      Image(systemName: "checkmark").font(.system(size: 11, weight: .bold)).foregroundStyle(.white)
+        .opacity(on ? 1 : 0)
+        .scaleEffect(on ? 1 : 0.6)
     }
     .frame(width: 24, height: 24)
     .accessibilityHidden(true)

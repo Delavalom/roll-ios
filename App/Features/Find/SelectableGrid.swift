@@ -3,6 +3,11 @@ import SwiftUI
 /// Three columns of square thumbnails, each with a check in its corner; tapping toggles it, and a sideways drag across
 /// the grid selects (or deselects) every photo it passes, as in Photos (`DragSelectGesture`). Unselected photos dim a
 /// little so what goes into the album stands out.
+///
+/// Interaction rules (docs/investigations/2026-11-27-grid-interactions.md): a cell is a button, so it answers at
+/// touch-down (`PressScale`) and a slow press still toggles on release; a drag sets the selection with no animation,
+/// so the checks stay under the finger; a tap animates, and a second tap mid-way turns the animation back from where
+/// it is.
 struct SelectableGrid: View {
   let ids: [String]
   let isSelected: (String) -> Bool
@@ -20,32 +25,33 @@ struct SelectableGrid: View {
     LazyVGrid(columns: columns, spacing: Self.spacing) {
       ForEach(Array(ids.enumerated()), id: \.element) { index, id in
         let on = isSelected(id)
-        Color.clear
-          .aspectRatio(1, contentMode: .fit)
-          .overlay { Thumbnail(id: id, side: 600) }
-          .clipShape(RoundedRectangle(cornerRadius: Roll.Radius.cell, style: .continuous))
-          .overlay {
-            RoundedRectangle(cornerRadius: Roll.Radius.cell, style: .continuous)
-              .strokeBorder(on ? Roll.Palette.album : .clear, lineWidth: 2)
-          }
-          .overlay(alignment: .topTrailing) { PickMark(on: on).padding(6) }
-          .opacity(on ? 1 : 0.6)
-          .contentShape(Rectangle())
-          .onTapGesture {
-            withAnimation(Roll.Motion.quick) { toggle(id) }
-          }
-          .accessibilityElement()
-          .accessibilityLabel("Photo \(index + 1)")
-          .accessibilityAddTraits(on ? [.isButton, .isSelected] : .isButton)
-          .accessibilityAction { toggle(id) }
-          .accessibilityIdentifier("album.cell.\(index)")
+        Button {
+          withAnimation(Roll.Motion.quick) { toggle(id) }
+        } label: {
+          Color.clear
+            .aspectRatio(1, contentMode: .fit)
+            .overlay { Thumbnail(id: id, side: 600) }
+            .clipShape(RoundedRectangle(cornerRadius: Roll.Radius.cell, style: .continuous))
+            .overlay {
+              RoundedRectangle(cornerRadius: Roll.Radius.cell, style: .continuous)
+                .strokeBorder(on ? Roll.Palette.album : .clear, lineWidth: 2)
+            }
+            .overlay(alignment: .topTrailing) { PickMark(on: on).padding(6) }
+            .opacity(on ? 1 : 0.6)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PressScale())
+        .accessibilityLabel("Photo \(index + 1)")
+        .accessibilityAddTraits(on ? .isSelected : [])
+        .accessibilityIdentifier("album.cell.\(index)")
       }
     }
     .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+    // No animation here: the selection follows the finger frame by frame (an eased change trails it by ~0.1 s).
     .gesture(DragSelectGesture(
       index: { [width] in Self.index(at: $0, width: width) },
-      began: { i in withAnimation(Roll.Motion.quick) { dragBegan(i) } },
-      moved: { i in withAnimation(Roll.Motion.quick) { dragMoved(i) } },
+      began: { i in withTransaction(Transaction(animation: nil)) { dragBegan(i) } },
+      moved: { i in withTransaction(Transaction(animation: nil)) { dragMoved(i) } },
       ended: dragEnded))
   }
 
