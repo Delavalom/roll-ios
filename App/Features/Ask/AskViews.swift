@@ -152,15 +152,17 @@ struct ResultGrid: View {
   var body: some View {
     LazyVGrid(columns: columns, spacing: 4) {
       ForEach(Array(ids.enumerated()), id: \.element) { index, id in
-        RevealCell(id: id, delay: Double(min(index, 12)) * 0.035)
-          .overlay(alignment: .topTrailing) {
-            if let isPicked { PickMark(on: isPicked(id)).padding(6) }
-          }
-          .onTapGesture { open(id) }
-          .accessibilityElement()
-          .accessibilityLabel("Photo \(index + 1)")
-          .accessibilityAddTraits(isPicked?(id) == true ? [.isButton, .isSelected] : .isButton)
-          .accessibilityAction { open(id) }
+        // A button, so the cell answers at touch-down (PressScale) and a slow press still counts.
+        Button { open(id) } label: {
+          RevealCell(id: id, delay: Double(min(index, 12)) * 0.035)
+            .overlay(alignment: .topTrailing) {
+              if let isPicked { PickMark(on: isPicked(id)).padding(6) }
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(PressScale())
+        .accessibilityLabel("Photo \(index + 1)")
+        .accessibilityAddTraits(isPicked?(id) == true ? .isSelected : [])
       }
     }
   }

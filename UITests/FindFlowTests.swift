@@ -65,6 +65,21 @@ final class FindFlowTests: XCTestCase {
     XCTAssertTrue(count.label.hasPrefix("3 of"), "an upward swipe changed the selection: \(count.label)")
   }
 
+  /// A slow press still selects on release. With a tap gesture, presses held past about half a second were dropped
+  /// (docs/investigations/2026-11-27-grid-interactions.md); the cell is a button now. Creates nothing.
+  @MainActor
+  func testSlowPressSelects() throws {
+    let app = launch(extra: ["-UITestOpen", "album"], home: false)
+    let count = app.staticTexts["album.count"]
+    XCTAssertTrue(count.waitForExistence(timeout: 20), "the Make album grid didn't open")
+    let cell = app.descendants(matching: .any)["album.cell.1"]
+    XCTAssertTrue(cell.waitForExistence(timeout: 5))
+    XCTAssertTrue(count.label.hasPrefix("0 of"), count.label)
+    cell.press(forDuration: 1.5)
+    waitUntil(timeout: 3) { count.label.hasPrefix("1 of") }
+    XCTAssertTrue(count.label.hasPrefix("1 of"), "a 1.5 s press didn't select: \(count.label)")
+  }
+
   /// Swipe to select, holding the finger at the bottom edge: the grid scrolls and the selection follows the finger.
   @MainActor
   func testDragSelectAutoscrolls() throws {
